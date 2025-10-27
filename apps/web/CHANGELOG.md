@@ -1,5 +1,12 @@
 # web
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [c4e4515]
+  - video-kit@2.0.0
+
 ## 0.0.10
 
 ### Patch Changes
