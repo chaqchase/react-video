@@ -25,7 +25,7 @@ export function VideoBackdrop({ className }: VideoBackdropProps) {
           ease: "easeInOut",
         }}
         className={cn(
-          "rv-absolute rv-inset-0 rv-bg-gradient-to-t rv-from-black rv-via-transparent rv-to-black",
+          "rv-absolute rv-inset-0 rv-bg-gradient-to-br rv-from-black rv-via-black/50 rv-to-black",
           { "rv-rounded-xl": !isFullscreen },
           className
         )}
