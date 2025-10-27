@@ -23,8 +23,10 @@
     }
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "pnpm build:css && tsup",
+    "build:css": "tailwindcss -i ./src/index.css -o ./src/styles.css --minify",
+    "dev": "pnpm build:css && pnpm dev:watch",
+    "dev:watch": "concurrently \"tailwindcss -i ./src/index.css -o ./src/styles.css --watch\" \"tsup --watch\"",
     "check-types": "tsc --noEmit"
   },
   "peerDependencies": {
@@ -46,6 +48,7 @@
     "@types/react": "^18.2.45",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
     "eslint": "^7.32.0",
     "motion": "^12.23.24",
     "postcss": "^8.4.32",

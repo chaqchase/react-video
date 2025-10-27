@@ -27,6 +27,9 @@ out/
 build
 dist
 
+# Compiled CSS (generated during build)
+packages/core/src/styles.css
+
 
 # Debug
 npm-debug.log*

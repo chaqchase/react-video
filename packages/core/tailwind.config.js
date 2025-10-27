@@ -6,4 +6,7 @@ module.exports = {
   },
   plugins: [],
   prefix: "rv-",
+  corePlugins: {
+    preflight: false,
+  },
 };

@@ -1,4 +1,4 @@
-import "./index.css";
+import "./styles.css";
 
 // Export composable primitives (shadcn-style API)
 export { Video } from "./video";

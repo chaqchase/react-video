@@ -272,7 +272,8 @@ function DropdownSeparator({ className }: DropdownSeparatorProps) {
 
 // Shared menu styles
 export const menuStyles = {
-  container: "rv-bg-black/20 rv-backdrop-blur-2xl rv-rounded-2xl rv-p-1 rv-shadow-2xl rv-border rv-border-white/5",
+  container:
+    "rv-bg-black/50 rv-backdrop-blur-3xl rv-rounded-2xl rv-p-1 rv-shadow-2xl rv-border rv-border-white/5",
   separator: "rv-h-[1px] rv-bg-white/10 rv-my-1",
   item: {
     base: "rv-text-xs rv-text-white/80 rv-px-2.5 rv-py-1.5 rv-rounded-xl rv-cursor-pointer rv-outline-none rv-transition-colors",
