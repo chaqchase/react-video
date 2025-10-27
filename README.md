@@ -1,15 +1,34 @@
-# `react-video-kit` a unified customizable video playback experience across all browsers for react
+# react-video-kit
 
 <img src="https://raw.githubusercontent.com/chaqchase/video-kit/main/assets/cover.png" alt="react-video-kit banner"
 title="react-video-kit" align="center" height="auto" width="100%"/>
 
-## Introduction
+A composable video player for React with a shadcn/ui-style API. Built for flexibility, accessibility, and SSR compatibility.
 
-The `react-video-kit` component is a highly customizable and easy-to-use React component for playing video content in your react applications inspired by apple tv video player. It offers extensive control over video playback and is fully compatible with TailwindCSS, allowing for seamless styling integration.
+## 🎥 Demo
+
+Check out the [interactive demo](apps/web) to see the player in action with live examples and comprehensive documentation.
+
+```bash
+# Run the demo locally
+pnpm install
+cd packages/core && pnpm build
+cd ../../apps/web && pnpm dev
+```
+
+Visit `http://localhost:3000` to explore all features with a beautiful, modern interface.
+
+## Features
+
+- Composable primitives for building custom video UIs
+- Declarative sources and tracks
+- Imperative ref API for programmatic control
+- Accessible with ARIA labels and keyboard support
+- SSR-safe for Next.js and other frameworks
+- Fully typed with TypeScript
+- Styleable with Tailwind CSS
 
 ## Installation
-
-To install the component, use the following command:
 
 ```bash
 npm install react-video-kit
@@ -19,161 +38,104 @@ pnpm add react-video-kit
 yarn add react-video-kit
 ```
 
-## Usage
+## Quick Start
 
-### Basic Usage
+```tsx
+import { Video } from "react-video-kit";
 
-You can use the video component simply by importing `Video` from the package
-
- ```tsx
- import { Video } from "react-video-kit";
-
- export default function Page() {
+export default function App() {
   return (
-    <Video
-    src="https://vjs.zencdn.net/v/oceans.mp4"
-    />
- )}
-``````
-
-### Options
-
-- **`src: VideoSource`**: The source of the video. This can be either a string URL or an array of objects containing `src`, `type`, and `label` fields.
-  - **Example**: 
-    ```javascript
-    [
-      { src: 'https://example.com/video.mp4', type: 'video/mp4', label: 'SD' },
-      { src: 'https://example.com/video.mp4', type: 'video/mp4', label: 'HD' }
-    ]
-    // or
-    'https://example.com/video.mp4'
-    ```
-
-- **`poster?: string`**: URL of the video's poster image.
-  - **Example**: `'https://example.com/poster.jpg'`
-
-- **`title?: string`**: Title of the video.
-  - **Example**: `'Video title'`
-
-- **`subtitle?: string`**: Subtitle of the video.
-  - **Example**: `'Video subtitle'`
-
-- **Event Handlers**:
-  - `onProgress?: (currentTime: number) => void`: Called when the video progress changes.
-  - `onDuration?: (duration: number) => void`: Called when the video duration is available.
-  - `onEnded?: () => void`: Called when the video ends.
-  - `onPlay?: () => void`: Called when the video is played.
-  - `onPause?: () => void`: Called when the video is paused.
-  - `onLoad?: () => void`: Called when the video is loaded.
-  - `onVolumeChange?: (volume: number) => void`: Called when the volume changes.
-  - `onPlaybackRateChange?: (playbackRate: number) => void`: Called when the playback rate changes.
-
-- **Styling and Layout**:
-  - `className?: string`: Root CSS class for custom styling.
-  - `classNames?: object`: Object containing CSS classes for various elements (title, subtitle, wrappers, video, backdrop, sliders).
-
-- **Playback Control**:
-  - `autoPlay?: boolean`: If `true`, the video will start playing as soon as it is ready.
-  - `loop?: boolean`: If `true`, the video will loop continuously.
-  - `showControls?: boolean`: If `true`, video controls will be displayed.
-  - `icons?: object`: Custom icons for various video controls (play, pause, forward, etc.).
-
-- **Additional Options**:
-  - `hideSliderThumb?: boolean`: If `true`, hides the slider thumb.
-
-### Example
-
-```javascript
-import React from 'react';
-import { Video } from 'react-video-kit';
-
-// Import custom icons (assuming these are available in your project)
-import {
-  CustomPlayIcon,
-  CustomPauseIcon,
-  CustomForwardIcon,
-  CustomBackwardIcon,
-  CustomEnterPipIcon,
-  CustomExitPipIcon,
-  CustomVolumeIcon,
-  CustomFullScreenIcon,
-  CustomExitFullScreenIcon,
-  CustomLoadingIcon,
-} from './YourIconPath';
-
-const MyVideoComponent = () => {
-  const videoProps = {
-    src: [
-      {
-        src: 'https://example.com/video-sd.mp4',
-        type: 'video/mp4',
-        label: 'SD',
-      },
-      {
-        src: 'https://example.com/video-hd.mp4',
-        type: 'video/mp4',
-        label: 'HD',
-      },
-    ],
-    poster: 'https://example.com/poster.jpg',
-    title: 'My Amazing Video',
-    subtitle: 'An insightful subtitle',
-    onProgress: currentTime => console.log(`Current Time: ${currentTime}`),
-    onDuration: duration => console.log(`Duration: ${duration}`),
-    onEnded: () => console.log('Video Ended'),
-    onPlay: () => console.log('Video Played'),
-    onPause: () => console.log('Video Paused'),
-    onLoad: () => console.log('Video Loaded'),
-    onVolumeChange: volume => console.log(`Volume: ${volume}`),
-    onPlaybackRateChange: rate => console.log(`Playback Rate: ${rate}`),
-    className: 'custom-video-class',
-    autoPlay: true,
-    loop: true,
-    showControls: true,
-    icons: {
-      play: CustomPlayIcon,
-      pause: CustomPauseIcon,
-      forwardBy10: CustomForwardIcon,
-      backBy10: CustomBackwardIcon,
-      enterPip: CustomEnterPipIcon,
-      exitPip: CustomExitPipIcon,
-      volume: CustomVolumeIcon,
-      fullScreen: CustomFullScreenIcon,
-      exitFullScreen: CustomExitFullScreenIcon,
-      loading: CustomLoadingIcon,
-    },
-    classNames: {
-      base: 'video-base-class',
-      title: 'video-title-class',
-      subtitle: 'video-subtitle-class',
-      topWrapper: 'top-wrapper-class',
-      centerWrapper: 'center-wrapper-class',
-      bottomWrapper: 'bottom-wrapper-class',
-      video: 'video-element-class',
-      backdrop: 'video-backdrop-class',
-      volumeSlider: {
-        root: 'volume-slider-root-class',
-        track: 'volume-slider-track-class',
-        thumb: 'volume-slider-thumb-class',
-        range: 'volume-slider-range-class',
-      },
-      playbackRateSlider: {
-        root: 'playback-rate-slider-root-class',
-        track: 'playback-rate-slider-track-class',
-        thumb: 'playback-rate-slider-thumb-class',
-        range: 'playback-rate-slider-range-class',
-      },
-    },
-    hideSliderThumb: false,
-  };
-
-  return <Video {...videoProps} />;
-};
-
-
-export default MyVideoComponent;
+    <Video.Root src="https://example.com/video.mp4">
+      <Video.Media />
+      <Video.Center>
+        <Video.PlayPause />
+      </Video.Center>
+    </Video.Root>
+  );
+}
 ```
 
-## Customization
+## Full Example
 
-The video component is fully customizable using TailwindCSS. You can use the `className` and `classNames` props to apply your TailwindCSS classes for styling the video player as per your design requirements.
+```tsx
+import { Video } from "react-video-kit";
+
+export default function Player() {
+  return (
+    <Video.Root
+      src="https://example.com/video.mp4"
+      title="My Video"
+      subtitle="Video description"
+    >
+      <Video.Media />
+      <Video.Backdrop />
+
+      <Video.Header>
+        <div className="rv-w-full rv-flex">
+          <Video.FullscreenToggle />
+          <Video.PipToggle />
+        </div>
+        <div className="rv-w-full rv-flex rv-justify-end rv-items-center rv-h-fit">
+          <Video.Volume.Button />
+          <Video.Volume.Slider />
+        </div>
+      </Video.Header>
+
+      <Video.Center>
+        <Video.SeekBack seconds={10} />
+        <Video.PlayPause />
+        <Video.SeekForward seconds={10} />
+        <Video.Loading />
+      </Video.Center>
+
+      <Video.Footer>
+        <div className="rv-flex rv-flex-col">
+          <Video.Subtitle />
+          <Video.Title />
+        </div>
+        <Video.Timeline />
+        <div className="rv-flex rv-justify-between rv-w-full">
+          <Video.Time.Current />
+          <Video.Time.Remaining negative />
+        </div>
+      </Video.Footer>
+    </Video.Root>
+  );
+}
+```
+
+## Documentation
+
+Full documentation is available in the [core package README](./packages/core/README.md).
+
+## Demo
+
+Visit [https://video-kit.chaqchase.com](https://video-kit.chaqchase.com) to see live demos.
+
+## Monorepo Structure
+
+This repository uses pnpm workspaces:
+
+- `packages/core` - The react-video-kit package
+- `apps/web` - Demo Next.js application
+
+## Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build packages
+pnpm -w build
+
+# Run dev server
+cd apps/web && pnpm dev
+```
+
+## License
+
+Apache-2.0
+
+## Author
+
+Mohamed Achaq ([@chaqchase](https://github.com/chaqchase))

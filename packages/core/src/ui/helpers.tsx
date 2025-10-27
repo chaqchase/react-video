@@ -1,9 +1,4 @@
-/**
- * `framer-motion` typescript definitions are not up to date.
- *  So, I have to use `@ts-ignore` to ignore the errors.
- * I will remove it once the definitions are up to date.
- */
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { IfElseProps, IfProps } from "../types/helpers.types";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +13,8 @@ export function IfElse({
   fallbackClassName,
 }: IfElseProps) {
   return (
-    // @ts-ignore
     <AnimatePresence key={JSON.stringify(condition)} mode="wait">
       {condition && (
-        // @ts-ignore
         <motion.div
           className={cn(className)}
           initial={{ opacity: 0 }}
@@ -32,7 +25,6 @@ export function IfElse({
         </motion.div>
       )}
       {!condition && (
-        // @ts-ignore
         <motion.div
           className={cn(fallbackClassName)}
           initial={{ opacity: 0 }}

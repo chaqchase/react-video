@@ -9,10 +9,13 @@ import useOnKeyDown from "./use-on-key-down";
 import usePip from "./use-pip";
 import usePlayPause from "./use-play";
 import usePlaybackRate from "./use-playrate";
+import useQuality from "./use-quality";
+import useTracks from "./use-tracks";
 import useVolume from "./use-volume";
 
 export const useVideo = ({
   src,
+  tracks,
   onProgress,
   onDuration,
   onEnded,
@@ -22,10 +25,15 @@ export const useVideo = ({
   onPlaybackRateChange,
   onPictureInPictureChange,
   onFullscreenChange,
+  onTrackChange,
+  onQualityChange,
+  defaultTrackIndex,
+  defaultQualityIndex,
   showControls: show,
   onLoad,
   wrapperRef,
   videoRef,
+  hotkeys,
 }: UseVideoProps): UseVideoReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -61,51 +69,133 @@ export const useVideo = ({
   } = useDuration(videoRef.current, onDuration);
   const { showControls } = useMouseMoves(wrapperRef.current, show, isPlaying);
 
+  // New hooks for tracks and quality management
+  const { activeTrackIndex, setActiveTrackIndex } = useTracks(
+    videoRef.current,
+    tracks,
+    defaultTrackIndex,
+    onTrackChange
+  );
+  const { qualityIndex, setQualityIndex } = useQuality(
+    videoRef.current,
+    src,
+    defaultQualityIndex,
+    onQualityChange
+  );
+
   const remainingTime = useMemo(
     () => duration - currentTime,
     [duration, currentTime]
   );
 
-  useOnKeyDown(" ", () => {
-    if (isPlaying) {
-      handlePause();
-    } else {
-      handlePlay();
+  const hotkeyScope = hotkeys?.scope ?? "focused";
+  const hotkeysEnabled = hotkeys?.enabled !== false;
+
+  useOnKeyDown(
+    " ",
+    () => {
+      if (isPlaying) {
+        handlePause();
+      } else {
+        handlePlay();
+      }
+    },
+    {
+      wrapperRef:
+        wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+      scope: hotkeyScope,
+      enabled: hotkeysEnabled,
     }
+  );
+  useOnKeyDown("ArrowLeft", () => backBy(5), {
+    wrapperRef:
+      wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+    scope: hotkeyScope,
+    enabled: hotkeysEnabled,
   });
-  useOnKeyDown("ArrowLeft", () => backBy(5));
-  useOnKeyDown("ArrowRight", () => forwardBy(5));
-  useOnKeyDown("ArrowUp", () => handleVolumeChange(volume + 0.1));
-  useOnKeyDown("ArrowDown", () => handleVolumeChange(volume - 0.1));
-  useOnKeyDown("f", () => {
-    if (isFullscreen) {
-      handleExitFullScreen();
-    } else {
-      handleFullScreen();
-    }
+  useOnKeyDown("ArrowRight", () => forwardBy(5), {
+    wrapperRef:
+      wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+    scope: hotkeyScope,
+    enabled: hotkeysEnabled,
   });
-  useOnKeyDown("p", () => {
-    if (isPip) {
-      handleExitPip();
-    } else {
-      handlePip();
-    }
+  useOnKeyDown("ArrowUp", () => handleVolumeChange(volume + 0.1), {
+    wrapperRef:
+      wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+    scope: hotkeyScope,
+    enabled: hotkeysEnabled,
   });
-  useOnKeyDown("m", () => {
-    if (isMuted) {
-      handleUnmute();
-    } else {
-      handleMute();
-    }
+  useOnKeyDown("ArrowDown", () => handleVolumeChange(volume - 0.1), {
+    wrapperRef:
+      wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+    scope: hotkeyScope,
+    enabled: hotkeysEnabled,
   });
-  useOnKeyDown("Escape", () => {
-    if (isFullscreen) {
-      handleExitFullScreen();
+  useOnKeyDown(
+    "f",
+    () => {
+      if (isFullscreen) {
+        handleExitFullScreen();
+      } else {
+        handleFullScreen();
+      }
+    },
+    {
+      wrapperRef:
+        wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+      scope: hotkeyScope,
+      enabled: hotkeysEnabled,
     }
-    if (isPip) {
-      handleExitPip();
+  );
+  useOnKeyDown(
+    "p",
+    () => {
+      if (isPip) {
+        handleExitPip();
+      } else {
+        handlePip();
+      }
+    },
+    {
+      wrapperRef:
+        wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+      scope: hotkeyScope,
+      enabled: hotkeysEnabled,
     }
-  });
+  );
+  useOnKeyDown(
+    "m",
+    () => {
+      if (isMuted) {
+        handleUnmute();
+      } else {
+        handleMute();
+      }
+    },
+    {
+      wrapperRef:
+        wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+      scope: hotkeyScope,
+      enabled: hotkeysEnabled,
+    }
+  );
+  useOnKeyDown(
+    "Escape",
+    () => {
+      if (isFullscreen) {
+        handleExitFullScreen();
+      }
+      if (isPip) {
+        handleExitPip();
+      }
+    },
+    {
+      wrapperRef:
+        wrapperRef as unknown as React.MutableRefObject<HTMLElement | null>,
+      scope: hotkeyScope,
+      enabled: hotkeysEnabled,
+    }
+  );
 
   useEffect(() => {
     const video = videoRef.current as HTMLVideoElement;
@@ -165,7 +255,18 @@ export const useVideo = ({
       video.removeEventListener("ratechange", handlers.ratechange);
       video.removeEventListener("seeking", handlers.seeking);
     };
-  }, [videoRef.current, src]);
+  }, [
+    src,
+    onLoad,
+    onProgress,
+    onEnded,
+    onPlaybackRateChange,
+    setBuffered,
+    setCurrentTime,
+    setIsLoading,
+    setIsPlaying,
+    setPlaybackRate,
+  ]);
 
   return {
     isPlaying,
@@ -178,6 +279,8 @@ export const useVideo = ({
     volume,
     remainingTime,
     playbackRate,
+    activeTrackIndex,
+    qualityIndex,
     handlePlay,
     handlePause,
     handleMute,
@@ -191,6 +294,8 @@ export const useVideo = ({
     handleExitPip,
     backBy,
     forwardBy,
+    setActiveTrackIndex,
+    setQualityIndex,
     isLoading,
     isLoaded,
     showControls,

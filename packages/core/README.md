@@ -1,12 +1,18 @@
-# `react-video-kit` a unified customizable video playback experience across all browsers for react
+# react-video-kit
 
-## Introduction
+A composable video player for React with a shadcn/ui-style API. Built for flexibility, accessibility, and SSR compatibility.
 
-The `react-video-kit` component is a highly customizable and easy-to-use React component for playing video content in your react applications inspired by apple tv video player. It offers extensive control over video playback and is fully compatible with TailwindCSS, allowing for seamless styling integration.
+## Features
+
+- **Composable primitives** for building custom video UIs
+- **Declarative sources and tracks** (no DOM manipulation)
+- **Imperative ref API** for programmatic control
+- **Accessible** with ARIA labels and keyboard support
+- **SSR-safe** for Next.js and other frameworks
+- **Fully typed** with TypeScript
+- **Styleable** with Tailwind CSS (rv- prefix)
 
 ## Installation
-
-To install the component, use the following command:
 
 ```bash
 npm install react-video-kit
@@ -16,161 +22,419 @@ pnpm add react-video-kit
 yarn add react-video-kit
 ```
 
-## Usage
+## Quick Start
 
-### Basic Usage
+```tsx
+import { Video } from "react-video-kit";
 
-You can use the video component simply by importing `Video` from the package
-
- ```tsx
- import { Video } from "react-video-kit";
-
- export default function Page() {
+export default function App() {
   return (
-    <Video
-    src="https://vjs.zencdn.net/v/oceans.mp4"
-    />
- )}
-``````
-
-### Options
-
-- **`src: VideoSource`**: The source of the video. This can be either a string URL or an array of objects containing `src`, `type`, and `label` fields.
-  - **Example**: 
-    ```javascript
-    [
-      { src: 'https://example.com/video.mp4', type: 'video/mp4', label: 'SD' },
-      { src: 'https://example.com/video.mp4', type: 'video/mp4', label: 'HD' }
-    ]
-    // or
-    'https://example.com/video.mp4'
-    ```
-
-- **`poster?: string`**: URL of the video's poster image.
-  - **Example**: `'https://example.com/poster.jpg'`
-
-- **`title?: string`**: Title of the video.
-  - **Example**: `'Video title'`
-
-- **`subtitle?: string`**: Subtitle of the video.
-  - **Example**: `'Video subtitle'`
-
-- **Event Handlers**:
-  - `onProgress?: (currentTime: number) => void`: Called when the video progress changes.
-  - `onDuration?: (duration: number) => void`: Called when the video duration is available.
-  - `onEnded?: () => void`: Called when the video ends.
-  - `onPlay?: () => void`: Called when the video is played.
-  - `onPause?: () => void`: Called when the video is paused.
-  - `onLoad?: () => void`: Called when the video is loaded.
-  - `onVolumeChange?: (volume: number) => void`: Called when the volume changes.
-  - `onPlaybackRateChange?: (playbackRate: number) => void`: Called when the playback rate changes.
-
-- **Styling and Layout**:
-  - `className?: string`: Root CSS class for custom styling.
-  - `classNames?: object`: Object containing CSS classes for various elements (title, subtitle, wrappers, video, backdrop, sliders).
-
-- **Playback Control**:
-  - `autoPlay?: boolean`: If `true`, the video will start playing as soon as it is ready.
-  - `loop?: boolean`: If `true`, the video will loop continuously.
-  - `showControls?: boolean`: If `true`, video controls will be displayed.
-  - `icons?: object`: Custom icons for various video controls (play, pause, forward, etc.).
-
-- **Additional Options**:
-  - `hideSliderThumb?: boolean`: If `true`, hides the slider thumb.
-
-### Example
-
-```javascript
-import React from 'react';
-import { Video } from 'react-video-kit';
-
-// Import custom icons (assuming these are available in your project)
-import {
-  CustomPlayIcon,
-  CustomPauseIcon,
-  CustomForwardIcon,
-  CustomBackwardIcon,
-  CustomEnterPipIcon,
-  CustomExitPipIcon,
-  CustomVolumeIcon,
-  CustomFullScreenIcon,
-  CustomExitFullScreenIcon,
-  CustomLoadingIcon,
-} from './YourIconPath';
-
-const MyVideoComponent = () => {
-  const videoProps = {
-    src: [
-      {
-        src: 'https://example.com/video-sd.mp4',
-        type: 'video/mp4',
-        label: 'SD',
-      },
-      {
-        src: 'https://example.com/video-hd.mp4',
-        type: 'video/mp4',
-        label: 'HD',
-      },
-    ],
-    poster: 'https://example.com/poster.jpg',
-    title: 'My Amazing Video',
-    subtitle: 'An insightful subtitle',
-    onProgress: currentTime => console.log(`Current Time: ${currentTime}`),
-    onDuration: duration => console.log(`Duration: ${duration}`),
-    onEnded: () => console.log('Video Ended'),
-    onPlay: () => console.log('Video Played'),
-    onPause: () => console.log('Video Paused'),
-    onLoad: () => console.log('Video Loaded'),
-    onVolumeChange: volume => console.log(`Volume: ${volume}`),
-    onPlaybackRateChange: rate => console.log(`Playback Rate: ${rate}`),
-    className: 'custom-video-class',
-    autoPlay: true,
-    loop: true,
-    showControls: true,
-    icons: {
-      play: CustomPlayIcon,
-      pause: CustomPauseIcon,
-      forwardBy10: CustomForwardIcon,
-      backBy10: CustomBackwardIcon,
-      enterPip: CustomEnterPipIcon,
-      exitPip: CustomExitPipIcon,
-      volume: CustomVolumeIcon,
-      fullScreen: CustomFullScreenIcon,
-      exitFullScreen: CustomExitFullScreenIcon,
-      loading: CustomLoadingIcon,
-    },
-    classNames: {
-      base: 'video-base-class',
-      title: 'video-title-class',
-      subtitle: 'video-subtitle-class',
-      topWrapper: 'top-wrapper-class',
-      centerWrapper: 'center-wrapper-class',
-      bottomWrapper: 'bottom-wrapper-class',
-      video: 'video-element-class',
-      backdrop: 'video-backdrop-class',
-      volumeSlider: {
-        root: 'volume-slider-root-class',
-        track: 'volume-slider-track-class',
-        thumb: 'volume-slider-thumb-class',
-        range: 'volume-slider-range-class',
-      },
-      playbackRateSlider: {
-        root: 'playback-rate-slider-root-class',
-        track: 'playback-rate-slider-track-class',
-        thumb: 'playback-rate-slider-thumb-class',
-        range: 'playback-rate-slider-range-class',
-      },
-    },
-    hideSliderThumb: false,
-  };
-
-  return <Video {...videoProps} />;
-};
-
-
-export default MyVideoComponent;
+    <Video.Root src="https://example.com/video.mp4">
+      <Video.Media />
+      <Video.Center>
+        <Video.PlayPause />
+      </Video.Center>
+    </Video.Root>
+  );
+}
 ```
 
-## Customization
+## API Overview
 
-The video component is fully customizable using TailwindCSS. You can use the `className` and `classNames` props to apply your TailwindCSS classes for styling the video player as per your design requirements.
+### Layout Components
+
+- **`Video.Root`** - Provider component that manages state and context
+- **`Video.Media`** - Renders the HTML video element with sources and tracks
+- **`Video.Backdrop`** - Gradient overlay backdrop
+- **`Video.Header`** - Top control bar container
+- **`Video.Center`** - Center control area container
+- **`Video.Footer`** - Bottom control bar container
+
+### Typography
+
+- **`Video.Title`** - Video title display
+- **`Video.Subtitle`** - Video subtitle display
+
+### Controls
+
+- **`Video.PlayPause`** - Toggle play/pause button
+- **`Video.SeekBack`** - Seek backward button (customizable seconds)
+- **`Video.SeekForward`** - Seek forward button (customizable seconds)
+- **`Video.FullscreenToggle`** - Fullscreen mode toggle
+- **`Video.PipToggle`** - Picture-in-picture toggle
+- **`Video.CaptionsMenu`** - Dropdown menu for selecting captions/subtitles
+- **`Video.QualityMenu`** - Dropdown menu for switching video quality
+- **`Video.Volume.Button`** - Mute/unmute button
+- **`Video.Volume.Slider`** - Volume level slider
+- **`Video.Timeline`** - Video progress slider
+- **`Video.Time.Current`** - Current time display
+- **`Video.Time.Remaining`** - Remaining time display
+- **`Video.Loading`** - Loading indicator
+
+## Examples
+
+### Full-Featured Player
+
+```tsx
+import { Video } from "react-video-kit";
+
+export default function Player() {
+  return (
+    <Video.Root
+      src="https://example.com/video.mp4"
+      title="My Video"
+      subtitle="Video description"
+      autoPlay
+    >
+      <Video.Media />
+      <Video.Backdrop />
+
+      <Video.Header>
+        <div className="rv-w-full rv-flex">
+          <Video.FullscreenToggle />
+          <Video.PipToggle />
+        </div>
+        <div className="rv-w-full rv-flex rv-justify-end rv-items-center rv-h-fit">
+          <Video.Volume.Button />
+          <Video.Volume.Slider />
+        </div>
+      </Video.Header>
+
+      <Video.Center>
+        <Video.SeekBack seconds={10} />
+        <Video.PlayPause />
+        <Video.SeekForward seconds={10} />
+        <Video.Loading />
+      </Video.Center>
+
+      <Video.Footer>
+        <div className="rv-flex rv-flex-col">
+          <Video.Subtitle />
+          <Video.Title />
+        </div>
+        <Video.Timeline />
+        <div className="rv-flex rv-justify-between rv-w-full">
+          <Video.Time.Current />
+          <Video.Time.Remaining negative />
+        </div>
+      </Video.Footer>
+    </Video.Root>
+  );
+}
+```
+
+### Multiple Sources & Quality Switching
+
+Provide multiple video sources for different quality levels. The `QualityMenu` component allows users to switch between quality levels while preserving currentTime and play state:
+
+```tsx
+<Video.Root
+  src={[
+    { src: "/video-1080p.mp4", type: "video/mp4", label: "HD" },
+    { src: "/video-720p.mp4", type: "video/mp4", label: "SD" },
+  ]}
+  defaultQualityIndex={0}
+  onQualityChange={(index, source) => {
+    console.log("Quality changed to:", source.label);
+  }}
+>
+  <Video.Media />
+  <Video.Footer>
+    <Video.QualityMenu />
+  </Video.Footer>
+</Video.Root>
+```
+
+When switching quality:
+
+- Current playback time is preserved
+- Play state is maintained (if playing, resumes after switch)
+- Minimal buffering/stutter during transition
+
+### Text Tracks (Captions/Subtitles)
+
+Add captions or subtitles using the tracks prop:
+
+```tsx
+<Video.Root
+  src="https://example.com/video.mp4"
+  tracks={[
+    {
+      src: "/captions-en.vtt",
+      kind: "captions",
+      srclang: "en",
+      label: "English",
+      default: true,
+    },
+    {
+      src: "/captions-es.vtt",
+      kind: "captions",
+      srclang: "es",
+      label: "Spanish",
+    },
+  ]}
+>
+  <Video.Media />
+  <Video.Footer>
+    <Video.CaptionsMenu />
+  </Video.Footer>
+</Video.Root>
+```
+
+The `CaptionsMenu` component automatically lists all available tracks plus an "Off" option. You can also provide callbacks to track changes:
+
+```tsx
+<Video.Root
+  src="https://example.com/video.mp4"
+  tracks={tracks}
+  defaultTrackIndex={0}
+  onTrackChange={(index, track) => {
+    console.log("Active track:", index, track);
+  }}
+>
+  <Video.Media />
+  <Video.Footer>
+    <Video.CaptionsMenu />
+  </Video.Footer>
+</Video.Root>
+```
+
+### Custom Styling
+
+All components accept className props for custom styling:
+
+```tsx
+<Video.Root className="max-w-4xl mx-auto">
+  <Video.Media className="rounded-2xl" />
+  <Video.Header className="bg-gradient-to-b from-black/70">
+    <Video.FullscreenToggle className="text-blue-500" />
+  </Video.Header>
+  <Video.Timeline
+    className="my-timeline"
+    trackClassName="bg-gray-700"
+    rangeClassName="bg-blue-500"
+    thumbClassName="bg-blue-600"
+  />
+</Video.Root>
+```
+
+### Custom Elements with `asChild`
+
+Button-based controls support the `asChild` prop, allowing you to use your own custom elements while preserving the control's behavior:
+
+```tsx
+<Video.Root src="https://example.com/video.mp4">
+  <Video.Media />
+  <Video.Center>
+    {/* Use a custom button element */}
+    <Video.PlayPause asChild>
+      <button className="my-custom-play-button">
+        {isPlaying ? "⏸" : "▶"}
+      </button>
+    </Video.PlayPause>
+  </Video.Center>
+  <Video.Footer>
+    {/* Custom fullscreen button */}
+    <Video.FullscreenToggle asChild>
+      <div className="custom-fullscreen-toggle">Toggle FS</div>
+    </Video.FullscreenToggle>
+  </Video.Footer>
+</Video.Root>
+```
+
+Components with `asChild` support:
+
+- `Video.PlayPause`
+- `Video.SeekBack` / `Video.SeekForward`
+- `Video.FullscreenToggle`
+- `Video.PipToggle`
+- `Video.Volume.Button`
+
+### Imperative Control
+
+Access video controls programmatically using a ref:
+
+```tsx
+import { useRef } from "react";
+import { Video, VideoHandle } from "react-video-kit";
+
+export default function ControlledPlayer() {
+  const videoRef = useRef<VideoHandle>(null);
+
+  return (
+    <div>
+      <Video.Root ref={videoRef} src="https://example.com/video.mp4">
+        <Video.Media />
+        <Video.Center>
+          <Video.PlayPause />
+        </Video.Center>
+      </Video.Root>
+
+      <div className="controls">
+        <button onClick={() => videoRef.current?.play()}>Play</button>
+        <button onClick={() => videoRef.current?.pause()}>Pause</button>
+        <button onClick={() => videoRef.current?.seek(30)}>Skip to 30s</button>
+        <button onClick={() => videoRef.current?.setVolume(0.5)}>
+          50% Volume
+        </button>
+        <button onClick={() => videoRef.current?.mute()}>Mute</button>
+        <button onClick={() => videoRef.current?.enterFullscreen()}>
+          Fullscreen
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+### VideoHandle Methods
+
+- `play()` - Start or resume playback
+- `pause()` - Pause playback
+- `seek(seconds)` - Seek to specific time
+- `setVolume(value)` - Set volume (0-1)
+- `mute()` - Mute audio
+- `unmute()` - Unmute audio
+- `enterFullscreen()` - Enter fullscreen mode
+- `exitFullscreen()` - Exit fullscreen mode
+- `enterPip()` - Enter picture-in-picture
+- `exitPip()` - Exit picture-in-picture
+
+## Props Reference
+
+### VideoRootProps
+
+| Prop                  | Type                                                  | Description                              |
+| --------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| `src`                 | `VideoSource`                                         | Video URL or array of source objects     |
+| `tracks`              | `VideoTrack[]`                                        | Text tracks for captions/subtitles       |
+| `poster`              | `string`                                              | Poster image URL                         |
+| `title`               | `string`                                              | Video title                              |
+| `subtitle`            | `string`                                              | Video subtitle                           |
+| `autoPlay`            | `boolean`                                             | Whether to autoplay (default: true)      |
+| `loop`                | `boolean`                                             | Whether to loop playback                 |
+| `showControls`        | `boolean`                                             | Whether to show controls (default: true) |
+| `className`           | `string`                                              | Additional CSS classes                   |
+| `defaultTrackIndex`   | `number \| null`                                      | Initial active track index (null = Off)  |
+| `defaultQualityIndex` | `number`                                              | Initial quality index when src is array  |
+| `onProgress`          | `(time: number) => void`                              | Called on progress update                |
+| `onDuration`          | `(duration: number) => void`                          | Called when duration available           |
+| `onEnded`             | `() => void`                                          | Called when playback ends                |
+| `onPlay`              | `() => void`                                          | Called when playback starts              |
+| `onPause`             | `() => void`                                          | Called when paused                       |
+| `onLoad`              | `() => void`                                          | Called when loaded                       |
+| `onVolumeChange`      | `(volume: number) => void`                            | Called on volume change                  |
+| `onTrackChange`       | `(index: number \| null, track?: VideoTrack) => void` | Called when active caption track changes |
+| `onQualityChange`     | `(index: number, source: {src, type, label}) => void` | Called when video quality/source changes |
+
+### VideoSource Type
+
+```typescript
+type VideoSource = string | Array<{ src: string; type: string; label: string }>;
+```
+
+### VideoTrack Type
+
+```typescript
+type VideoTrack = {
+  src: string;
+  kind: TextTrackKind;
+  srclang?: string;
+  label?: string;
+  default?: boolean;
+};
+```
+
+## Accessibility
+
+All controls include proper ARIA labels and keyboard support:
+
+- **Space** - Play/pause
+- **Arrow Left/Right** - Seek backward/forward 5s
+- **Arrow Up/Down** - Volume up/down
+- **F** - Toggle fullscreen
+- **M** - Toggle mute
+- **P** - Toggle picture-in-picture
+- **Escape** - Exit fullscreen/PiP
+
+### Screen Reader Support
+
+- All interactive controls have descriptive `aria-label` attributes
+- Sliders (timeline, volume) include `aria-valuetext` for meaningful value announcements
+- Menu items use `role="menuitemradio"` and `aria-checked` for selection state
+- Focus management follows WAI-ARIA best practices
+
+### Keyboard Navigation
+
+Hotkey scope can be configured per player:
+
+```tsx
+<Video.Root src="video.mp4" hotkeys={{ scope: "focused", enabled: true }}>
+  {/* ... */}
+</Video.Root>
+```
+
+Scope options:
+
+- `"focused"` (default) - Hotkeys only work when player is focused
+- `"hovered"` - Hotkeys work when mouse is over player
+- `"global"` - Hotkeys work anywhere on the page
+
+### Reduced Motion
+
+The player respects the `prefers-reduced-motion` media query for animations. All motion effects are automatically disabled when users have this preference enabled.
+
+## SSR Compatibility
+
+The component is fully SSR-compatible with Next.js and other frameworks. All DOM operations are guarded within effects and client-side checks.
+
+```tsx
+// Works in Next.js App Router
+import { Video } from "react-video-kit";
+
+export default function Page() {
+  return (
+    <Video.Root src="/video.mp4">
+      <Video.Media />
+      <Video.Center>
+        <Video.PlayPause />
+      </Video.Center>
+    </Video.Root>
+  );
+}
+```
+
+## Browser Support
+
+Supports all modern browsers with native HTML5 video support.
+
+### Cross-Browser Compatibility
+
+- **Chrome/Edge** - Full support for all features
+- **Firefox** - Full support for all features
+- **Safari** - Full support with webkit-specific fullscreen API fallbacks
+- **Mobile browsers** - Supports native video controls fallback on iOS Safari
+
+### Safari-Specific Behavior
+
+**Text Tracks:**
+
+- Caption tracks are managed via the `textTracks` API with `mode` toggling
+- The "Off" option properly disables all tracks by setting `mode: "disabled"`
+- `defaultTrackIndex` applies once on mount; subsequent changes are user-controlled
+
+**Quality Switching:**
+
+- Quality changes preserve `currentTime` and play state
+- Playback rate is maintained across quality switches
+- Error handling reverts to previous working source on load failure
+
+### Known Limitations
+
+- Picture-in-picture may not be supported on all mobile devices
+- Fullscreen API behavior varies slightly between browsers (handled automatically)
+- Some mobile browsers override video controls behavior
+
+## License
+
+Apache-2.0

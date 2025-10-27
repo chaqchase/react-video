@@ -8,6 +8,7 @@ const useMouseMoves = (
   const [isMoving, setIsMoving] = useState(false);
   const [timeoutId, setTimeoutId] = useState<number | null>(null);
   const [showControls, setShowControls] = useState(false);
+  const [isFocusWithin, setIsFocusWithin] = useState(false);
 
   useEffect(() => {
     if (!element) {
@@ -18,31 +19,48 @@ const useMouseMoves = (
       return;
     }
 
-    const onMouseMove = () => {
+    const showNowAndArmTimeout = () => {
       setIsMoving(true);
       setShowControls(true);
-
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
+      if (timeoutId) clearTimeout(timeoutId);
       const id = window.setTimeout(() => {
         setIsMoving(false);
-        setShowControls(false);
+        // Keep visible if focus is within
+        setShowControls(isFocusWithin);
       }, 3000);
-
       setTimeoutId(id);
     };
 
+    const onMouseMove = () => showNowAndArmTimeout();
+    const onPointerDown = () => showNowAndArmTimeout();
+    const onTouchStart = () => showNowAndArmTimeout();
+    const onFocusIn = () => {
+      setIsFocusWithin(true);
+      setShowControls(true);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+    const onFocusOut = () => {
+      setIsFocusWithin(false);
+      if (!isMoving) setShowControls(false);
+    };
+
     element.addEventListener("mousemove", onMouseMove);
+    element.addEventListener("pointerdown", onPointerDown);
+    element.addEventListener("touchstart", onTouchStart, { passive: true });
+    element.addEventListener("focusin", onFocusIn);
+    element.addEventListener("focusout", onFocusOut);
 
     return () => {
       element.removeEventListener("mousemove", onMouseMove);
+      element.removeEventListener("pointerdown", onPointerDown);
+      element.removeEventListener("touchstart", onTouchStart);
+      element.removeEventListener("focusin", onFocusIn);
+      element.removeEventListener("focusout", onFocusOut);
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
     };
-  }, [element, timeoutId, isPlaying]);
+  }, [element, timeoutId, isPlaying, isFocusWithin]);
 
   useEffect(() => {
     if (!show) {
@@ -64,6 +82,7 @@ const useMouseMoves = (
     showControls,
     isMoving,
     isPlaying,
+    isFocusWithin,
   };
 };
 

@@ -1,6 +1,53 @@
+/**
+ * Video source configuration. Can be a single URL string or an array of source objects
+ * with different quality levels.
+ */
 export type VideoSource =
   | string
   | Array<{ src: string; type: string; label: string }>;
+
+/**
+ * Text track configuration for captions, subtitles, or other text tracks.
+ */
+export type VideoTrack = {
+  /** URL of the track file (e.g., WebVTT) */
+  src: string;
+  /** Type of text track */
+  kind: TextTrackKind;
+  /** Language code (e.g., 'en', 'es') */
+  srclang?: string;
+  /** Human-readable label */
+  label?: string;
+  /** Whether this track should be enabled by default */
+  default?: boolean;
+};
+
+/**
+ * Imperative handle for controlling video playback programmatically.
+ * Access via ref on Video.Root component.
+ */
+export type VideoHandle = {
+  /** Start or resume video playback */
+  play: () => void;
+  /** Pause video playback */
+  pause: () => void;
+  /** Seek to a specific time in seconds */
+  seek: (seconds: number) => void;
+  /** Set volume level (0-1) */
+  setVolume: (value: number) => void;
+  /** Mute audio */
+  mute: () => void;
+  /** Unmute audio */
+  unmute: () => void;
+  /** Enter fullscreen mode */
+  enterFullscreen: () => void;
+  /** Exit fullscreen mode */
+  exitFullscreen: () => void;
+  /** Enter picture-in-picture mode */
+  enterPip: () => void;
+  /** Exit picture-in-picture mode */
+  exitPip: () => void;
+};
 
 type VideoProps = {
   /**
@@ -35,6 +82,22 @@ type VideoProps = {
    * ```
    */
   poster?: string;
+  /**
+   * Tracks for captions/subtitles.
+   * Example:
+   * ```js
+   * [
+   *  {
+   *    src: 'https://example.com/captions-en.vtt',
+   *    kind: 'captions',
+   *    srclang: 'en',
+   *    label: 'English',
+   *    default: true,
+   *  },
+   * ]
+   * ```
+   */
+  tracks?: VideoTrack[];
   /**
    * The title of the video.
    * Example:
@@ -83,6 +146,27 @@ type VideoProps = {
    * `onPlaybackRateChange` is called when the playback rate is changed.
    */
   onPlaybackRateChange?: (playbackRate: number) => void;
+  /**
+   * `onTrackChange` is called when the active text track is changed.
+   * Receives the track index (null for Off) and the track object.
+   */
+  onTrackChange?: (index: number | null, track?: VideoTrack | null) => void;
+  /**
+   * `onQualityChange` is called when the video quality/source is changed.
+   * Only relevant when src is an array of sources.
+   */
+  onQualityChange?: (
+    index: number,
+    source: { src: string; type: string; label?: string }
+  ) => void;
+  /**
+   * Default track index to enable on mount. null means no track (Off).
+   */
+  defaultTrackIndex?: number | null;
+  /**
+   * Default quality index to start with when src is an array.
+   */
+  defaultQualityIndex?: number;
   /**
    * The root CSS class.
    */

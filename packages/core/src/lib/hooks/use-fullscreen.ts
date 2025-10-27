@@ -84,13 +84,15 @@ const useFullscreen = (
       // @ts-ignore
       document.webkitExitFullscreen();
       // @ts-ignore
-    } else if (el.children[0] && "webkitEnterFullscreen" in el.children[0]) {
+    } else if (
+      element?.children[0] &&
+      "webkitExitFullscreen" in element.children[0]
+    ) {
       // @ts-ignore
-      (el.children[0] as HTMLElement).webkitExitFullscreen();
+      (element.children[0] as HTMLElement).webkitExitFullscreen();
       // @ts-ignore
     } else if (document.msExitFullscreen) {
       // @ts-ignore
-
       document.msExitFullscreen();
     }
   };
@@ -105,9 +107,9 @@ const useFullscreen = (
         exitFullscreen();
       } else {
         if (
-          !element.children[0] &&
+          element.children[0] &&
           // @ts-ignore
-          "webkitEnterFullscreen" in element?.children[0]
+          "webkitEnterFullscreen" in element.children[0]
         ) {
           setIsFullscreen(true);
         }

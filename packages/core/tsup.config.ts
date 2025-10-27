@@ -9,7 +9,7 @@ export default defineConfig((options: Options) => ({
   dts: true,
   clean: true,
   minify: true,
-  external: ["react", "react-dom", "framer-motion"],
+  external: ["react", "react-dom", "motion"],
   injectStyle: true,
   ...options,
 }));
