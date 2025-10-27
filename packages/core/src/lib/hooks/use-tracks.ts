@@ -66,10 +66,17 @@ export function useTracks(
     applyTrackModes();
 
     // Also listen for track changes in case tracks load asynchronously
-    video.addEventListener("loadedmetadata", applyTrackModes);
+    const handleLoadedMetadata = () => {
+      // Small delay to ensure tracks are fully loaded
+      setTimeout(applyTrackModes, 100);
+    };
+
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
+    video.addEventListener("loadeddata", applyTrackModes);
 
     return () => {
-      video.removeEventListener("loadedmetadata", applyTrackModes);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      video.removeEventListener("loadeddata", applyTrackModes);
     };
   }, [video, activeTrackIndex, tracks]);
 

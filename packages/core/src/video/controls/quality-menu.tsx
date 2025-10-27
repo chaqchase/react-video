@@ -48,7 +48,7 @@ export function VideoQualityMenu({
   const currentLabel = currentQuality?.label || "Quality";
 
   return (
-    <DropdownMenu.Root>
+    <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <Button
           size={size}
@@ -67,8 +67,6 @@ export function VideoQualityMenu({
           className="rv-min-w-[120px] rv-bg-black/90 rv-backdrop-blur-sm rv-rounded-lg rv-p-1 rv-shadow-lg rv-border rv-border-white/10 rv-z-[100]"
           sideOffset={5}
           align="end"
-          role="menu"
-          aria-label="Video quality selection"
         >
           {src.map((source, index) => (
             <DropdownMenu.Item

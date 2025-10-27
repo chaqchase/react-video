@@ -1,15 +1,21 @@
-import { AnimatePresence, motion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "motion/react";
+import { useEffect } from "react";
 
 const Volume = ({ volume, isMuted }: { volume: number; isMuted: boolean }) => {
-  const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
-  const mapRange = (v: number, inMin: number, inMax: number, outMin: number, outMax: number) => {
-    if (inMax === inMin) return outMin;
-    const t = clamp((v - inMin) / (inMax - inMin), 0, 1);
-    return outMin + (outMax - outMin) * t;
-  };
-  const opacity_start = mapRange(volume, 0, 0.3, 0.4, 1);
-  const opacity_center = mapRange(volume, 0.3, 0.6, 0.4, 1);
-  const opacity_end = mapRange(volume, 0.6, 1, 0.4, 1);
+  const val = useMotionValue(volume);
+
+  useEffect(() => {
+    val.set(volume);
+  }, [volume, val]);
+
+  const opacity_start = useTransform(val, [0, 0.3], [0.4, 1]);
+  const opacity_center = useTransform(val, [0.3, 0.6], [0.4, 1]);
+  const opacity_end = useTransform(val, [0.6, 1], [0.4, 1]);
 
   return (
     <motion.svg

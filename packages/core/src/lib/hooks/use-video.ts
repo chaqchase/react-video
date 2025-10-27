@@ -197,6 +197,22 @@ export const useVideo = ({
     }
   );
 
+  // Ensure crossOrigin is set on the video element to prevent CORS issues
+  useEffect(() => {
+    const video = videoRef.current as HTMLVideoElement;
+    if (!isVideo(video)) {
+      return;
+    }
+    // Explicitly set crossOrigin to ensure CORS works for all video sources
+    if (video.crossOrigin !== "anonymous") {
+      video.crossOrigin = "anonymous";
+      // Reload the video if it has already started loading without CORS
+      if (video.networkState !== video.NETWORK_EMPTY) {
+        video.load();
+      }
+    }
+  }, [videoRef]);
+
   useEffect(() => {
     const video = videoRef.current as HTMLVideoElement;
     if (!isVideo(video)) {
@@ -207,6 +223,9 @@ export const useVideo = ({
         setIsLoading(false);
         setIsLoaded(true);
         onLoad?.();
+      },
+      canplay: () => {
+        setIsLoading(false);
       },
       progress: () => {
         setBuffered(video.buffered);
@@ -238,6 +257,7 @@ export const useVideo = ({
 
     video.addEventListener("loadstart", handlers.loadstart);
     video.addEventListener("loadeddata", handlers.loadeddata);
+    video.addEventListener("canplay", handlers.canplay);
     video.addEventListener("seeking", handlers.seeking);
     video.addEventListener("waiting", handlers.waiting);
     video.addEventListener("progress", handlers.progress);
@@ -248,6 +268,7 @@ export const useVideo = ({
     return () => {
       video.removeEventListener("loadstart", handlers.loadstart);
       video.removeEventListener("loadeddata", handlers.loadeddata);
+      video.removeEventListener("canplay", handlers.canplay);
       video.removeEventListener("waiting", handlers.waiting);
       video.removeEventListener("progress", handlers.progress);
       video.removeEventListener("timeupdate", handlers.timeupdate);

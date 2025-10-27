@@ -6,6 +6,7 @@ const useVolume = (
 ) => {
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [previousVolume, setPreviousVolume] = useState(1);
 
   useEffect(() => {
     if (video?.volume) {
@@ -23,6 +24,7 @@ const useVolume = (
     if (value > 1) {
       video.volume = 1;
       setVolume(1);
+      setPreviousVolume(1);
       return;
     }
     if (value <= 0) {
@@ -34,6 +36,7 @@ const useVolume = (
     }
     video.volume = value;
     setVolume(value);
+    setPreviousVolume(value);
     setIsMuted(value === 0);
   };
 
@@ -41,9 +44,13 @@ const useVolume = (
     if (!video) {
       return;
     }
+    // Store current volume before muting
+    if (volume > 0) {
+      setPreviousVolume(volume);
+    }
     video.muted = true;
-    setVolume(0);
     setIsMuted(true);
+    // Don't change the volume state - keep the slider position
   };
 
   const handleUnmute = () => {
@@ -51,8 +58,13 @@ const useVolume = (
       return;
     }
     video.muted = false;
-    setVolume(video.volume + 0.1);
     setIsMuted(false);
+    // Restore previous volume if current volume is 0
+    if (volume === 0 || video.volume === 0) {
+      const restoreVolume = previousVolume > 0 ? previousVolume : 0.5;
+      video.volume = restoreVolume;
+      setVolume(restoreVolume);
+    }
   };
 
   return {

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { ButtonProps } from "@/types/button.types";
-import { motion } from "motion/react";
 
 function Button({
   size = "md",
@@ -8,25 +7,21 @@ function Button({
   className,
   children,
   onClick,
-}: ButtonProps) {
-  const buttonVariants = {
-    hover: { scale: 1.1 },
-    press: { scale: 0.9 },
-  };
-
+  ref,
+  ...props
+}: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
     if (onClick) {
       onClick(event);
     }
   };
 
   return (
-    <motion.button
+    <button
+      ref={ref}
       onClick={handleClick}
       className={cn(
-        "rv-flex rv-justify-center rv-items-center",
+        "rv-flex rv-justify-center rv-items-center rv-transition-transform hover:rv-scale-110 active:rv-scale-90",
         {
           "rv-w-8 rv-h-8": size === "sm",
           "rv-w-10 rv-h-10": size === "md",
@@ -39,13 +34,10 @@ function Button({
         },
         className
       )}
-      variants={buttonVariants}
-      whileHover="hover"
-      whileTap="press"
-      transition={{ type: "spring", stiffness: 700, damping: 30 }}
+      {...props}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }
 

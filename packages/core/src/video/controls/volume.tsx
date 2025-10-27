@@ -85,11 +85,13 @@ export function VideoVolumeSlider({
   return (
     <RadixSlider.Root
       className={cn(
-        "rv-relative rv-z-50 rv-items-center rv-select-none rv-touch-none rv-w-full rv-h-5 rv-hidden lg:rv-flex lg:rv-w-1/4",
+        "rv-relative rv-z-50 rv-items-center rv-select-none rv-touch-none rv-w-full rv-h-5 rv-hidden lg:rv-flex lg:rv-w-16",
         className
       )}
       onValueChange={(value) => {
-        handleVolumeChange(Number(value));
+        if (value[0] !== undefined) {
+          handleVolumeChange(value[0]);
+        }
       }}
       value={[volume]}
       min={0}
@@ -100,7 +102,7 @@ export function VideoVolumeSlider({
     >
       <RadixSlider.Track
         className={cn(
-          "rv-bg-white rv-backdrop-filter rv-overflow-hidden rv-backdrop-blur-sm rv-h-3 rv-bg-opacity-20 rv-relative rv-grow rv-rounded-full",
+          "rv-bg-white rv-backdrop-filter rv-overflow-hidden rv-backdrop-blur-sm rv-h-2.5 rv-bg-opacity-30 rv-relative rv-grow rv-rounded-full",
           trackClassName
         )}
       >

@@ -42,7 +42,7 @@ export function VideoCaptionsMenu({
   }
 
   return (
-    <DropdownMenu.Root>
+    <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <Button
           size={size}
@@ -61,8 +61,6 @@ export function VideoCaptionsMenu({
           className="rv-min-w-[160px] rv-bg-black/90 rv-backdrop-blur-sm rv-rounded-lg rv-p-1 rv-shadow-lg rv-border rv-border-white/10 rv-z-[100]"
           sideOffset={5}
           align="end"
-          role="menu"
-          aria-label="Caption and subtitle selection"
         >
           {/* Off option */}
           <DropdownMenu.Item

@@ -64,6 +64,9 @@ export function useQuality(
       video.pause();
     }
 
+    // Set crossOrigin before changing src to ensure CORS works
+    video.crossOrigin = "anonymous";
+
     // Set new source
     video.src = newSource.src;
     video.load();
@@ -102,6 +105,16 @@ export function useQuality(
       previousIndexRef.current = qualityIndex;
     };
 
+    const handleLoadedData = () => {
+      // Ignore if this is from an old request
+      if (currentRequestId !== requestIdRef.current) {
+        return;
+      }
+      // Also mark as complete on loadeddata in case canplay is delayed
+      switchingRef.current = false;
+      previousIndexRef.current = qualityIndex;
+    };
+
     const handleError = () => {
       // Ignore if this is from an old request
       if (currentRequestId !== requestIdRef.current) {
@@ -123,11 +136,22 @@ export function useQuality(
     };
 
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
+    video.addEventListener("loadeddata", handleLoadedData);
     video.addEventListener("canplay", handleCanPlay);
     video.addEventListener("error", handleError);
 
+    // Timeout fallback to prevent infinite loading state
+    const timeoutId = setTimeout(() => {
+      if (currentRequestId === requestIdRef.current && switchingRef.current) {
+        console.warn("Quality switch timed out, forcing completion");
+        switchingRef.current = false;
+      }
+    }, 10000); // 10 second timeout
+
     return () => {
+      clearTimeout(timeoutId);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("error", handleError);
     };
