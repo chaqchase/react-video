@@ -65,16 +65,19 @@ const FEATURES = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen w-full bg-gradient-to-b from-black via-zinc-950 to-black text-zinc-100">
+    <main className="min-h-screen w-full bg-gradient-to-br from-black via-zinc-950 to-black text-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col items-center gap-12 px-6 py-16">
         <section className="flex flex-col items-center gap-4 text-center">
-          <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+          <a
+            href="https://github.com/chaqchase/react-video"
+            className="rounded-full bg-zinc-900 px-3 py-1 underline text-base font-medium text-zinc-100"
+          >
             React Video Kit
-          </span>
-          <h1 className="text-4xl font-semibold text-white md:text-5xl">
+          </a>
+          <h1 className="text-2xl font-semibold text-white">
             A composable video player with thoughtful defaults
           </h1>
-          <p className="max-w-2xl text-sm text-zinc-400 md:text-base">
+          <p className="max-w-2xl text-sm text-zinc-300 md:text-base">
             This minimal demo showcases every piece of the `Video` API—media,
             overlays, controls, quality switching, captions, and time
             displays—styled with a crisp dark palette.
@@ -149,7 +152,7 @@ export default function Home() {
           {FEATURES.map((feature) => (
             <article
               key={feature.title}
-              className="rounded-2xl border border-zinc-900/80 bg-zinc-950/80 p-6 shadow-[0_30px_120px_-80px_rgba(255,255,255,0.25)] transition-transform hover:-translate-y-1"
+              className="rounded-2xl border border-zinc-800/50 bg-zinc-800/20 p-6 shadow-[0_30px_120px_-80px_rgba(255,255,255,0.25)]"
             >
               <h2 className="text-lg font-semibold text-white">
                 {feature.title}
