@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Dropdown, menuStyles } from "../../ui/dropdown";
 import Button from "../../ui/button";
 import { useVideoContext } from "../context";
 
@@ -42,8 +42,8 @@ export function VideoCaptionsMenu({
   }
 
   return (
-    <DropdownMenu.Root modal={false}>
-      <DropdownMenu.Trigger asChild>
+    <Dropdown.Root modal={false}>
+      <Dropdown.Trigger asChild>
         <Button
           size={size}
           radius={radius}
@@ -54,20 +54,20 @@ export function VideoCaptionsMenu({
             <span className="rv-text-sm rv-font-semibold">CC</span>
           )}
         </Button>
-      </DropdownMenu.Trigger>
+      </Dropdown.Trigger>
 
-      <DropdownMenu.Portal>
-        <DropdownMenu.Content
-          className="rv-min-w-[160px] rv-bg-black/90 rv-backdrop-blur-sm rv-rounded-lg rv-p-1 rv-shadow-lg rv-border rv-border-white/10 rv-z-[100]"
-          sideOffset={5}
+      <Dropdown.Portal>
+        <Dropdown.Content
+          className={cn("rv-min-w-[140px]", menuStyles.container)}
+          sideOffset={8}
           align="end"
         >
           {/* Off option */}
-          <DropdownMenu.Item
+          <Dropdown.Item
             className={cn(
-              "rv-text-sm rv-text-white rv-px-3 rv-py-2 rv-rounded rv-cursor-pointer rv-outline-none",
-              "hover:rv-bg-white/10 focus:rv-bg-white/10",
-              activeTrackIndex === null && "rv-bg-white/20"
+              menuStyles.item.base,
+              menuStyles.item.hover,
+              activeTrackIndex === null && menuStyles.item.active
             )}
             onSelect={() => setActiveTrackIndex(null)}
             role="menuitemradio"
@@ -79,18 +79,18 @@ export function VideoCaptionsMenu({
               </span>
             )}
             Off
-          </DropdownMenu.Item>
+          </Dropdown.Item>
 
-          <DropdownMenu.Separator className="rv-h-[1px] rv-bg-white/10 rv-my-1" />
+          <Dropdown.Separator className={menuStyles.separator} />
 
           {/* Track options */}
           {tracks.map((track, index) => (
-            <DropdownMenu.Item
+            <Dropdown.Item
               key={index}
               className={cn(
-                "rv-text-sm rv-text-white rv-px-3 rv-py-2 rv-rounded rv-cursor-pointer rv-outline-none",
-                "hover:rv-bg-white/10 focus:rv-bg-white/10",
-                activeTrackIndex === index && "rv-bg-white/20"
+                menuStyles.item.base,
+                menuStyles.item.hover,
+                activeTrackIndex === index && menuStyles.item.active
               )}
               onSelect={() => setActiveTrackIndex(index)}
               role="menuitemradio"
@@ -102,11 +102,11 @@ export function VideoCaptionsMenu({
                 </span>
               )}
               {track.label || `Track ${index + 1}`}
-            </DropdownMenu.Item>
+            </Dropdown.Item>
           ))}
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+        </Dropdown.Content>
+      </Dropdown.Portal>
+    </Dropdown.Root>
   );
 }
 

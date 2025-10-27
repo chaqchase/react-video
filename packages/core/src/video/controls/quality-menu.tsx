@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Dropdown, menuStyles } from "../../ui/dropdown";
 import Button from "../../ui/button";
 import { useVideoContext } from "../context";
 
@@ -48,8 +48,8 @@ export function VideoQualityMenu({
   const currentLabel = currentQuality?.label || "Quality";
 
   return (
-    <DropdownMenu.Root modal={false}>
-      <DropdownMenu.Trigger asChild>
+    <Dropdown.Root modal={false}>
+      <Dropdown.Trigger asChild>
         <Button
           size={size}
           radius={radius}
@@ -60,21 +60,21 @@ export function VideoQualityMenu({
             <span className="rv-text-sm rv-font-semibold">{currentLabel}</span>
           )}
         </Button>
-      </DropdownMenu.Trigger>
+      </Dropdown.Trigger>
 
-      <DropdownMenu.Portal>
-        <DropdownMenu.Content
-          className="rv-min-w-[120px] rv-bg-black/90 rv-backdrop-blur-sm rv-rounded-lg rv-p-1 rv-shadow-lg rv-border rv-border-white/10 rv-z-[100]"
-          sideOffset={5}
+      <Dropdown.Portal>
+        <Dropdown.Content
+          className={cn("rv-min-w-[100px]", menuStyles.container)}
+          sideOffset={8}
           align="end"
         >
           {src.map((source, index) => (
-            <DropdownMenu.Item
+            <Dropdown.Item
               key={index}
               className={cn(
-                "rv-text-sm rv-text-white rv-px-3 rv-py-2 rv-rounded rv-cursor-pointer rv-outline-none",
-                "hover:rv-bg-white/10 focus:rv-bg-white/10",
-                qualityIndex === index && "rv-bg-white/20"
+                menuStyles.item.base,
+                menuStyles.item.hover,
+                qualityIndex === index && menuStyles.item.active
               )}
               onSelect={() => setQualityIndex(index)}
               role="menuitemradio"
@@ -86,11 +86,11 @@ export function VideoQualityMenu({
                 </span>
               )}
               {source.label || `Source ${index + 1}`}
-            </DropdownMenu.Item>
+            </Dropdown.Item>
           ))}
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+        </Dropdown.Content>
+      </Dropdown.Portal>
+    </Dropdown.Root>
   );
 }
 
