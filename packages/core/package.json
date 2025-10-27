@@ -1,6 +1,6 @@
 {
-  "name": "@triyanox/react-video",
-  "version": "0.1.9",
+  "name": "video-kit",
+  "version": "1.0.0",
   "description": "A video component for react inspired by the ios video player",
   "license": "Apache-2.0",
   "main": "./dist/index.js",
@@ -55,13 +55,13 @@
     "typescript": "^4.9.4"
   },
   "author": "Mohamed Achaq <hi@achaq.dev>",
-  "homepage": "https://react-video.achaq.dev",
+  "homepage": "https://video-kit.chaqchase.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/triyanox/react-video.git"
+    "url": "git+https://github.com/chaqchase/video-kit.git"
   },
   "bugs": {
-    "url": "https://github.com/triyanox/react-video/issues"
+    "url": "https://github.com/chaqchase/video-kit/issues"
   },
   "keywords": [
     "react",
@@ -73,7 +73,9 @@
     "ui-component",
     "ui-kit",
     "ui-library",
+    "video-kit",
+    "react-video",
     "react-ios-video",
-    "React Video"
+    "video component"
   ]
 }

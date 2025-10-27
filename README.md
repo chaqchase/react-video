@@ -1,18 +1,22 @@
-# `@triyanox/react-video` a unified customizable video playback experience across all browsers for react
+# `video-kit` a unified customizable video playback experience across all browsers for react
 
-<img src="https://raw.githubusercontent.com/triyanox/react-video/main/assets/cover.png" alt="react-video banner"
-title="react-video" align="center" height="auto" width="100%"/>
+<img src="https://raw.githubusercontent.com/chaqchase/video-kit/main/assets/cover.png" alt="video-kit banner"
+title="video-kit" align="center" height="auto" width="100%"/>
 
 ## Introduction
 
-The `@triyanox/react-video` component is a highly customizable and easy-to-use React component for playing video content in your react applications inspired by apple tv video player. It offers extensive control over video playback and is fully compatible with TailwindCSS, allowing for seamless styling integration.
+The `video-kit` component is a highly customizable and easy-to-use React component for playing video content in your react applications inspired by apple tv video player. It offers extensive control over video playback and is fully compatible with TailwindCSS, allowing for seamless styling integration.
 
 ## Installation
 
 To install the component, use the following command:
 
 ```bash
-pnpm add @triyanox/react-video
+npm install video-kit
+# or
+pnpm add video-kit
+# or
+yarn add video-kit
 ```
 
 ## Usage
@@ -22,7 +26,7 @@ pnpm add @triyanox/react-video
 You can use the video component simply by importing `Video` from the package
 
  ```tsx
- import { Video } from "@triyanox/react-video";
+ import { Video } from "video-kit";
 
  export default function Page() {
   return (
@@ -81,7 +85,7 @@ You can use the video component simply by importing `Video` from the package
 
 ```javascript
 import React from 'react';
-import { Video } from '@triyanox/react-video';
+import { Video } from 'video-kit';
 
 // Import custom icons (assuming these are available in your project)
 import {

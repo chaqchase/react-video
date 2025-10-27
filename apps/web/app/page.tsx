@@ -7,7 +7,7 @@ import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
 import { Snippet } from '@nextui-org/snippet';
 import { Switch } from '@nextui-org/switch';
-import { Video } from '@triyanox/react-video';
+import { Video } from 'video-kit';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -15,10 +15,10 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const packages = [
-  { label: 'pnpm', value: 'pnpm add @triyanox/react-video' },
-  { label: 'npm', value: 'npm add @triyanox/react-video' },
-  { label: 'yarn', value: 'yarn add @triyanox/react-video' },
-  { label: 'bun', value: 'bun add @triyanox/react-video' },
+  { label: 'pnpm', value: 'pnpm add video-kit' },
+  { label: 'npm', value: 'npm add video-kit' },
+  { label: 'yarn', value: 'yarn add video-kit' },
+  { label: 'bun', value: 'bun add video-kit' },
 ];
 
 const schema = z.object({
@@ -35,7 +35,7 @@ const schema = z.object({
 
 export default function Home() {
   const [value, setValue] = useState<Selection>(
-    new Set(['pnpm add @triyanox/react-video']) as unknown as Selection,
+    new Set(['pnpm add video-kit']) as unknown as Selection,
   );
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +56,7 @@ export default function Home() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8">
       <div className="flex w-full justify-center items-center flex-col gap-4 px-4">
-        <h3 className={title()}>@triyanox/react-video</h3>
+        <h3 className={title()}>video-kit</h3>
         <p className={subtitle({ class: 'text-center' })}>
           A highly customizable react video component for your app
         </p>
@@ -192,7 +192,7 @@ export default function Home() {
             className="bg-default-900 text-default-100 mt-4"
             as={Link}
             size="lg"
-            href="https://github.com/triyanox/react-video"
+            href="https://github.com/chaqchase/video-kit"
           >
             Read Docs <GithubIcon className="text-default-100" />
           </Button>

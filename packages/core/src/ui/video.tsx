@@ -30,7 +30,7 @@ import {
  *
  * @example
  * ```tsx
- * import { Video } from "@triyanox/react-video";
+ * import { Video } from "video-kit";
  *
  * export default function Page() {
  *  return (

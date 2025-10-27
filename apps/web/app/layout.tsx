@@ -93,7 +93,7 @@ export default function RootLayout({
               <Link
                 target="_blank"
                 className="text-default-900"
-                href="https://achaq.dev"
+                href="https://chaqchase.com"
               >
                 Mohamed Achaq
               </Link>
