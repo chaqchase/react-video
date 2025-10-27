@@ -59,7 +59,7 @@
     "typescript": "^4.9.4"
   },
   "author": "Mohamed Achaq <hi@achaq.dev>",
-  "homepage": "https://video-kit.chaqchase.com",
+  "homepage": "https://react-vide-kit.chaqchase.com",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chaqchase/video-kit.git"

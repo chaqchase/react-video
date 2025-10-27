@@ -1,23 +1,5 @@
 # react-video-kit
 
-<img src="https://raw.githubusercontent.com/chaqchase/video-kit/main/assets/cover.png" alt="react-video-kit banner"
-title="react-video-kit" align="center" height="auto" width="100%"/>
-
-A composable video player for React with a shadcn/ui-style API. Built for flexibility, accessibility, and SSR compatibility.
-
-## 🎥 Demo
-
-Check out the [interactive demo](apps/web) to see the player in action with live examples and comprehensive documentation.
-
-```bash
-# Run the demo locally
-pnpm install
-cd packages/core && pnpm build
-cd ../../apps/web && pnpm dev
-```
-
-Visit `http://localhost:3000` to explore all features with a beautiful, modern interface.
-
 ## Features
 
 - Composable primitives for building custom video UIs
@@ -31,9 +13,11 @@ Visit `http://localhost:3000` to explore all features with a beautiful, modern i
 ## Installation
 
 ```bash
-npm install react-video-kit
+bun add react-video-kit
 # or
-pnpm add react-video-kit
+pnpm install react-video-kit
+# or
+npm add react-video-kit
 # or
 yarn add react-video-kit
 ```
@@ -119,27 +103,7 @@ Full documentation is available in the [core package README](./packages/core/REA
 
 ## Demo
 
-Visit [https://video-kit.chaqchase.com](https://video-kit.chaqchase.com) to see live demos.
-
-## Monorepo Structure
-
-This repository uses pnpm workspaces:
-
-- `packages/core` - The react-video-kit package
-- `apps/web` - Demo Next.js application
-
-## Development
-
-```bash
-# Install dependencies
-pnpm install
-
-# Build packages
-pnpm -w build
-
-# Run dev server
-cd apps/web && pnpm dev
-```
+Visit [https://react-vide-kit.chaqchase.com](https://react-vide-kit.chaqchase.com) to see live demos.
 
 ## License
 

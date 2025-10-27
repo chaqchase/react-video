@@ -15,9 +15,11 @@ A composable video player for React with a shadcn/ui-style API. Built for flexib
 ## Installation
 
 ```bash
-npm install react-video-kit
+bun add react-video-kit
 # or
 pnpm add react-video-kit
+# or
+npm install react-video-kit
 # or
 yarn add react-video-kit
 ```
@@ -32,6 +34,7 @@ yarn add react-video-kit
   preflight conflicts with your app’s styling.
 
 Notes:
+
 - If your application relied on Tailwind’s preflight/base from this library,
   include your own base styles in the app instead.
 - You do not need to process this library through your Tailwind build.

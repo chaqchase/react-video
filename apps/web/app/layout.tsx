@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://video-kit.chaqchase.com"),
+  metadataBase: new URL("https://react-vide-kit.chaqchase.com"),
   title: {
     default: "react-video-kit — Composable React Video Player",
     template: "%s — react-video-kit",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: "react-video-kit — Composable React Video Player",
     description:
       "Composable, declarative React video player primitives with Tailwind, SSR support, captions and quality menus.",
-    url: "https://video-kit.chaqchase.com",
+    url: "https://react-vide-kit.chaqchase.com",
     siteName: "react-video-kit",
     type: "website",
   },
@@ -46,9 +46,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased`}>
-        {children}
-      </body>
+      <body className={`antialiased`}>{children}</body>
     </html>
   );
 }
