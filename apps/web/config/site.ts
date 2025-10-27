@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Video Kit",
+  name: "React Video Kit",
   description: "A react video component inspired by the ios video player",
   navItems: [
     {

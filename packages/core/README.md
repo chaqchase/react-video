@@ -1,19 +1,19 @@
-# `video-kit` a unified customizable video playback experience across all browsers for react
+# `react-video-kit` a unified customizable video playback experience across all browsers for react
 
 ## Introduction
 
-The `video-kit` component is a highly customizable and easy-to-use React component for playing video content in your react applications inspired by apple tv video player. It offers extensive control over video playback and is fully compatible with TailwindCSS, allowing for seamless styling integration.
+The `react-video-kit` component is a highly customizable and easy-to-use React component for playing video content in your react applications inspired by apple tv video player. It offers extensive control over video playback and is fully compatible with TailwindCSS, allowing for seamless styling integration.
 
 ## Installation
 
 To install the component, use the following command:
 
 ```bash
-npm install video-kit
+npm install react-video-kit
 # or
-pnpm add video-kit
+pnpm add react-video-kit
 # or
-yarn add video-kit
+yarn add react-video-kit
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ yarn add video-kit
 You can use the video component simply by importing `Video` from the package
 
  ```tsx
- import { Video } from "video-kit";
+ import { Video } from "react-video-kit";
 
  export default function Page() {
   return (
@@ -82,7 +82,7 @@ You can use the video component simply by importing `Video` from the package
 
 ```javascript
 import React from 'react';
-import { Video } from 'video-kit';
+import { Video } from 'react-video-kit';
 
 // Import custom icons (assuming these are available in your project)
 import {

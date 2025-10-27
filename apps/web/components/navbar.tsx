@@ -29,7 +29,7 @@ export const Navbar = () => {
             size="md"
             variant="light"
           >
-            <p className="font-bold text-inherit">video-kit</p>
+            <p className="font-bold text-inherit">react-video-kit</p>
           </Button>
         </NavbarBrand>
       </NavbarContent>

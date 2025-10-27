@@ -30,7 +30,7 @@ import {
  *
  * @example
  * ```tsx
- * import { Video } from "video-kit";
+ * import { Video } from "react-video-kit";
  *
  * export default function Page() {
  *  return (
