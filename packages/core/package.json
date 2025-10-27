@@ -1,6 +1,6 @@
 {
   "name": "react-video-kit",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A video component for react inspired by the ios video player",
   "license": "Apache-2.0",
   "main": "./dist/index.js",

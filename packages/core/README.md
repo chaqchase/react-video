@@ -10,7 +10,7 @@ A composable video player for React with a shadcn/ui-style API. Built for flexib
 - **Accessible** with ARIA labels and keyboard support
 - **SSR-safe** for Next.js and other frameworks
 - **Fully typed** with TypeScript
-- **Styleable** with Tailwind CSS (rv- prefix)
+- **Isolated styling** with Tailwind CSS (rv- prefix)
 
 ## Installation
 
@@ -21,6 +21,20 @@ pnpm add react-video-kit
 # or
 yarn add react-video-kit
 ```
+
+## Styling and Tailwind
+
+- The library ships precompiled CSS with an `rv-` prefix for all utilities and
+  components. No global resets are injected.
+- Works seamlessly in apps using Tailwind v3 or v4 — and also in apps without
+  Tailwind at all.
+- Because styles are precompiled and prefixed, there are no class name or
+  preflight conflicts with your app’s styling.
+
+Notes:
+- If your application relied on Tailwind’s preflight/base from this library,
+  include your own base styles in the app instead.
+- You do not need to process this library through your Tailwind build.
 
 ## Quick Start
 
@@ -70,6 +84,12 @@ export default function App() {
 - **`Video.Time.Current`** - Current time display
 - **`Video.Time.Remaining`** - Remaining time display
 - **`Video.Loading`** - Loading indicator
+
+### Menus and Fullscreen
+
+- Menus automatically portal into the fullscreen element when the player is
+  fullscreen, and portal to `document.body` otherwise. This prevents clipping
+  from parent overflow and ensures menus open correctly in both modes.
 
 ## Examples
 

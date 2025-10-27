@@ -26,7 +26,7 @@ Visit `http://localhost:3000` to explore all features with a beautiful, modern i
 - Accessible with ARIA labels and keyboard support
 - SSR-safe for Next.js and other frameworks
 - Fully typed with TypeScript
-- Styleable with Tailwind CSS
+- Isolated styling with Tailwind CSS (rv- prefix), compatible with Tailwind v3 and v4
 
 ## Installation
 
@@ -37,6 +37,15 @@ pnpm add react-video-kit
 # or
 yarn add react-video-kit
 ```
+
+## Styling and Tailwind
+
+- The core package ships precompiled CSS with an `rv-` prefix for all utilities.
+- No Tailwind preflight/base is injected by the library, avoiding global resets leaking into apps.
+- Works with Tailwind v3, v4, or without Tailwind.
+
+For local development of the core package, CSS is built automatically by
+`pnpm build` and watched in `pnpm dev`.
 
 ## Quick Start
 
