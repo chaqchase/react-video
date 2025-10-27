@@ -81,14 +81,22 @@ function DropdownTrigger({ children, asChild }: DropdownTriggerProps) {
 
 type DropdownPortalProps = {
   children: React.ReactNode;
+  container?: HTMLElement | null;
 };
 
-function DropdownPortal({ children }: DropdownPortalProps) {
+function DropdownPortal({ children, container }: DropdownPortalProps) {
   const { isOpen } = useDropdownContext();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence>{isOpen && children}</AnimatePresence>,
-    document.body
+    container || document.body
   );
 }
 

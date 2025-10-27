@@ -37,7 +37,7 @@ export function VideoQualityMenu({
   radius = "md",
   triggerContent,
 }: VideoQualityMenuProps) {
-  const { src, qualityIndex, setQualityIndex } = useVideoContext();
+  const { src, qualityIndex, setQualityIndex, wrapperRef } = useVideoContext();
 
   // Only render if src is an array (multiple quality levels)
   if (typeof src === "string" || !Array.isArray(src) || src.length <= 1) {
@@ -62,7 +62,7 @@ export function VideoQualityMenu({
         </Button>
       </Dropdown.Trigger>
 
-      <Dropdown.Portal>
+      <Dropdown.Portal container={wrapperRef.current}>
         <Dropdown.Content
           className={cn("rv-min-w-[100px]", menuStyles.container)}
           sideOffset={8}

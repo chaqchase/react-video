@@ -34,7 +34,7 @@ export function VideoCaptionsMenu({
   radius = "md",
   triggerContent,
 }: VideoCaptionsMenuProps) {
-  const { tracks, activeTrackIndex, setActiveTrackIndex } = useVideoContext();
+  const { tracks, activeTrackIndex, setActiveTrackIndex, wrapperRef } = useVideoContext();
 
   // Don't render if no tracks available
   if (!tracks || tracks.length === 0) {
@@ -56,7 +56,7 @@ export function VideoCaptionsMenu({
         </Button>
       </Dropdown.Trigger>
 
-      <Dropdown.Portal>
+      <Dropdown.Portal container={wrapperRef.current}>
         <Dropdown.Content
           className={cn("rv-min-w-[140px]", menuStyles.container)}
           sideOffset={8}

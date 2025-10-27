@@ -21,7 +21,7 @@ function Button({
       ref={ref}
       onClick={handleClick}
       className={cn(
-        "rv-flex rv-justify-center rv-items-center",
+        "rv-flex rv-justify-center rv-select-none rv-items-center",
         {
           "rv-w-8 rv-h-8": size === "sm",
           "rv-w-10 rv-h-10": size === "md",

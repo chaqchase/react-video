@@ -51,7 +51,7 @@ export function VideoVolumeButton({
     <Button
       size={size}
       radius={radius}
-      className={cn("rv-bg-transparent rv-z-50", className)}
+      className={cn("rv-bg-transparent rv-z-50 rv-w-8", className)}
       onClick={handleClick}
       aria-label={ariaLabel}
     >
