@@ -1,15 +1,14 @@
-import { cn } from "@/lib/utils";
+import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
+import { AnimatePresence, motion } from "motion/react";
 import React, {
   createContext,
-  useContext,
-  useState,
-  useRef,
-  useEffect,
   useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "motion/react";
-import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
 
 type DropdownContextValue = {
   isOpen: boolean;
@@ -60,7 +59,11 @@ function DropdownTrigger({ children, asChild }: DropdownTriggerProps) {
       ref: triggerRef,
       onClick: (e: React.MouseEvent) => {
         handleClick();
-        children.props.onClick?.(e);
+        (
+          children as React.ReactElement<{
+            onClick: (e: React.MouseEvent) => void;
+          }>
+        ).props.onClick?.(e);
       },
       "aria-expanded": isOpen,
       "aria-haspopup": "true",
@@ -87,16 +90,50 @@ type DropdownPortalProps = {
 function DropdownPortal({ children, container }: DropdownPortalProps) {
   const { isOpen } = useDropdownContext();
   const [mounted, setMounted] = useState(false);
+  const [target, setTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Ensure menus render inside the fullscreen element when active,
+  // otherwise fall back to provided container or document.body.
+  useEffect(() => {
+    const updateTarget = () => {
+      const fsEl =
+        (typeof document !== "undefined" &&
+          (document.fullscreenElement as HTMLElement | null)) ||
+        null;
+      setTarget(
+        fsEl ||
+          container ||
+          (typeof document !== "undefined" ? document.body : null)
+      );
+    };
+
+    updateTarget();
+    if (typeof document !== "undefined") {
+      document.addEventListener("fullscreenchange", updateTarget);
+      // Safari/WebKit legacy event
+      // @ts-ignore
+      document.addEventListener("webkitfullscreenchange", updateTarget);
+    }
+    return () => {
+      if (typeof document !== "undefined") {
+        document.removeEventListener("fullscreenchange", updateTarget);
+        // @ts-ignore
+        document.removeEventListener("webkitfullscreenchange", updateTarget);
+      }
+    };
+  }, [container]);
+
   if (!mounted) return null;
+
+  if (!target) return null;
 
   return createPortal(
     <AnimatePresence>{isOpen && children}</AnimatePresence>,
-    container || document.body
+    target
   );
 }
 
@@ -118,7 +155,7 @@ function DropdownContent({
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Calculate position - open to top
+  // Calculate position with basic collision handling (flip above/below)
   useEffect(() => {
     if (!isOpen || !triggerRef.current) return;
 
@@ -127,6 +164,8 @@ function DropdownContent({
 
       const triggerRect = triggerRef.current.getBoundingClientRect();
       const contentRect = contentRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
       let left = triggerRect.left;
       if (align === "end") {
@@ -135,10 +174,25 @@ function DropdownContent({
         left = triggerRect.left + (triggerRect.width - contentRect.width) / 2;
       }
 
-      setPosition({
-        top: triggerRect.top - contentRect.height - sideOffset,
-        left,
-      });
+      // Clamp left within viewport with small margin
+      const margin = 8;
+      left = Math.max(
+        margin,
+        Math.min(left, viewportWidth - contentRect.width - margin)
+      );
+
+      // Prefer opening above; if not enough space, open below; otherwise clamp
+      const above = triggerRect.top - contentRect.height - sideOffset;
+      const below = triggerRect.bottom + sideOffset;
+
+      let top = above;
+      if (above < margin && below + margin <= viewportHeight) {
+        top = below;
+      } else if (above < margin && below + margin > viewportHeight) {
+        top = Math.max(margin, viewportHeight - contentRect.height - margin);
+      }
+
+      setPosition({ top, left });
     };
 
     // Initial update
@@ -273,7 +327,7 @@ function DropdownSeparator({ className }: DropdownSeparatorProps) {
 // Shared menu styles
 export const menuStyles = {
   container:
-    "rv-bg-black/50 rv-backdrop-blur-3xl rv-rounded-2xl rv-p-1 rv-shadow-2xl rv-border rv-border-white/5",
+    "rv-bg-black/70 rv-backdrop-blur-3xl rv-rounded-2xl rv-p-1 rv-shadow-2xl rv-border rv-border-white/5",
   separator: "rv-h-[1px] rv-bg-white/10 rv-my-1",
   item: {
     base: "rv-text-xs rv-text-white/80 rv-px-2.5 rv-py-1.5 rv-rounded-xl rv-cursor-pointer rv-outline-none rv-transition-colors",

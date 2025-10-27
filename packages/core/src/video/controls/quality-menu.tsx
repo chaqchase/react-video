@@ -62,7 +62,7 @@ export function VideoQualityMenu({
         </Button>
       </Dropdown.Trigger>
 
-      <Dropdown.Portal container={wrapperRef.current}>
+      <Dropdown.Portal>
         <Dropdown.Content
           className={cn("rv-min-w-[100px]", menuStyles.container)}
           sideOffset={8}

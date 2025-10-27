@@ -56,7 +56,7 @@ export function VideoCaptionsMenu({
         </Button>
       </Dropdown.Trigger>
 
-      <Dropdown.Portal container={wrapperRef.current}>
+      <Dropdown.Portal>
         <Dropdown.Content
           className={cn("rv-min-w-[140px]", menuStyles.container)}
           sideOffset={8}
