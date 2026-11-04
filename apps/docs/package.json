@@ -13,9 +13,11 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "dashjs": "5.2.1",
     "fumadocs-core": "16.17.10",
     "fumadocs-mdx": "15.4.10",
     "fumadocs-ui": "16.17.10",
+    "hls.js": "1.7.4",
     "next": "16.4.5",
     "react": "19.3.1",
     "react-dom": "19.3.1",

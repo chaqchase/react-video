@@ -41,7 +41,7 @@ export class RenditionProvider extends NativeProvider {
     this.switchScope?.abort();
     const controller = new AbortController();
     this.switchScope = controller;
-    this.switching = true;
+    this.ignoreElementErrors = true;
 
     const swap = (rendition: Rendition) => {
       element.src = rendition.src;
@@ -54,7 +54,7 @@ export class RenditionProvider extends NativeProvider {
     };
 
     const resumePlayback = () => {
-      this.switching = false;
+      this.ignoreElementErrors = false;
       this.switchScope = null;
       if (resume.playing) element.play().catch(() => {});
       this.sink?.sync();
@@ -94,7 +94,7 @@ export class RenditionProvider extends NativeProvider {
           );
           swap(previous);
         } else {
-          this.switching = false;
+          this.ignoreElementErrors = false;
         }
         this.sink?.error({ code: "quality-switch", message, fatal: false });
       },

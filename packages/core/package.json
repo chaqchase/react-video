@@ -113,6 +113,18 @@
       "types": "./dist/plugins/i18n/fr.d.ts",
       "default": "./dist/plugins/i18n/fr.js"
     },
+    "./hls": {
+      "types": "./dist/plugins/hls/index.d.ts",
+      "default": "./dist/plugins/hls/index.js"
+    },
+    "./dash": {
+      "types": "./dist/plugins/dash/index.d.ts",
+      "default": "./dist/plugins/dash/index.js"
+    },
+    "./live": {
+      "types": "./dist/plugins/live/index.d.ts",
+      "default": "./dist/plugins/live/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
