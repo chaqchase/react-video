@@ -1,3 +1,7 @@
+/* The skin sits above Tailwind's reset and below its utilities, so classes still win. */
+@layer theme, base, rv, components, utilities;
+
 @import "tailwindcss";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+@import "react-video-kit/styles.css";

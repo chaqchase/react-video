@@ -53,6 +53,7 @@ function createInitialMedia(): MediaState {
     ended: false,
     waiting: false,
     seeking: false,
+    scrubbing: false,
     started: false,
     duration: 0,
     buffered: [],
@@ -139,7 +140,11 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     );
   };
 
-  const applyProviderState = (state: Partial<MediaState>) => {
+  const applyProviderState = (reported: Partial<MediaState>) => {
+    // Scrubbing pauses the element, but `paused` keeps what the viewer asked for,
+    // so the controls don't flicker and playback can resume afterwards.
+    const { paused: _paused, ...rest } = reported;
+    const state = media().scrubbing ? rest : reported;
     // A provider reporting duration without a timeline is on-demand content.
     if (
       state.duration !== undefined &&
@@ -451,6 +456,13 @@ export function createPlayer(options: PlayerOptions = {}): Player {
         clock.sync();
       });
     },
+    scrub(active) {
+      if (active === media().scrubbing || (active && isLocked("seek"))) return;
+      setMedia({ scrubbing: active });
+      if (media().paused) return;
+      if (active) top()?.pause();
+      else void commands.play();
+    },
     setVolume(volume) {
       if (isLocked("volume") || !Number.isFinite(volume)) return;
       const next = clamp(volume, 0, 1);
@@ -594,6 +606,7 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     "data-ended": state.ended,
     "data-waiting": state.waiting,
     "data-seeking": state.seeking,
+    "data-scrubbing": state.scrubbing,
     "data-muted": state.muted,
     "data-live": state.live !== null,
     "data-error": state.error?.fatal === true,

@@ -1,1 +1,869 @@
-@layer rv;
+@layer rv {
+  .rv-root {
+    --rv-accent: #fff;
+    --rv-foreground: #fff;
+    --rv-muted: rgb(255 255 255 / 0.68);
+    --rv-glass: rgb(28 28 30 / 0.52);
+    --rv-glass-strong: rgb(28 28 30 / 0.78);
+    --rv-glass-border: rgb(255 255 255 / 0.13);
+    --rv-glass-hover: rgb(255 255 255 / 0.13);
+    --rv-track: rgb(255 255 255 / 0.26);
+    --rv-buffered: rgb(255 255 255 / 0.3);
+    --rv-focus: #5eb1ff;
+    --rv-blur: 22px;
+    --rv-radius: 16px;
+    --rv-pill-radius: 999px;
+    --rv-menu-radius: 18px;
+    --rv-control-size: 36px;
+    --rv-icon-size: 20px;
+    --rv-gap: 8px;
+    --rv-inset: 12px;
+    --rv-font: ui-sans-serif, -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    --rv-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --rv-duration-in: 160ms;
+    --rv-duration-out: 280ms;
+    --rv-duration-press: 110ms;
+
+    position: relative;
+    display: block;
+    container: rv / inline-size;
+    /* Containment removes intrinsic width, which would collapse a shrink-wrapped player. */
+    contain-intrinsic-inline-size: 640px;
+    isolation: isolate;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    border-radius: var(--rv-radius);
+    background: #000;
+    color: var(--rv-foreground);
+    font: 500 13px/1 var(--rv-font);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .rv-root:fullscreen,
+  .rv-root:-webkit-full-screen {
+    border-radius: 0;
+    aspect-ratio: auto;
+    width: 100%;
+    height: 100%;
+  }
+
+  .rv-root[data-controls="hidden"] {
+    cursor: none;
+  }
+
+  .rv-root [data-part="media"] {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+  }
+
+  /* Control bar */
+  .rv-root [data-part="controls"] {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 24px max(var(--rv-inset), env(safe-area-inset-right)) max(var(--rv-inset), env(safe-area-inset-bottom)) max(var(--rv-inset), env(safe-area-inset-left));
+    background: linear-gradient(to top, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0));
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root[data-controls="hidden"] [data-part="controls"] {
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition-duration: var(--rv-duration-out);
+  }
+
+  /* Keyboard users can still reach hidden controls, which then reveal themselves. */
+  .rv-root[data-controls="hidden"] [data-part="controls"]:has(:focus-visible) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .rv-root [data-part="control-row"] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rv-gap);
+  }
+
+  .rv-root [data-part="control-group"] {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: calc(var(--rv-control-size) + 4px);
+    padding: 2px;
+    border-radius: var(--rv-pill-radius);
+    background: var(--rv-glass);
+    box-shadow: inset 0 0 0 0.5px var(--rv-glass-border), 0 1px 12px rgb(0 0 0 / 0.14);
+    -webkit-backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
+    backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
+  }
+
+  .rv-root [data-part="control-group"]:empty {
+    display: none;
+  }
+
+  /* Buttons */
+  .rv-root [data-control] {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: var(--rv-control-size);
+    height: var(--rv-control-size);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--rv-pill-radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--rv-icon-size);
+    cursor: pointer;
+    transition:
+      background-color var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  /* A comfortable touch target around a compact visual. */
+  .rv-root [data-control]::before {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  .rv-root [data-control]:active {
+    transform: scale(0.92);
+    transition-duration: var(--rv-duration-press);
+  }
+
+  .rv-root [data-control]:focus-visible,
+  .rv-root [data-part="timeline"]:has(input:focus-visible) [data-part="timeline-track"],
+  .rv-root [data-part="volume-slider"]:has(input:focus-visible) [data-part="volume-track"],
+  .rv-root [data-part="menu-content"] [role^="menuitem"]:focus-visible {
+    outline: 2px solid var(--rv-focus);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-control]:hover {
+      background: var(--rv-glass-hover);
+    }
+
+    /* Tooltips only appear where hover exists, after a beat. */
+    .rv-root [data-control][aria-label]::after {
+      content: attr(aria-label);
+      position: absolute;
+      inset: auto auto calc(100% + 10px) 50%;
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: var(--rv-glass-strong);
+      color: var(--rv-foreground);
+      font: 500 12px/1 var(--rv-font);
+      white-space: nowrap;
+      opacity: 0;
+      transform: translate(-50%, 4px);
+      pointer-events: none;
+      transition:
+        opacity var(--rv-duration-in) var(--rv-ease),
+        transform var(--rv-duration-in) var(--rv-ease);
+    }
+
+    .rv-root [data-control][aria-label]:hover::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      transition-delay: 450ms;
+    }
+
+    .rv-root [data-part="control-group"]:first-child > [data-control]:first-child::after,
+    .rv-root [data-part="volume"] [data-control]::after {
+      inset-inline-start: 0;
+      transform: translate(0, 4px);
+    }
+
+    .rv-root [data-part="control-group"]:first-child > [data-control]:first-child:hover::after,
+    .rv-root [data-part="volume"] [data-control]:hover::after {
+      transform: translate(0, 0);
+    }
+
+    .rv-root [data-part="control-group"]:last-child > [data-control]:last-child::after,
+    .rv-root [data-part="control-group"]:last-child > :last-child [data-control]::after {
+      inset-inline: auto 0;
+      transform: translate(0, 4px);
+    }
+
+    .rv-root [data-part="control-group"]:last-child > [data-control]:last-child:hover::after,
+    .rv-root [data-part="control-group"]:last-child > :last-child [data-control]:hover::after {
+      transform: translate(0, 0);
+    }
+
+    .rv-root [data-state="open"]::after,
+    .rv-root [data-part="play-overlay"]::after {
+      display: none;
+    }
+  }
+
+  /* Icons that swap by state stack in one grid cell, then cross-fade and scale. */
+  .rv-root [data-control] > svg {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-control] > svg[data-show] {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  .rv-root [data-control][data-state="paused"] > [data-show="paused"],
+  .rv-root [data-control][data-state="playing"] > [data-show="playing"],
+  .rv-root [data-control][data-state="ended"] > [data-show="ended"],
+  .rv-root [data-control][data-state="ready"] > [data-show="ready"],
+  .rv-root [data-control][data-state="started"] > [data-show="ready"],
+  .rv-root [data-control][data-state="active"] > [data-show="active"],
+  .rv-root [data-control][data-state="inactive"] > [data-show="inactive"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .rv-root [data-part="pip"][data-state="active"],
+  .rv-root [data-part="menu-trigger"][data-state="open"] {
+    background: var(--rv-glass-hover);
+  }
+
+  .rv-root [data-part="menu-trigger"] > svg {
+    transition: transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="menu-trigger"][data-state="open"] > svg {
+    transform: rotate(45deg);
+  }
+
+  /* Volume waves fade away as the level drops. */
+  .rv-root [data-part="mute"] [data-wave] {
+    transition: opacity var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="mute"] [data-wave="slash"],
+  .rv-root [data-part="mute"][data-level="low"] [data-wave="high"],
+  .rv-root [data-part="mute"][data-level="muted"] [data-wave="low"],
+  .rv-root [data-part="mute"][data-level="muted"] [data-wave="high"] {
+    opacity: 0;
+  }
+
+  .rv-root [data-part="mute"][data-level="muted"] [data-wave="slash"] {
+    opacity: 1;
+  }
+
+  /* Sliders share a real input for focus and assistive tech. */
+  .rv-root [data-part="timeline-input"],
+  .rv-root [data-part="volume-input"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Timeline */
+  .rv-root [data-part="timeline"] {
+    position: relative;
+    height: 20px;
+    margin: 0 4px;
+    touch-action: pan-y;
+    cursor: pointer;
+  }
+
+  /* 44px of hit area around a 5px track. */
+  .rv-root [data-part="timeline"]::before {
+    content: "";
+    position: absolute;
+    inset: -12px 0;
+  }
+
+  .rv-root [data-part="timeline"][data-disabled] {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .rv-root [data-part="timeline-track"] {
+    position: absolute;
+    inset: 50% 0 auto;
+    overflow: hidden;
+    height: 5px;
+    margin-top: -2.5px;
+    border-radius: var(--rv-pill-radius);
+    background: var(--rv-track);
+    transition: transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="timeline-buffered"],
+  .rv-root [data-part="timeline-fill"] {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
+  }
+
+  .rv-root [data-part="timeline-buffered"] {
+    background: var(--rv-buffered);
+    transition: transform 400ms linear;
+  }
+
+  .rv-root [data-part="timeline-fill"] {
+    background: var(--rv-accent);
+  }
+
+  .rv-root [data-part="timeline-rail"] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .rv-root [data-part="timeline-thumb"] {
+    position: absolute;
+    top: 50%;
+    left: -7px;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: var(--rv-accent);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="timeline"][data-dragging] [data-part="timeline-track"] {
+    transform: scaleY(1.6);
+  }
+
+  .rv-root [data-part="timeline"][data-dragging] [data-part="timeline-thumb"],
+  .rv-root [data-part="timeline"]:has(input:focus-visible) [data-part="timeline-thumb"] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .rv-root [data-part="timeline"][data-dragging] [data-part="timeline-thumb"] {
+    transform: scale(1.15);
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-track"] {
+      transform: scaleY(1.6);
+    }
+
+    .rv-root [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-thumb"] {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .rv-root [data-part="timeline-preview"] {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: var(--rv-glass-strong);
+    box-shadow: inset 0 0 0 0.5px var(--rv-glass-border);
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="timeline-preview"][data-visible] {
+    opacity: 1;
+  }
+
+  /* Time */
+  .rv-root [data-part="time"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding-inline: 8px 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .rv-root [data-part="time-separator"],
+  .rv-root [data-part="duration"] {
+    color: var(--rv-muted);
+  }
+
+  /* Volume */
+  .rv-root [data-part="volume"] {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .rv-root [data-part="volume-slider"] {
+    position: relative;
+    flex: none;
+    overflow: hidden;
+    width: 0;
+    height: var(--rv-control-size);
+    touch-action: none;
+    cursor: pointer;
+    opacity: 0;
+    transition:
+      width var(--rv-duration-out) var(--rv-ease),
+      opacity var(--rv-duration-in) var(--rv-ease),
+      margin var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="volume"]:hover [data-part="volume-slider"],
+  .rv-root [data-part="volume"]:focus-within [data-part="volume-slider"] {
+    overflow: visible;
+    width: 72px;
+    margin-inline: 4px 8px;
+    opacity: 1;
+  }
+
+  .rv-root [data-part="volume-track"] {
+    position: absolute;
+    inset: 50% 0 auto;
+    overflow: hidden;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: var(--rv-pill-radius);
+    background: var(--rv-track);
+  }
+
+  .rv-root [data-part="volume-fill"] {
+    position: absolute;
+    inset: 0;
+    background: var(--rv-accent);
+    transform-origin: left;
+  }
+
+  .rv-root [data-part="volume-rail"] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .rv-root [data-part="volume-thumb"] {
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: var(--rv-accent);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+  }
+
+  /* Overlays */
+  .rv-root [data-part="play-overlay"],
+  .rv-root [data-part="buffering"] {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    z-index: 1;
+    width: 68px;
+    height: 68px;
+    margin: -34px 0 0 -34px;
+    border-radius: 50%;
+    background: var(--rv-glass);
+    box-shadow: inset 0 0 0 0.5px var(--rv-glass-border), 0 4px 24px rgb(0 0 0 / 0.22);
+    -webkit-backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
+    backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
+    font-size: 30px;
+  }
+
+  .rv-root [data-part="play-overlay"] {
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease),
+      visibility 0s;
+  }
+
+  .rv-root [data-part="play-overlay"][data-state="started"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.82);
+    pointer-events: none;
+    transition-delay: 0s, 0s, var(--rv-duration-out);
+  }
+
+  .rv-root[data-status="error"] [data-part="play-overlay"] {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-part="play-overlay"]:hover {
+      transform: scale(1.06);
+      background: var(--rv-glass);
+    }
+  }
+
+  .rv-root [data-part="buffering"] {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin: -26px 0 0 -26px;
+    font-size: 28px;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+    transition:
+      opacity var(--rv-duration-out) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease),
+      visibility 0s var(--rv-duration-out);
+  }
+
+  .rv-root [data-part="buffering"][data-visible] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  .rv-root [data-part="buffering"] > svg {
+    animation: rv-spin 900ms linear infinite;
+  }
+
+  @keyframes rv-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  .rv-root [data-part="error-overlay"] {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background: rgb(0 0 0 / 0.72);
+    text-align: center;
+    animation: rv-fade var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="error-title"] {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .rv-root [data-part="error-message"] {
+    margin: 0;
+    max-width: 44ch;
+    color: var(--rv-muted);
+    line-height: 1.35;
+  }
+
+  .rv-root [data-part="error-retry"] {
+    width: auto;
+    height: auto;
+    margin-top: 8px;
+    padding: 9px 16px;
+    background: var(--rv-glass-hover);
+    font-size: 13px;
+  }
+
+  .rv-root [data-part="error-retry"]::after {
+    display: none;
+  }
+
+  @keyframes rv-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Double-tap seek ripple */
+  .rv-root [data-part="seek-feedback"] {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .rv-root [data-part="seek-feedback"] > span {
+    position: absolute;
+    top: 50%;
+    left: 22%;
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    opacity: 0;
+  }
+
+  .rv-root [data-part="seek-feedback"][data-direction="forward"] > span {
+    left: 78%;
+  }
+
+  .rv-root [data-part="seek-feedback"][data-active] > span {
+    animation: rv-ripple 480ms var(--rv-ease);
+  }
+
+  @keyframes rv-ripple {
+    from {
+      opacity: 1;
+      transform: scale(0.5);
+    }
+
+    to {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+
+  /* Menu */
+  .rv-root [data-part="menu-content"] {
+    position: absolute;
+    right: max(var(--rv-inset), env(safe-area-inset-right));
+    bottom: calc(100% - 16px);
+    z-index: 4;
+    overflow: hidden;
+    width: 240px;
+    max-height: min(320px, 76cqh);
+    border-radius: var(--rv-menu-radius);
+    background: var(--rv-glass-strong);
+    box-shadow: inset 0 0 0 0.5px var(--rv-glass-border), 0 12px 40px rgb(0 0 0 / 0.36);
+    -webkit-backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
+    backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
+    font-size: 14px;
+    transform-origin: bottom right;
+    transition:
+      opacity 220ms var(--rv-ease),
+      transform 220ms var(--rv-ease),
+      height 220ms var(--rv-ease);
+  }
+
+  @starting-style {
+    .rv-root [data-part="menu-content"][data-state="open"] {
+      opacity: 0;
+      transform: scale(0.94) translateY(6px);
+    }
+  }
+
+  .rv-root [data-part="menu-content"][data-state="closed"] {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+    pointer-events: none;
+    transition-duration: 140ms;
+  }
+
+  .rv-root [data-part="menu-panels"] {
+    position: relative;
+  }
+
+  .rv-root [data-part="menu-panel"] {
+    position: absolute;
+    inset: 0 0 auto;
+    padding: 6px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(16px);
+    transition:
+      opacity 180ms var(--rv-ease),
+      transform 220ms var(--rv-ease),
+      visibility 0s 220ms;
+  }
+
+  .rv-root [data-part="menu-panel"][data-root] {
+    transform: translateX(-16px);
+  }
+
+  .rv-root [data-part="menu-panel"][data-active] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  .rv-root [data-part="menu-item"],
+  .rv-root [data-part="menu-radio-item"],
+  .rv-root [data-part="menu-back"] {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 38px;
+    padding: 0 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="menu-item-label"] {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rv-root [data-part="menu-item-value"] {
+    color: var(--rv-muted);
+    white-space: nowrap;
+  }
+
+  .rv-root [data-part="menu-item"][data-sub]::after,
+  .rv-root [data-part="menu-back"]::before {
+    content: "";
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border: solid var(--rv-muted);
+    border-width: 2px 2px 0 0;
+    transform: rotate(45deg);
+  }
+
+  .rv-root [data-part="menu-back"]::before {
+    transform: rotate(-135deg);
+  }
+
+  .rv-root [data-part="menu-back"] {
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .rv-root [data-part="menu-radio-item"]::after {
+    content: "";
+    flex: none;
+    width: 6px;
+    height: 11px;
+    margin-inline: auto 3px;
+    border: solid var(--rv-accent);
+    border-width: 0 2px 2px 0;
+    opacity: 0;
+    transform: rotate(45deg) scale(0.5);
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="menu-radio-item"][data-checked]::after {
+    opacity: 1;
+    transform: rotate(45deg);
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-part="menu-item"]:hover,
+    .rv-root [data-part="menu-radio-item"]:hover,
+    .rv-root [data-part="menu-back"]:hover {
+      background: var(--rv-glass-hover);
+    }
+  }
+
+  .rv-root [role^="menuitem"][aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  /* Small players drop the slider and shrink. */
+  @container rv (max-width: 479px) {
+    [data-part="control-group"] {
+      --rv-control-size: 32px;
+      --rv-icon-size: 18px;
+    }
+
+    [data-part="volume-slider"],
+    [data-part="time-separator"],
+    [data-part="duration"] {
+      display: none;
+    }
+
+    [data-part="controls"] {
+      --rv-inset: 8px;
+    }
+
+    [data-part="play-overlay"] {
+      width: 56px;
+      height: 56px;
+      margin: -28px 0 0 -28px;
+      font-size: 24px;
+    }
+
+    /* The menu becomes a bottom sheet. */
+    [data-part="menu-content"] {
+      right: 8px;
+      left: 8px;
+      bottom: 8px;
+      width: auto;
+      transform-origin: bottom center;
+    }
+  }
+
+  @container rv (min-width: 840px) {
+    [data-part="control-group"] {
+      --rv-control-size: 40px;
+      --rv-icon-size: 22px;
+    }
+
+    [data-part="time"] {
+      font-size: 14px;
+    }
+  }
+
+  /* Reduced motion: no movement, just quick fades. */
+  @media (prefers-reduced-motion: reduce) {
+    .rv-root,
+    .rv-root * {
+      --rv-duration-in: 120ms;
+      --rv-duration-out: 120ms;
+      --rv-duration-press: 0ms;
+    }
+
+    .rv-root [data-part="controls"],
+    .rv-root [data-control],
+    .rv-root [data-control] > svg,
+    .rv-root [data-part="menu-content"],
+    .rv-root [data-part="menu-panel"],
+    .rv-root [data-part="play-overlay"],
+    .rv-root [data-part="buffering"],
+    .rv-root [data-part="timeline-track"],
+    .rv-root [data-part="timeline-thumb"] {
+      transform: none !important;
+      transition-property: opacity, background-color, visibility;
+    }
+
+    .rv-root [data-part="buffering"] > svg {
+      animation-duration: 2.400s;
+    }
+
+    .rv-root [data-part="seek-feedback"][data-active] > span {
+      animation-name: rv-fade;
+    }
+  }
+}

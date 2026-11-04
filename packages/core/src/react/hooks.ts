@@ -100,6 +100,16 @@ export function useVideoState(
   );
 }
 
+/** A localized string from the i18n plugin when it's installed, else `fallback`. */
+export function useLabel(key: string, fallback: string): string {
+  const strings = useSelected(
+    usePlayer(),
+    (state) => (state.i18n as { strings?: Record<string, string> } | undefined)?.strings,
+    Object.is
+  );
+  return strings?.[key] ?? fallback;
+}
+
 /** Core commands, or a plugin's commands when given its factory. */
 export function useCommands(): CoreCommands;
 export function useCommands<Factory extends AnyPluginFactory>(

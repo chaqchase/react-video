@@ -60,7 +60,8 @@ export class NativeProvider implements Provider {
     on("pause", () => sink.update({ paused: true }));
     on("waiting", () => sink.update({ waiting: true }));
     on("seeking", () => {
-      sink.update({ seeking: true });
+      // Seeking back from the end leaves the ended state without a play.
+      sink.update({ seeking: true, ended: element.ended });
       sink.sync();
     });
     on("seeked", () => {
@@ -106,7 +107,7 @@ export class NativeProvider implements Provider {
       scope.on(tracks, "change", publish);
     }
 
-    sink.update(this.snapshot());
+    sink.update({ ...this.snapshot(), capabilities: this.capabilities(element) });
   }
 
   async load(request: LoadRequest) {
@@ -185,6 +186,15 @@ export class NativeProvider implements Provider {
     // Clearing the source releases the download and the decoder.
     element.removeAttribute("src");
     element.load();
+  }
+
+  private capabilities(element: HTMLVideoElement) {
+    // iOS ignores volume writes, because the hardware buttons own volume there.
+    const volume = element.volume;
+    element.volume = volume === 0.5 ? 0.25 : 0.5;
+    const canSetVolume = element.volume !== volume;
+    element.volume = volume;
+    return { seek: true, rate: true, volume: canSetVolume };
   }
 
   private duration() {

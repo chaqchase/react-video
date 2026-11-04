@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { defineConfig } from "tsdown";
 
 type ExportsMap = Record<string, string | { default: string }>;
@@ -10,9 +10,10 @@ const { exports: exportsMap } = JSON.parse(
 // package.json is the contract: every code subpath maps to one source entry.
 const entry = Object.values(exportsMap)
   .filter((target) => typeof target === "object")
-  .map((target) =>
-    target.default.replace("./dist/", "src/").replace(/\.js$/, ".ts")
-  );
+  .map((target) => {
+    const base = target.default.replace("./dist/", "src/").replace(/\.js$/, "");
+    return existsSync(`${base}.tsx`) ? `${base}.tsx` : `${base}.ts`;
+  });
 
 export default defineConfig({
   entry,

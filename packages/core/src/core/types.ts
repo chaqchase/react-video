@@ -97,6 +97,8 @@ export interface MediaState {
   ended: boolean;
   waiting: boolean;
   seeking: boolean;
+  /** True while the viewer drags the timeline. `paused` keeps their intent meanwhile. */
+  scrubbing: boolean;
   /** True once playback has begun for the current source. */
   started: boolean;
   duration: number;
@@ -190,6 +192,8 @@ export interface CoreCommands {
   play(): Promise<boolean>;
   pause(): void;
   seek(time: number): void;
+  /** Holds playback while the viewer drags the timeline, then restores it. */
+  scrub(active: boolean): void;
   setVolume(volume: number): void;
   setMuted(muted: boolean): void;
   setRate(rate: number): void;

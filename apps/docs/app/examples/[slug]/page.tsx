@@ -10,7 +10,7 @@ export default async function ExamplePage(props: Props) {
   if (!example) notFound();
 
   return (
-    <main style={{ maxWidth: 960, margin: "0 auto", padding: 16 }}>
+    <main style={{ width: "100%", maxWidth: 960, margin: "0 auto", padding: 16 }}>
       <example.Component />
     </main>
   );

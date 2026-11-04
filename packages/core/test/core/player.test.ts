@@ -219,6 +219,41 @@ describe("playback commands", () => {
     expect(media().volume).toBe(0.3);
   });
 
+  it("scrubbing holds playback without showing as paused, then resumes", async () => {
+    const { player, video, media } = await setup();
+    await player.commands.play();
+    await settle();
+    player.commands.scrub(true);
+    await settle();
+    expect(video.paused).toBe(true);
+    expect(media()).toMatchObject({ paused: false, scrubbing: true });
+    player.commands.scrub(false);
+    await settle();
+    expect(video.paused).toBe(false);
+    expect(media()).toMatchObject({ paused: false, scrubbing: false });
+  });
+
+  it("scrubbing while paused stays paused", async () => {
+    const { player, video, media } = await setup();
+    player.commands.scrub(true);
+    player.commands.scrub(false);
+    await settle();
+    expect(video.paused).toBe(true);
+    expect(media().paused).toBe(true);
+  });
+
+  it("leaves the ended state when seeking back", async () => {
+    const { player, video, media } = await setup();
+    await player.commands.play();
+    await settle();
+    advance(video, 100);
+    await settle();
+    expect(media().ended).toBe(true);
+    player.commands.seek(5);
+    await settle();
+    expect(media().ended).toBe(false);
+  });
+
   it("reports ended and pauses", async () => {
     const { player, video, media } = await setup();
     await player.commands.play();

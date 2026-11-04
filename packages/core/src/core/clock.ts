@@ -6,6 +6,8 @@ export interface Clock {
    * seconds, plus once immediately and after every discontinuity. Returns unbind.
    */
   bind(write: (time: number) => void, resolution: () => number): () => void;
+  /** Writes every binding now, for seeks, source changes, and provider swaps. */
+  sync(): void;
 }
 
 export interface OwnedClock extends Clock {
@@ -13,8 +15,6 @@ export interface OwnedClock extends Clock {
   setSource(source: { time(): number; rate(): number } | null): void;
   /** Starts or stops the loop. Stopped means nothing runs per frame. */
   setRunning(running: boolean): void;
-  /** Writes every binding now, for seeks, source changes, and provider swaps. */
-  sync(): void;
   dispose(): void;
 }
 

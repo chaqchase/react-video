@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import Basic from "./basic";
 import FailedSource from "./failed-source";
 import Fallback from "./fallback";
+import Player from "./player";
 import SourceChange from "./source-change";
 
 export type Example = {
@@ -12,6 +13,7 @@ export type Example = {
 
 export const examples: Example[] = [
   { slug: "basic", title: "Basic", Component: Basic },
+  { slug: "player", title: "Complete player", Component: Player },
   { slug: "fallback", title: "Fallback sources", Component: Fallback },
   { slug: "failed-source", title: "Failed source", Component: FailedSource },
   { slug: "source-change", title: "Changing the source", Component: SourceChange },
