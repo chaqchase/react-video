@@ -27,7 +27,7 @@
     "build:css": "tailwindcss -i ./src/index.css -o ./src/styles.css --minify",
     "dev": "pnpm build:css && pnpm dev:watch",
     "dev:watch": "concurrently \"tailwindcss -i ./src/index.css -o ./src/styles.css --watch\" \"tsup --watch\"",
-    "check-types": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "motion": ">=10.0.0",
@@ -49,14 +49,13 @@
     "@types/react-dom": "18.2.7",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.2",
-    "eslint": "^7.32.0",
     "motion": "^12.23.24",
     "postcss": "^8.4.32",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwindcss": "^3.3.6",
     "tsup": "^8.0.1",
-    "typescript": "^4.9.4"
+    "typescript": "6.0.3"
   },
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://react-vide-kit.chaqchase.com",
