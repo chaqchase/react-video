@@ -42,6 +42,7 @@ export interface Strings {
   ad?: string;
   skipAd?: string;
   skipAdIn?: string;
+  learnMore?: string;
 }
 
 export interface I18nOptions {

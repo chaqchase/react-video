@@ -125,6 +125,34 @@
       "types": "./dist/plugins/live/index.d.ts",
       "default": "./dist/plugins/live/index.js"
     },
+    "./playlist": {
+      "types": "./dist/plugins/playlist/index.d.ts",
+      "default": "./dist/plugins/playlist/index.js"
+    },
+    "./airplay": {
+      "types": "./dist/plugins/airplay/index.d.ts",
+      "default": "./dist/plugins/airplay/index.js"
+    },
+    "./chromecast": {
+      "types": "./dist/plugins/chromecast/index.d.ts",
+      "default": "./dist/plugins/chromecast/index.js"
+    },
+    "./ads": {
+      "types": "./dist/plugins/ads/index.d.ts",
+      "default": "./dist/plugins/ads/index.js"
+    },
+    "./drm": {
+      "types": "./dist/plugins/drm/index.d.ts",
+      "default": "./dist/plugins/drm/index.js"
+    },
+    "./ads/vast": {
+      "types": "./dist/plugins/ads/vast.d.ts",
+      "default": "./dist/plugins/ads/vast.js"
+    },
+    "./ads/ima": {
+      "types": "./dist/plugins/ads/ima.d.ts",
+      "default": "./dist/plugins/ads/ima.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },

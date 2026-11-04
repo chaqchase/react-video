@@ -1,15 +1,22 @@
 import type { ComponentType } from "react";
+import Ads from "./ads";
+import AdsEmpty from "./ads-empty";
+import AdsWrapper from "./ads-wrapper";
 import Basic from "./basic";
 import Dash from "./dash";
+import Drm from "./drm";
+import DrmMissing from "./drm-missing";
 import EngineUnused from "./engine-unused";
 import FailedSource from "./failed-source";
 import Fallback from "./fallback";
 import Features from "./features";
 import Hls from "./hls";
 import HlsEngine from "./hls-engine";
+import HlsTracks from "./hls-tracks";
 import Live from "./live";
 import LiveDvr from "./live-dvr";
 import Player from "./player";
+import Playlist from "./playlist";
 import SourceChange from "./source-change";
 
 export type Example = {
@@ -31,4 +38,11 @@ export const examples: Example[] = [
   { slug: "engine-unused", title: "Engines stay unloaded", Component: EngineUnused },
   { slug: "live", title: "Live", Component: Live },
   { slug: "live-dvr", title: "Live with a DVR window", Component: LiveDvr },
+  { slug: "hls-tracks", title: "Alternate audio and engine subtitles", Component: HlsTracks },
+  { slug: "playlist", title: "Playlist", Component: Playlist },
+  { slug: "ads", title: "Pre-roll ad", Component: Ads },
+  { slug: "ads-wrapper", title: "Pre-roll behind a wrapper", Component: AdsWrapper },
+  { slug: "ads-empty", title: "Ad tag with nothing to show", Component: AdsEmpty },
+  { slug: "drm", title: "Clear Key protection", Component: Drm },
+  { slug: "drm-missing", title: "Protected stream with no key", Component: DrmMissing },
 ];

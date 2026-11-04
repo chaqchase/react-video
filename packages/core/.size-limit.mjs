@@ -38,6 +38,14 @@ export default [
   code("hls", "dist/plugins/hls/index.js", 2.75),
   code("dash", "dist/plugins/dash/index.js", 2.75),
   code("live", "dist/plugins/live/index.js", 2),
+  code("playlist", "dist/plugins/playlist/index.js", 2.25),
+  code("airplay", "dist/plugins/airplay/index.js", 1.75),
+  code("chromecast", "dist/plugins/chromecast/index.js", 3),
+  code("ads", "dist/plugins/ads/index.js", 2.5),
+  code("ads/vast", "dist/plugins/ads/vast.js", 1.5),
+  code("ads/ima", "dist/plugins/ads/ima.js", 1.25),
+  code("drm", "dist/plugins/drm/index.js", 1.5),
+  code("compat", "dist/compat/index.js", 1.25),
   // CSS skips bundling: size-limit's Rolldown step can't bundle CSS.
   { name: "styles.css", path: "dist/styles.css", rolldown: false, brotli: true, limit: "4 KB" },
 ];

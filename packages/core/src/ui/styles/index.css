@@ -950,6 +950,135 @@
     background: var(--rv-live, #ff453a);
   }
 
+  /* Up next */
+  .rv-root [data-part="up-next"] {
+    position: absolute;
+    inset: auto var(--rv-inset) calc(var(--rv-control-size) + 44px) auto;
+    z-index: 2;
+    max-width: min(320px, 80%);
+    padding: 14px 16px;
+    border-radius: var(--rv-radius);
+    background: var(--rv-glass-strong);
+    box-shadow: inset 0 0 0 1px var(--rv-glass-border);
+    backdrop-filter: blur(var(--rv-blur));
+    animation: rv-fade var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="up-next-label"] {
+    margin: 0;
+    color: var(--rv-muted);
+    font-size: 12px;
+  }
+
+  .rv-root [data-part="up-next-title"] {
+    margin: 2px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .rv-root [data-part="up-next-actions"] {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .rv-root [data-part="up-next-play"],
+  .rv-root [data-part="up-next-cancel"] {
+    width: auto;
+    height: 32px;
+    padding-inline: 12px;
+    font-size: 13px;
+  }
+
+  .rv-root [data-part="up-next-play"] {
+    background: var(--rv-accent);
+    color: #000;
+  }
+
+  /* Disabled transport buttons */
+  .rv-root [data-control][aria-disabled="true"] {
+    opacity: 0.4;
+  }
+
+  /* Casting */
+  .rv-root [data-part="casting"] {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 0.72);
+    font-size: 15px;
+  }
+
+  .rv-root [data-part="casting"] p {
+    margin: 0;
+  }
+
+  .rv-root[data-casting] [data-part="play-overlay"],
+  .rv-root[data-casting] [data-part="buffering"] {
+    display: none;
+  }
+
+  /* Ads */
+  .rv-root [data-part="ad-container"] {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .rv-root[data-ad] [data-part="ad-container"] {
+    pointer-events: auto;
+  }
+
+  .rv-root [data-part="ad-media"] {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+  }
+
+  .rv-root [data-part="ad-overlay"] {
+    position: absolute;
+    inset: var(--rv-inset) var(--rv-inset) auto;
+    z-index: 2;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .rv-root [data-part="ad-label"],
+  .rv-root [data-part="ad-link"] {
+    padding: 6px 10px;
+    border-radius: var(--rv-pill-radius);
+    background: var(--rv-glass-strong);
+    color: var(--rv-foreground);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    pointer-events: auto;
+  }
+
+  .rv-root [data-part="ad-skip"] {
+    width: auto;
+    height: 32px;
+    margin-inline-start: auto;
+    padding-inline: 12px;
+    background: var(--rv-glass-strong);
+    font-size: 13px;
+    pointer-events: auto;
+  }
+
+  .rv-root [data-part="ad-skip"]:disabled {
+    color: var(--rv-muted);
+    cursor: default;
+  }
+
   /* Small players drop the slider and shrink. */
   @container rv (max-width: 479px) {
     [data-part="control-group"] {
