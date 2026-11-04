@@ -1,0 +1,24 @@
+name: Setup
+description: Install pnpm, Node.js, and workspace dependencies
+
+inputs:
+  cache:
+    description: Cache the pnpm store. Keep this off in release jobs to avoid cache poisoning.
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v6
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version-file: .node-version
+        package-manager-cache: false
+        cache: ${{ inputs.cache == 'true' && 'pnpm' || '' }}
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile

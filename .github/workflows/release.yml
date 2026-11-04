@@ -5,40 +5,109 @@ on:
     branches:
       - main
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
-    name: Release
+  select-mode:
     runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.select-mode.outputs.mode }}
+      publish-plan-artifact-id: ${{ steps.select-mode.outputs.publish-plan-artifact-id }}
+    permissions:
+      contents: read
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Check out repo
+        uses: actions/checkout@v7
         with:
-          node-version: 18
+          persist-credentials: false
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Select Changesets mode
+        id: select-mode
+        uses: changesets/action/select-mode@v2
+
+  version:
+    if: needs.select-mode.outputs.mode == 'version'
+    needs: select-mode
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v7
         with:
-          version: 8.9.0
+          persist-credentials: false
 
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Build core package only
-        run: pnpm -C packages/core build
-
-      - name: Create Release PR or Publish Packages
-        id: changesets
-        uses: changesets/action@v1
+      # Pull requests opened with the default GITHUB_TOKEN don't trigger CI,
+      # so the version PR would never get its required checks.
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
         with:
-          publish: pnpm release
-          version: pnpm version-packages
-          commit: "chore: update package versions"
-          title: "chore: update package versions"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Create or update the version PR
+        uses: changesets/action/version@v2
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          commit-message: "chore: version packages"
+          pr-title: "chore: version packages"
+
+  pack:
+    if: needs.select-mode.outputs.mode == 'publish'
+    needs: select-mode
+    runs-on: ubuntu-latest
+    outputs:
+      pack-dir-artifact-id: ${{ steps.pack.outputs.pack-dir-artifact-id }}
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build package
+        run: pnpm --filter react-video-kit build
+
+      - name: Pack package
+        id: pack
+        uses: changesets/action/pack@v2
+        with:
+          publish-plan-artifact-id: ${{ needs.select-mode.outputs.publish-plan-artifact-id }}
+
+  # Only this job can publish. The `npm` environment should require a reviewer,
+  # and npm's trusted publisher must name this workflow and environment.
+  publish:
+    needs: pack
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Publish to npm
+        uses: changesets/action/publish@v2
+        with:
+          pack-dir-artifact-id: ${{ needs.pack.outputs.pack-dir-artifact-id }}
+          create-github-releases: true
