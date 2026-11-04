@@ -119,6 +119,7 @@ export function installFakeMedia(prototype: HTMLMediaElement) {
     duration: { configurable: true, get(this: HTMLMediaElement) { return stateOf(this).duration; } },
     paused: { configurable: true, get(this: HTMLMediaElement) { return stateOf(this).paused; } },
     ended: { configurable: true, get(this: HTMLMediaElement) { return stateOf(this).ended; } },
+    readyState: { configurable: true, get(this: HTMLMediaElement) { return Number.isNaN(stateOf(this).duration) ? 0 : 4; } },
     error: { configurable: true, get(this: HTMLMediaElement) { return stateOf(this).error; } },
     volume: accessor("volume", (element) => emit(element, "volumechange")),
     muted: accessor("muted", (element) => emit(element, "volumechange")),

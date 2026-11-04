@@ -37,6 +37,18 @@
       "types": "./dist/plugins/fullscreen/index.d.ts",
       "default": "./dist/plugins/fullscreen/index.js"
     },
+    "./pip": {
+      "types": "./dist/plugins/pip/index.d.ts",
+      "default": "./dist/plugins/pip/index.js"
+    },
+    "./idle": {
+      "types": "./dist/plugins/idle/index.d.ts",
+      "default": "./dist/plugins/idle/index.js"
+    },
+    "./gestures": {
+      "types": "./dist/plugins/gestures/index.d.ts",
+      "default": "./dist/plugins/gestures/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },

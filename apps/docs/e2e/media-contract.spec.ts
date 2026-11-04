@@ -18,7 +18,6 @@ type Scenario = (
 ) => Promise<void>;
 
 declare global {
-  // eslint-disable-next-line no-var
   var __mediaContract: Record<string, Scenario>;
 }
 

@@ -1,32 +1,35 @@
 "use client";
 
-import { forwardRef, type ButtonHTMLAttributes } from "react";
-import { useCommands, useVideoState } from "../hooks";
+import { forwardRef } from "react";
+import { useCommands, useLabel, useVideoState } from "../hooks";
+import { Button, type ButtonProps } from "./button";
 
-export type PlayPauseProps = ButtonHTMLAttributes<HTMLButtonElement>;
+export type PlayPauseProps = ButtonProps;
 
 export const PlayPause = forwardRef<HTMLButtonElement, PlayPauseProps>(
-  function PlayPause({ onClick, children, ...props }, ref) {
-    const paused = useVideoState((media) => media.paused);
+  function PlayPause({ onClick, ...props }, ref) {
+    const state = useVideoState((media) =>
+      media.ended ? "ended" : media.paused ? "paused" : "playing"
+    );
     const commands = useCommands();
+    const play = useLabel("play", "Play");
+    const pause = useLabel("pause", "Pause");
+    const replay = useLabel("replay", "Replay");
 
     return (
-      <button
+      <Button
         ref={ref}
-        type="button"
         data-part="play-pause"
-        data-paused={paused ? "" : undefined}
-        aria-label={paused ? "Play" : "Pause"}
+        data-state={state}
+        aria-label={state === "playing" ? pause : state === "ended" ? replay : play}
         onClick={(event) => {
           onClick?.(event);
           if (event.defaultPrevented) return;
-          if (paused) void commands.play();
-          else commands.pause();
+          if (state === "playing") commands.pause();
+          else void commands.play();
         }}
         {...props}
-      >
-        {children}
-      </button>
+      />
     );
   }
 );
