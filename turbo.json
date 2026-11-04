@@ -47,6 +47,12 @@
       "dependsOn": [
         "build"
       ]
+    },
+    "test:ssr": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": false
     }
   }
 }

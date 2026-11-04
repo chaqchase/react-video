@@ -111,3 +111,17 @@ jobs:
         with:
           pack-dir-artifact-id: ${{ needs.pack.outputs.pack-dir-artifact-id }}
           create-github-releases: true
+
+  # While main publishes prereleases, a stable tag must never move.
+  verify-dist-tags:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that latest is still on 3.x
+        run: |
+          latest="$(npm view react-video-kit dist-tags.latest)"
+          echo "latest is $latest"
+          case "$latest" in
+            3.*) ;;
+            *) echo "::error::latest moved to $latest" && exit 1 ;;
+          esac

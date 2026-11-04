@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          cache: "true"
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm lint:pkg
+      - run: pnpm --filter react-video-kit test:treeshake
+
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        react: ["19", "18"]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          cache: "true"
+      - run: pnpm --filter react-video-kit test
+        env:
+          REACT_VERSION: ${{ matrix.react }}
+
+  size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          cache: "true"
+      - run: pnpm size
+
+  e2e:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - browser: chrome
+            os: ubuntu-latest
+          - browser: firefox
+            os: ubuntu-latest
+          # Playwright recommends macOS for WebKit media playback.
+          - browser: webkit
+            os: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          cache: "true"
+      - name: Restore generated media
+        id: media
+        uses: actions/cache@v6
+        with:
+          path: apps/docs/public/media
+          key: media-${{ hashFiles('apps/docs/scripts/gen-media.mjs') }}
+      - name: Install ffmpeg
+        if: steps.media.outputs.cache-hit != 'true'
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            brew install ffmpeg
+          else
+            sudo apt-get update && sudo apt-get install -y ffmpeg
+          fi
+      - name: Generate media
+        if: steps.media.outputs.cache-hit != 'true'
+        run: pnpm media
+      - run: pnpm build
+      - name: Install ${{ matrix.browser }}
+        working-directory: apps/docs
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      - name: Run browser tests
+        working-directory: apps/docs
+        run: pnpm exec playwright test --project=${{ matrix.browser }}
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-${{ matrix.browser }}
+          path: apps/docs/test-results
+          if-no-files-found: ignore
+
+  ssr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          cache: "true"
+      - run: pnpm test:ssr
+
+  # The single required status check, so jobs can change without repo settings.
+  ci-ok:
+    if: always()
+    needs: [static, unit, size, e2e, ssr]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every job to pass
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          for result in $RESULTS; do
+            [ "$result" = "success" ] || exit 1
+          done
