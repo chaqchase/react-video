@@ -34,6 +34,10 @@ export default [
   code("autoplay", "dist/plugins/autoplay/index.js", 1.5),
   code("recovery", "dist/plugins/recovery/index.js", 0.75),
   code("analytics", "dist/plugins/analytics/index.js", 0.75),
+  // These include the provider each one loads lazily, but not the engine itself.
+  code("hls", "dist/plugins/hls/index.js", 2.75),
+  code("dash", "dist/plugins/dash/index.js", 2.75),
+  code("live", "dist/plugins/live/index.js", 2),
   // CSS skips bundling: size-limit's Rolldown step can't bundle CSS.
   { name: "styles.css", path: "dist/styles.css", rolldown: false, brotli: true, limit: "4 KB" },
 ];

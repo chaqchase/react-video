@@ -13,13 +13,16 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
-    // Bundled Chromium lacks proprietary codecs, so CI targets real Chrome. Set
-    // E2E_CHROME_CHANNEL=chrome locally when Chrome is installed.
+    // Bundled Chromium lacks proprietary codecs, so CI targets real Chrome. Locally,
+    // set E2E_CHROME_CHANNEL=chrome, or E2E_CHROME_PATH to any Chromium browser's binary.
     {
       name: "chrome",
       use: {
         ...devices["Desktop Chrome"],
         channel: process.env.E2E_CHROME_CHANNEL ?? (process.env.CI ? "chrome" : undefined),
+        launchOptions: process.env.E2E_CHROME_PATH
+          ? { executablePath: process.env.E2E_CHROME_PATH }
+          : {},
       },
     },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },

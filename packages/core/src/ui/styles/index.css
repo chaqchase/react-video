@@ -911,6 +911,45 @@
     transform: none;
   }
 
+  /* Live */
+  .rv-root[data-live] [data-part="time"] {
+    display: none;
+  }
+
+  .rv-root[data-live]:not([data-dvr]) [data-part="timeline"] {
+    visibility: hidden;
+  }
+
+  .rv-root [data-part="live"] {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    width: auto;
+    padding-inline: 10px;
+    color: var(--rv-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: color var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="live"]::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentcolor;
+    transition: background var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="live"][data-edge] {
+    color: var(--rv-foreground);
+  }
+
+  .rv-root [data-part="live"][data-edge]::before {
+    background: var(--rv-live, #ff453a);
+  }
+
   /* Small players drop the slider and shrink. */
   @container rv (max-width: 479px) {
     [data-part="control-group"] {

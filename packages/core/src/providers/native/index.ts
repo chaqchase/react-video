@@ -1,4 +1,5 @@
 import type {
+  Capabilities,
   LoadRequest,
   MediaState,
   Provider,
@@ -28,12 +29,14 @@ function typeOf(source: SourceObject) {
 
 /** Plays whatever the browser supports directly through the media element. */
 export class NativeProvider implements Provider {
-  readonly name = "native";
+  readonly name: string = "native";
   protected element: HTMLVideoElement | null = null;
   protected sink: Sink | null = null;
   protected source: SourceObject | null = null;
-  /** Set while a subclass swaps sources, when load errors aren't fatal. */
-  protected switching = false;
+  /** Set while something else decides what element errors mean, like an engine. */
+  protected ignoreElementErrors = false;
+  /** What attach detected, for subclasses that report narrower capabilities. */
+  protected baseCapabilities: Capabilities = { seek: true, rate: true, volume: true };
 
   get time() {
     return this.element?.currentTime ?? 0;
@@ -82,7 +85,7 @@ export class NativeProvider implements Provider {
       if (element.paused) sink.sync();
     });
     on("error", () => {
-      if (this.switching) return;
+      if (this.ignoreElementErrors) return;
       const error = element.error;
       sink.error({
         code: error?.code ?? "unknown",
@@ -95,10 +98,11 @@ export class NativeProvider implements Provider {
       });
     });
 
-    sink.update({ ...this.snapshot(), capabilities: this.capabilities(element) });
+    this.baseCapabilities = this.capabilities(element);
+    sink.update({ ...this.snapshot(), capabilities: this.baseCapabilities });
   }
 
-  async load(request: LoadRequest) {
+  async load(request: LoadRequest, _signal?: AbortSignal) {
     const element = this.element;
     if (!element) return;
     this.source = request.source;
