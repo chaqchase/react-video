@@ -102,10 +102,6 @@ If your app compiled the library’s Tailwind directives at build time:
 
   All functionality remains the same. This is purely a rebranding/rename.
 
-## 2.0.0
-
-### Major Changes
-
 - c4e4515: # Package Renamed: @triyanox/react-video → video-kit
 
   This is a major release marking the rename of the package from `@triyanox/react-video` to `video-kit`.

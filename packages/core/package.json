@@ -49,7 +49,8 @@
     "test": "vitest run",
     "test:react18": "REACT_VERSION=18 vitest run",
     "size": "size-limit",
-    "lint:pkg": "node scripts/check-package.mjs"
+    "lint:pkg": "node scripts/check-package.mjs",
+    "test:ssr": "node scripts/check-ssr.mjs"
   },
   "peerDependencies": {
     "dashjs": "^5.0.0",

@@ -3,7 +3,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist/**", "coverage/**"] },
+  { ignores: ["dist/**", "coverage/**", "test/fixtures/**"] },
   js.configs.recommended,
   tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
@@ -20,7 +20,13 @@ export default tseslint.config(
   {
     files: ["scripts/**/*.mjs"],
     languageOptions: {
-      globals: { console: "readonly", process: "readonly", URL: "readonly" },
+      globals: {
+        console: "readonly",
+        fetch: "readonly",
+        process: "readonly",
+        setTimeout: "readonly",
+        URL: "readonly",
+      },
     },
   }
 );
