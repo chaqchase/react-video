@@ -28,6 +28,10 @@ const react18 =
         },
         { find: /^react-dom$/, replacement: react18Require.resolve("react-dom") },
         {
+          find: /^react-dom\/server$/,
+          replacement: react18Require.resolve("react-dom/server"),
+        },
+        {
           find: /^react-dom\/client$/,
           replacement: react18Require.resolve("react-dom/client"),
         },
@@ -42,6 +46,7 @@ export default defineConfig({
   resolve: { alias: react18 },
   test: {
     environment: "happy-dom",
+    setupFiles: ["test/helpers/setup.ts"],
     include: ["test/**/*.test.{ts,tsx}"],
     server: { deps: { inline: ["@testing-library/react"] } },
   },

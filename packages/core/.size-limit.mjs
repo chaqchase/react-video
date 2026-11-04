@@ -10,7 +10,9 @@ const code = (name, path, limit) => ({
 });
 
 export default [
-  code("headless (primitives)", "dist/react/index.js", 5),
+  // The floor every player pays: the kernel, native provider, Root, and Media.
+  { ...code("kernel (Root, Media)", "dist/react/index.js", 5.25), import: "{ Root, Media }" },
+  code("headless (all primitives)", "dist/react/index.js", 6),
   code("styled parts", "dist/ui/index.js", 12),
   code("fullscreen", "dist/plugins/fullscreen/index.js", 1.5),
   // CSS skips bundling: size-limit's Rolldown step can't bundle CSS.
