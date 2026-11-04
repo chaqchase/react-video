@@ -1,11 +1,9 @@
 {
   "name": "react-video-kit",
   "version": "3.0.0",
-  "description": "A video component for react inspired by the ios video player",
+  "description": "A composable, plugin-first React video player inspired by the iOS player",
   "license": "Apache-2.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
@@ -16,50 +14,69 @@
   ],
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
-    }
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    },
+    "./primitives": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "default": "./dist/core/index.js"
+    },
+    "./player": {
+      "types": "./dist/player/index.d.ts",
+      "default": "./dist/player/index.js"
+    },
+    "./compat": {
+      "types": "./dist/compat/index.d.ts",
+      "default": "./dist/compat/index.js"
+    },
+    "./fullscreen": {
+      "types": "./dist/plugins/fullscreen/index.d.ts",
+      "default": "./dist/plugins/fullscreen/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "pnpm build:css && tsup",
-    "build:css": "tailwindcss -i ./src/index.css -o ./src/styles.css --minify",
-    "dev": "pnpm build:css && pnpm dev:watch",
-    "dev:watch": "concurrently \"tailwindcss -i ./src/index.css -o ./src/styles.css --watch\" \"tsup --watch\"",
-    "typecheck": "tsc --noEmit"
+    "build": "tsdown && node scripts/build-css.mjs && node scripts/check-dist.mjs",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "test:treeshake": "node scripts/check-treeshake.mjs"
   },
   "peerDependencies": {
-    "motion": ">=11.11.12",
-    "react": ">=18",
-    "react-dom": ">=18"
+    "dashjs": "^5.0.0",
+    "hls.js": "^1.7.0",
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
   },
-  "dependencies": {
-    "@radix-ui/react-slider": "^1.1.2",
-    "@radix-ui/react-slot": "^1.1.0",
-    "clsx": "^2.0.0",
-    "tailwind-merge": "^2.1.0"
+  "peerDependenciesMeta": {
+    "dashjs": {
+      "optional": true
+    },
+    "hls.js": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/react": "^18.2.45",
-    "@types/react-dom": "18.2.7",
-    "autoprefixer": "^10.4.16",
-    "concurrently": "^8.2.2",
-    "motion": "^12.23.24",
-    "postcss": "^8.4.32",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^3.3.6",
-    "tsup": "^8.0.1",
-    "typescript": "6.0.3"
+    "@rollup/plugin-node-resolve": "16.0.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "esbuild": "0.28.2",
+    "lightningcss": "1.33.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "rollup": "4.67.5",
+    "tsdown": "0.23.5",
+    "typescript": "6.0.3",
+    "webpack": "5.112.2"
   },
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://react-vide-kit.chaqchase.com",
@@ -75,16 +92,12 @@
     "react",
     "video",
     "player",
+    "video-player",
+    "hls",
+    "dash",
+    "headless",
+    "plugins",
     "ios",
-    "component",
-    "ui",
-    "ui-component",
-    "ui-kit",
-    "ui-library",
-    "react-video-kit",
-    "react-video",
-    "react-ios-video",
-    "video component",
-    "video kit"
+    "react-video-kit"
   ]
 }
