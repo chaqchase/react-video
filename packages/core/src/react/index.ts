@@ -14,60 +14,30 @@ export {
   type BufferingIndicatorProps,
 } from "./primitives/buffering";
 export { Button, type ButtonProps } from "./primitives/button";
-export {
-  ControlGroup,
-  type ControlGroupProps,
-  ControlRow,
-  type ControlRowProps,
-  Controls,
-  type ControlsProps,
-  ErrorOverlay,
-  type ErrorOverlayProps,
-  PlayOverlay,
-  type PlayOverlayProps,
-} from "./primitives/layout";
-export {
-  Menu,
-  MenuContent,
-  type MenuContentProps,
-  MenuItem,
-  type MenuItemProps,
-  type MenuProps,
-  MenuRadioGroup,
-  type MenuRadioGroupProps,
-  MenuRadioItem,
-  type MenuRadioItemProps,
-  MenuSub,
-  type MenuSubProps,
-  MenuTrigger,
-  type MenuTriggerProps,
-} from "./primitives/menu";
+export { ControlGroup, type ControlGroupProps } from "./primitives/control-group";
+export { ControlRow, type ControlRowProps } from "./primitives/control-row";
+export { Controls, type ControlsProps } from "./primitives/controls";
+export { CurrentTime, type CurrentTimeProps } from "./primitives/current-time";
+export { Duration, type DurationProps } from "./primitives/duration";
+export { ErrorOverlay, type ErrorOverlayProps } from "./primitives/error-overlay";
+export { Menu, type MenuProps } from "./primitives/menu";
+export { MenuContent, type MenuContentProps } from "./primitives/menu-content";
+export { MenuItem, type MenuItemProps } from "./primitives/menu-item";
+export { MenuRadioGroup, type MenuRadioGroupProps } from "./primitives/menu-radio-group";
+export { MenuRadioItem, type MenuRadioItemProps } from "./primitives/menu-radio-item";
+export { MenuSub, type MenuSubProps } from "./primitives/menu-sub";
+export { MenuTrigger, type MenuTriggerProps } from "./primitives/menu-trigger";
+export { Mute, type MuteProps } from "./primitives/mute";
+export { PlayOverlay, type PlayOverlayProps } from "./primitives/play-overlay";
 export { PlayPause, type PlayPauseProps } from "./primitives/play-pause";
-export {
-  CurrentTime,
-  type CurrentTimeProps,
-  Duration,
-  type DurationProps,
-  RemainingTime,
-  type RemainingTimeProps,
-} from "./primitives/time";
-export {
-  Timeline,
-  TimelineBuffered,
-  TimelineFill,
-  type TimelinePartProps,
-  TimelinePreview,
-  type TimelinePreviewProps,
-  type TimelineProps,
-  TimelineThumb,
-  TimelineTrack,
-  useTimelinePreview,
-} from "./primitives/timeline";
-export {
-  Mute,
-  type MuteProps,
-  VolumeSlider,
-  type VolumeSliderProps,
-} from "./primitives/volume";
+export { RemainingTime, type RemainingTimeProps } from "./primitives/remaining-time";
+export { Timeline, type TimelineProps } from "./primitives/timeline";
+export { TimelineBuffered } from "./primitives/timeline-buffered";
+export { type TimelinePartProps, useTimelinePreview } from "./primitives/timeline-context";
+export { TimelineFill } from "./primitives/timeline-fill";
+export { TimelinePreview, type TimelinePreviewProps } from "./primitives/timeline-preview";
+export { TimelineThumb } from "./primitives/timeline-thumb";
+export { TimelineTrack } from "./primitives/timeline-track";
+export { VolumeSlider, type VolumeSliderProps } from "./primitives/volume-slider";
 export { Root, type RootProps } from "./root";
 export { Slot } from "./slot";

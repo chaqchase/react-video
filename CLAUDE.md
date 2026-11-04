@@ -8,7 +8,7 @@ See `CONTRIBUTING.md` for setup, checks, and the release process.
 
 - **Time never enters the store.** High-frequency time goes through the clock and writes straight to the DOM. Parts must not re-render during playback.
 - **Everything optional is a plugin.** The kernel holds only what every player needs.
-- **One part per file.** Top-level `displayName` assignments and `forwardRef` calls keep a whole module alive, so sharing a file defeats tree-shaking.
+- **One part per file.** Top-level `displayName` assignments and `forwardRef` calls keep a whole module alive, so sharing a file defeats tree-shaking. A plugin's own parts are the exception: its `slots` already keep them all alive, so they can share the plugin's file.
 - **`'use client'` goes in each source file that needs it,** never a banner. `core/` stays directive-free. `scripts/check-dist.mjs` enforces this on the build output.
 - **Import `hls.js` and `dashjs` dynamically only.** They're optional peers.
 - **No `any` and no `@ts-ignore`.** ESLint rejects both.

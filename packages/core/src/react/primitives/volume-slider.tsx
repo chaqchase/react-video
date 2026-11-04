@@ -3,42 +3,7 @@
 import { forwardRef, type HTMLAttributes } from "react";
 import { usePlayer } from "../context";
 import { useCommands, useLabel, useVideoState } from "../hooks";
-import { Button, type ButtonProps } from "./button";
 import { useSliderGesture } from "./slider-gesture";
-
-export type MuteProps = ButtonProps;
-
-export const Mute = forwardRef<HTMLButtonElement, MuteProps>(function Mute(
-  { onClick, ...props },
-  ref
-) {
-  const level = useVideoState((media) =>
-    media.muted || media.volume === 0 ? "muted" : media.volume < 0.5 ? "low" : "high"
-  );
-  const commands = useCommands();
-  const player = usePlayer();
-  const mute = useLabel("mute", "Mute");
-  const unmute = useLabel("unmute", "Unmute");
-
-  return (
-    <Button
-      ref={ref}
-      data-part="mute"
-      data-level={level}
-      aria-label={level === "muted" ? unmute : mute}
-      onClick={(event) => {
-        onClick?.(event);
-        if (event.defaultPrevented) return;
-        const { muted, volume } = player.getState().media;
-        // Unmuting at zero volume would otherwise look like nothing happened.
-        if (volume === 0) commands.setVolume(0.5);
-        commands.setMuted(volume === 0 ? false : !muted);
-      }}
-      {...props}
-    />
-  );
-});
-Mute.displayName = "Video.Mute";
 
 export interface VolumeSliderProps extends HTMLAttributes<HTMLDivElement> {
   /** Change per arrow key press, from 0 to 1. */
@@ -100,10 +65,6 @@ export const VolumeSlider = forwardRef<HTMLDivElement, VolumeSliderProps>(
           step={step}
           value={value}
           onChange={(event) => apply(Number(event.target.value))}
-          // Hotkeys on the player mustn't also act on the slider's arrows.
-          onKeyDown={(event) => {
-            if (event.key.startsWith("Arrow")) event.stopPropagation();
-          }}
         />
         <div data-part="volume-track">
           <div data-part="volume-fill" style={{ transform: `scaleX(${value})` }} />

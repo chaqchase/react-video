@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { definePlugin } from "../../src/core/plugin";
 import { useCommands, useCurrentTime, useVideoState } from "../../src/react/hooks";
 import { Media } from "../../src/react/media";
-import { CurrentTime } from "../../src/react/primitives/time";
+import { CurrentTime } from "../../src/react/primitives/current-time";
 import { PlayPause } from "../../src/react/primitives/play-pause";
 import { Root } from "../../src/react/root";
 import { Slot } from "../../src/react/slot";

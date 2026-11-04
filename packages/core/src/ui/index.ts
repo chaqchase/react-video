@@ -1,15 +1,10 @@
 export * from "../react/index";
 export { type RootProps, Root } from "./parts/root";
-export {
-  BufferingIndicator,
-  Mute,
-  PlayOverlay,
-  PlayPause,
-  SettingsMenu,
-  type SettingsMenuProps,
-  Time,
-  type TimeProps,
-  Volume,
-  type VolumeProps,
-} from "./parts/controls";
+export { BufferingIndicator } from "./parts/buffering-indicator";
+export { Mute } from "./parts/mute";
+export { PlayOverlay } from "./parts/play-overlay";
+export { PlayPause } from "./parts/play-pause";
+export { SettingsMenu, type SettingsMenuProps } from "./parts/settings-menu";
+export { Time, type TimeProps } from "./parts/time";
+export { Volume, type VolumeProps } from "./parts/volume";
 export * from "./icons";

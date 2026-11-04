@@ -114,3 +114,48 @@ export function SpinnerIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function CaptionsIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path
+        fillRule="evenodd"
+        d="M5 4a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H5Zm3.750 5a3 3 0 1 0 2.120 5.120 1 1 0 1 0-1.410-1.410 1 1 0 1 1 0-1.420 1 1 0 0 0 1.410-1.410A3 3 0 0 0 8.750 9Zm6.500 0a3 3 0 1 0 2.120 5.120 1 1 0 1 0-1.410-1.410 1 1 0 1 1 0-1.420 1 1 0 0 0 1.410-1.410A3 3 0 0 0 15.250 9Z"
+      />
+    </Icon>
+  );
+}
+
+export function NextIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 5.600c0-1 1.100-1.600 1.900-1l8.100 5.900V5.500a1 1 0 1 1 2 0v13a1 1 0 1 1-2 0v-5l-8.100 5.900c-.8.600-1.900 0-1.900-1V5.600Z" />
+    </Icon>
+  );
+}
+
+export function PreviousIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M19 5.600c0-1-1.100-1.600-1.900-1L9 10.500V5.500a1 1 0 1 0-2 0v13a1 1 0 1 0 2 0v-5l8.100 5.900c.8.600 1.900 0 1.900-1V5.600Z" />
+    </Icon>
+  );
+}
+
+export function AirPlayIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 4a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h1.500l1.700-2H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3.200l1.700 2H19a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H5Z" />
+      <path d="M11.200 13.400c.4-.5 1.200-.5 1.600 0l4.300 5a1 1 0 0 1-.8 1.600H7.700a1 1 0 0 1-.8-1.600l4.300-5Z" />
+    </Icon>
+  );
+}
+
+export function CastIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 4a3 3 0 0 0-3 3v1.500a1 1 0 0 0 2 0V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-5.500a1 1 0 1 0 0 2H19a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H5Z" />
+      <path d="M3 11a1 1 0 0 0 0 2 6 6 0 0 1 6 6 1 1 0 1 0 2 0 8 8 0 0 0-8-8Zm0 4a1 1 0 1 0 0 2 2 2 0 0 1 2 2 1 1 0 1 0 2 0 4 4 0 0 0-4-4Zm0 3.200a1.400 1.400 0 1 0 0 2.800 1.400 1.400 0 0 0 0-2.800Z" />
+    </Icon>
+  );
+}

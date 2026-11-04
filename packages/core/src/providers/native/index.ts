@@ -95,18 +95,6 @@ export class NativeProvider implements Provider {
       });
     });
 
-    const tracks = element.textTracks;
-    if (tracks) {
-      const publish = () =>
-        sink.update({
-          textTracks: this.textTracks(),
-          textTrack: this.activeTextTrack(),
-        });
-      scope.on(tracks, "addtrack", publish);
-      scope.on(tracks, "removetrack", publish);
-      scope.on(tracks, "change", publish);
-    }
-
     sink.update({ ...this.snapshot(), capabilities: this.capabilities(element) });
   }
 
@@ -148,18 +136,10 @@ export class NativeProvider implements Provider {
   }
 
   setRate(rate: number) {
-    if (this.element) this.element.playbackRate = rate;
-  }
-
-  setTextTrack(id: string | null) {
-    const tracks = this.element?.textTracks;
-    if (!tracks) return;
-    for (let index = 0; index < tracks.length; index += 1) {
-      const track = tracks[index];
-      if (!track) continue;
-      const active = this.textTrackId(track, index) === id;
-      track.mode = active ? "showing" : "disabled";
-    }
+    if (!this.element) return;
+    // load() resets playbackRate to this, so the rate survives a new source.
+    this.element.defaultPlaybackRate = rate;
+    this.element.playbackRate = rate;
   }
 
   snapshot(): Partial<MediaState> {
@@ -173,8 +153,6 @@ export class NativeProvider implements Provider {
       volume: element.volume,
       muted: element.muted,
       rate: element.playbackRate,
-      textTracks: this.textTracks(),
-      textTrack: this.activeTextTrack(),
     };
   }
 
@@ -212,36 +190,6 @@ export class NativeProvider implements Provider {
     return result;
   }
 
-  private textTrackId(track: TextTrack, index: number) {
-    return track.id || track.language || track.label || String(index);
-  }
-
-  private textTracks() {
-    const tracks = this.element?.textTracks;
-    if (!tracks) return [];
-    const result = [];
-    for (let index = 0; index < tracks.length; index += 1) {
-      const track = tracks[index];
-      if (!track) continue;
-      result.push({
-        id: this.textTrackId(track, index),
-        label: track.label,
-        language: track.language,
-        kind: track.kind,
-      });
-    }
-    return result;
-  }
-
-  private activeTextTrack() {
-    const tracks = this.element?.textTracks;
-    if (!tracks) return null;
-    for (let index = 0; index < tracks.length; index += 1) {
-      const track = tracks[index];
-      if (track?.mode === "showing") return this.textTrackId(track, index);
-    }
-    return null;
-  }
 }
 
 export const nativeProviderEntry: ProviderEntry = {
