@@ -49,7 +49,9 @@ export const VideoPlayer = forwardRef<Player, VideoPlayerProps>(function VideoPl
         <Timeline />
         <ControlRow>
           <ControlGroup>
+            <Slot name="transport-start" />
             <PlayPause />
+            <Slot name="transport-end" />
             <Volume />
             <Time />
             <Slot name="controls-start" />

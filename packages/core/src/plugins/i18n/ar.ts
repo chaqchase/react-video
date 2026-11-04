@@ -40,4 +40,5 @@ export const ar: Strings = {
   ad: "إعلان",
   skipAd: "تخطي الإعلان",
   skipAdIn: "تخطي خلال",
+  learnMore: "معرفة المزيد",
 };

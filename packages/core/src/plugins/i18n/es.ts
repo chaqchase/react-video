@@ -40,4 +40,5 @@ export const es: Strings = {
   ad: "Anuncio",
   skipAd: "Omitir anuncio",
   skipAdIn: "Omitir en",
+  learnMore: "Más información",
 };

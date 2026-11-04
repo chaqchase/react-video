@@ -40,4 +40,5 @@ export const fr: Strings = {
   ad: "Publicité",
   skipAd: "Ignorer la publicité",
   skipAdIn: "Ignorer dans",
+  learnMore: "En savoir plus",
 };

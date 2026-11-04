@@ -15,6 +15,13 @@ const SLUGS = [
   "engine-unused",
   "live",
   "live-dvr",
+  "hls-tracks",
+  "playlist",
+  "ads",
+  "ads-wrapper",
+  "ads-empty",
+  "drm",
+  "drm-missing",
 ];
 
 for (const slug of SLUGS) {

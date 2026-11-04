@@ -114,6 +114,7 @@ export function createPlayer(options: PlayerOptions = {}): Player {
 
   const entries = new Map<string, ProviderEntry>();
   const stack: StackItem[] = [];
+  let base: StackItem | null = null;
   const loadStrategy = options.load ?? "eager";
 
   let input: SourceInput | null | undefined = options.src;
@@ -143,7 +144,10 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     // Scrubbing pauses the element, but `paused` keeps what the viewer asked for,
     // so the controls don't flicker and playback can resume afterwards.
     const { paused: _paused, ...rest } = reported;
-    const state = media().scrubbing ? rest : reported;
+    const scrubbed = media().scrubbing ? rest : reported;
+    // A failure stands until the next load, whatever late media events say.
+    const { status: _status, ...running } = scrubbed;
+    const state = media().status === "error" ? running : scrubbed;
     // A provider reporting duration without a timeline is on-demand content, or
     // live when that duration never ends.
     if (
@@ -224,26 +228,36 @@ export function createPlayer(options: PlayerOptions = {}): Player {
   };
 
   const installBase = (provider: Provider, scope: Scope) => {
-    stack.length = 0;
-    const itemScope = createScope();
-    stack.push({ provider, scope: itemScope });
+    const item = { provider, scope: createScope() };
+    const itemScope = item.scope;
+    // A load gate can push a provider first, as casting does, which stays on top.
+    stack.unshift(item);
+    base = item;
     scope.add(() => {
-      if (stack[0]?.provider === provider) stack.length = 0;
+      const index = stack.indexOf(item);
+      if (index !== -1) stack.splice(index, 1);
+      if (base === item) base = null;
       itemScope.dispose();
       provider.destroy();
     });
-    setClockSource(provider);
+    setClockSource(top());
     const { volume, muted, rate } = media();
     provider.attach(element, sinkFor(provider), itemScope);
     // Attaching reports the element's own values, but the viewer's choices win.
-    setMedia({ provider: provider.name, volume, muted, rate });
+    setMedia({
+      volume,
+      muted,
+      rate,
+      ...(top() === provider && { provider: provider.name }),
+    });
     provider.setVolume(volume, muted);
     provider.setRate(rate);
   };
 
   const endSource = () => {
     failover = null;
-    for (const item of stack.splice(1).reverse()) {
+    for (const item of stack.filter((entry) => entry !== base).reverse()) {
+      stack.splice(stack.indexOf(item), 1);
       item.scope.dispose();
       item.provider.destroy();
     }
@@ -312,8 +326,9 @@ export function createPlayer(options: PlayerOptions = {}): Player {
           }
           const ProviderClass = await entry.load();
           if (signal.aborted) return;
-          installBase(new ProviderClass(), scope);
-          await top()?.load(final, signal);
+          const provider = new ProviderClass();
+          installBase(provider, scope);
+          await provider.load(final, signal);
           if (signal.aborted) return;
           flushPendingPlays();
         }
@@ -510,6 +525,8 @@ export function createPlayer(options: PlayerOptions = {}): Player {
 
   const pushProvider = (provider: Provider) => {
     const scope = createScope();
+    // An ad brings its own timeline, and the content's must come back afterwards.
+    const { timeline } = media();
     stack.push({ provider, scope });
     setClockSource(provider);
     provider.attach(element, sinkFor(provider), scope);
@@ -524,6 +541,7 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       provider.destroy();
       const current = top();
       setClockSource(current);
+      setMedia({ timeline });
       if (current) {
         applyProviderState({ provider: current.name, ...current.snapshot?.() });
       }
