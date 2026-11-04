@@ -10,7 +10,9 @@
     "clean": "rimraf --glob \"packages/*/dist\" \"**/.turbo\" \"**/.next\" \"**/node_modules\"",
     "test": "turbo run test",
     "size": "turbo run size",
-    "lint:pkg": "turbo run lint:pkg"
+    "lint:pkg": "turbo run lint:pkg",
+    "test:e2e": "turbo run test:e2e",
+    "media": "pnpm --filter docs media"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",
