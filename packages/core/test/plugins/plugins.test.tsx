@@ -6,7 +6,7 @@ import { gestures } from "../../src/plugins/gestures/index";
 import { idle } from "../../src/plugins/idle/index";
 import { pip, Pip } from "../../src/plugins/pip/index";
 import { Media } from "../../src/react/media";
-import { Controls } from "../../src/react/primitives/layout";
+import { Controls } from "../../src/react/primitives/controls";
 import { Root } from "../../src/react/root";
 import { Slot } from "../../src/react/slot";
 

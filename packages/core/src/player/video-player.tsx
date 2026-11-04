@@ -3,17 +3,18 @@
 import { forwardRef, useState, type ReactNode, type VideoHTMLAttributes } from "react";
 import type { Player } from "../core/types";
 import { Media } from "../react/media";
-import { ControlGroup, ControlRow, Controls, ErrorOverlay } from "../react/primitives/layout";
+import { ControlGroup } from "../react/primitives/control-group";
+import { ControlRow } from "../react/primitives/control-row";
+import { Controls } from "../react/primitives/controls";
+import { ErrorOverlay } from "../react/primitives/error-overlay";
 import { Timeline } from "../react/primitives/timeline";
 import { Slot } from "../react/slot";
-import {
-  BufferingIndicator,
-  PlayOverlay,
-  PlayPause,
-  SettingsMenu,
-  Time,
-  Volume,
-} from "../ui/parts/controls";
+import { BufferingIndicator } from "../ui/parts/buffering-indicator";
+import { PlayOverlay } from "../ui/parts/play-overlay";
+import { PlayPause } from "../ui/parts/play-pause";
+import { SettingsMenu } from "../ui/parts/settings-menu";
+import { Time } from "../ui/parts/time";
+import { Volume } from "../ui/parts/volume";
 import { Root, type RootProps } from "../ui/parts/root";
 import { defaultPlugins } from "./default-plugins";
 

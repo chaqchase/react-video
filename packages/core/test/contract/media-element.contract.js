@@ -99,6 +99,14 @@
       await changed;
       assert(media.playbackRate === 2, `rate ${media.playbackRate}`);
     },
+    "loading resets playbackRate to defaultPlaybackRate": async (media, { src }) => {
+      media.playbackRate = 2;
+      await load(media, src);
+      assert(media.playbackRate === 1, `rate ${media.playbackRate}`);
+      media.defaultPlaybackRate = 1.5;
+      await load(media, src);
+      assert(media.playbackRate === 1.5, `rate ${media.playbackRate}`);
+    },
     "playing to the end reports ended and pauses": async (media, { src, finish }) => {
       await load(media, src);
       const ended = once(media, "ended", 30000);

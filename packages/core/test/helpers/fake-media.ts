@@ -11,6 +11,7 @@ interface FakeState {
   volume: number;
   muted: boolean;
   playbackRate: number;
+  defaultPlaybackRate: number;
   error: { code: number; message: string } | null;
   buffered: [number, number][];
   metadataDuration: number;
@@ -30,6 +31,7 @@ function stateOf(element: object): FakeState {
       volume: 1,
       muted: false,
       playbackRate: 1,
+      defaultPlaybackRate: 1,
       error: null,
       buffered: [],
       metadataDuration: 60,
@@ -124,6 +126,7 @@ export function installFakeMedia(prototype: HTMLMediaElement) {
     volume: accessor("volume", (element) => emit(element, "volumechange")),
     muted: accessor("muted", (element) => emit(element, "volumechange")),
     playbackRate: accessor("playbackRate", (element) => emit(element, "ratechange")),
+    defaultPlaybackRate: accessor("defaultPlaybackRate"),
     buffered: {
       configurable: true,
       get(this: HTMLMediaElement) {
@@ -157,6 +160,10 @@ export function installFakeMedia(prototype: HTMLMediaElement) {
     state.ended = false;
     state.error = null;
     state.buffered = [];
+    if (state.playbackRate !== state.defaultPlaybackRate) {
+      state.playbackRate = state.defaultPlaybackRate;
+      emit(this, "ratechange");
+    }
     emit(this, "emptied");
     const src = state.src;
     if (!src) return;

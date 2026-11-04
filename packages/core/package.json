@@ -49,6 +49,70 @@
       "types": "./dist/plugins/gestures/index.d.ts",
       "default": "./dist/plugins/gestures/index.js"
     },
+    "./hotkeys": {
+      "types": "./dist/plugins/hotkeys/index.d.ts",
+      "default": "./dist/plugins/hotkeys/index.js"
+    },
+    "./speed": {
+      "types": "./dist/plugins/speed/index.d.ts",
+      "default": "./dist/plugins/speed/index.js"
+    },
+    "./quality": {
+      "types": "./dist/plugins/quality/index.d.ts",
+      "default": "./dist/plugins/quality/index.js"
+    },
+    "./audio-tracks": {
+      "types": "./dist/plugins/audio-tracks/index.d.ts",
+      "default": "./dist/plugins/audio-tracks/index.js"
+    },
+    "./captions": {
+      "types": "./dist/plugins/captions/index.d.ts",
+      "default": "./dist/plugins/captions/index.js"
+    },
+    "./thumbnails": {
+      "types": "./dist/plugins/thumbnails/index.d.ts",
+      "default": "./dist/plugins/thumbnails/index.js"
+    },
+    "./chapters": {
+      "types": "./dist/plugins/chapters/index.d.ts",
+      "default": "./dist/plugins/chapters/index.js"
+    },
+    "./persistence": {
+      "types": "./dist/plugins/persistence/index.d.ts",
+      "default": "./dist/plugins/persistence/index.js"
+    },
+    "./media-session": {
+      "types": "./dist/plugins/media-session/index.d.ts",
+      "default": "./dist/plugins/media-session/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/plugins/i18n/index.d.ts",
+      "default": "./dist/plugins/i18n/index.js"
+    },
+    "./autoplay": {
+      "types": "./dist/plugins/autoplay/index.d.ts",
+      "default": "./dist/plugins/autoplay/index.js"
+    },
+    "./recovery": {
+      "types": "./dist/plugins/recovery/index.d.ts",
+      "default": "./dist/plugins/recovery/index.js"
+    },
+    "./analytics": {
+      "types": "./dist/plugins/analytics/index.d.ts",
+      "default": "./dist/plugins/analytics/index.js"
+    },
+    "./i18n/ar": {
+      "types": "./dist/plugins/i18n/ar.d.ts",
+      "default": "./dist/plugins/i18n/ar.js"
+    },
+    "./i18n/es": {
+      "types": "./dist/plugins/i18n/es.d.ts",
+      "default": "./dist/plugins/i18n/es.js"
+    },
+    "./i18n/fr": {
+      "types": "./dist/plugins/i18n/fr.d.ts",
+      "default": "./dist/plugins/i18n/fr.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },

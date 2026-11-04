@@ -7,18 +7,18 @@ import { VideoPlayer } from "../../src/player/video-player";
 import { Media } from "../../src/react/media";
 import { BufferingIndicator } from "../../src/react/primitives/buffering";
 import { Button } from "../../src/react/primitives/button";
-import { ErrorOverlay, PlayOverlay } from "../../src/react/primitives/layout";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuRadioGroup,
-  MenuRadioItem,
-  MenuSub,
-  MenuTrigger,
-} from "../../src/react/primitives/menu";
+import { ErrorOverlay } from "../../src/react/primitives/error-overlay";
+import { PlayOverlay } from "../../src/react/primitives/play-overlay";
+import { Menu } from "../../src/react/primitives/menu";
+import { MenuContent } from "../../src/react/primitives/menu-content";
+import { MenuItem } from "../../src/react/primitives/menu-item";
+import { MenuRadioGroup } from "../../src/react/primitives/menu-radio-group";
+import { MenuRadioItem } from "../../src/react/primitives/menu-radio-item";
+import { MenuSub } from "../../src/react/primitives/menu-sub";
+import { MenuTrigger } from "../../src/react/primitives/menu-trigger";
 import { Timeline } from "../../src/react/primitives/timeline";
-import { Mute, VolumeSlider } from "../../src/react/primitives/volume";
+import { Mute } from "../../src/react/primitives/mute";
+import { VolumeSlider } from "../../src/react/primitives/volume-slider";
 import { Root } from "../../src/react/root";
 import { advance } from "../helpers/fake-media";
 
@@ -198,15 +198,13 @@ describe("Timeline", () => {
     expect(video.currentTime).toBe(0);
   });
 
-  it("moves by steps with the keyboard, without reaching hotkeys", async () => {
+  it("moves by steps with the keyboard, claiming each key", async () => {
     const { input, video } = await parts();
-    const outer = vi.fn();
-    // Hotkeys listen here, which React's stopPropagation does reach.
-    document.addEventListener("keydown", outer);
-    fireEvent.keyDown(input, { key: "ArrowRight" });
+    // fireEvent returns false when the default was prevented.
+    expect(fireEvent.keyDown(input, { key: "ArrowRight" })).toBe(false);
     await flush();
     expect(video.currentTime).toBe(5);
-    fireEvent.keyDown(input, { key: "PageUp" });
+    expect(fireEvent.keyDown(input, { key: "PageUp" })).toBe(false);
     await flush();
     expect(video.currentTime).toBe(35);
     fireEvent.keyDown(input, { key: "ArrowLeft" });
@@ -218,8 +216,6 @@ describe("Timeline", () => {
     fireEvent.keyDown(input, { key: "Home" });
     await flush();
     expect(video.currentTime).toBe(0);
-    expect(outer).not.toHaveBeenCalled();
-    document.removeEventListener("keydown", outer);
   });
 
   it("accepts changes from assistive tech through the input", async () => {

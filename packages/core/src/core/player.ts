@@ -5,7 +5,6 @@ import { createScope, type OwnedScope, type Scope } from "./scope";
 import { toLoadRequests } from "./source";
 import { createStore } from "./store";
 import type {
-  AnyPlugin,
   AnyPluginFactory,
   CoreCommands,
   Gate,
@@ -95,7 +94,7 @@ function clamp(value: number, min: number, max: number) {
 
 /** Builds a player. Pure: it touches no DOM until `mount` and `attach`. */
 export function createPlayer(options: PlayerOptions = {}): Player {
-  const sorted: AnyPlugin[] = sortPlugins(options.plugins ?? []);
+  const sorted = sortPlugins(options.plugins ?? []);
 
   const slices: Record<string, object> = {};
   for (const { name, spec } of sorted) {
@@ -145,7 +144,8 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     // so the controls don't flicker and playback can resume afterwards.
     const { paused: _paused, ...rest } = reported;
     const state = media().scrubbing ? rest : reported;
-    // A provider reporting duration without a timeline is on-demand content.
+    // A provider reporting duration without a timeline is on-demand content, or
+    // live when that duration never ends.
     if (
       state.duration !== undefined &&
       state.timeline === undefined &&
@@ -153,7 +153,9 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     ) {
       setMedia({
         ...state,
-        timeline: { start: 0, end: state.duration, kind: "vod" },
+        timeline: Number.isFinite(state.duration)
+          ? { start: 0, end: state.duration, kind: "vod" }
+          : { start: 0, end: 0, kind: "live" },
       });
     } else {
       setMedia(state);
@@ -231,11 +233,12 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       provider.destroy();
     });
     setClockSource(provider);
-    provider.attach(element, sinkFor(provider), itemScope);
     const { volume, muted, rate } = media();
+    provider.attach(element, sinkFor(provider), itemScope);
+    // Attaching reports the element's own values, but the viewer's choices win.
+    setMedia({ provider: provider.name, volume, muted, rate });
     provider.setVolume(volume, muted);
-    if (rate !== 1) provider.setRate(rate);
-    setMedia({ provider: provider.name });
+    provider.setRate(rate);
   };
 
   const endSource = () => {
@@ -538,6 +541,7 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       state: () => store.get()[name] as object,
       set: (partial) => store.set(name, partial),
       media,
+      report: setMedia,
       video: () => element,
       root: () => root,
       watch(scope, select, listener) {

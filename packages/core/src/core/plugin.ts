@@ -8,6 +8,7 @@ import type {
 /**
  * Declares a plugin. Calling the result creates an instance for `plugins`, and
  * the factory itself is the typed key for `useVideoState` and `useCommands`.
+ * `create` runs once for each player, so it can hold that player's private state.
  */
 export function definePlugin<
   Name extends string,
@@ -20,26 +21,34 @@ export function definePlugin<
 ): PluginFactory<Name, Options, State, Commands> {
   const factory = (...options: Options): PluginInstance<Name, State, Commands> => ({
     name,
-    spec: create(...options),
+    // Once per player, so what `create` closes over never crosses between players.
+    create: () => create(...options),
   });
   return Object.assign(factory, { pluginName: name });
 }
 
-/** Orders plugins so dependencies run first, keeping the given order otherwise. */
-export function sortPlugins(plugins: readonly AnyPlugin[]): AnyPlugin[] {
-  const byName = new Map<string, AnyPlugin>();
-  for (const plugin of plugins) {
-    if (byName.has(plugin.name)) {
-      throw new Error(`react-video-kit: plugin "${plugin.name}" is installed twice.`);
-    }
-    byName.set(plugin.name, plugin);
-  }
+interface ResolvedPlugin {
+  name: string;
+  spec: PluginSpec<object, object>;
+}
 
-  const sorted: AnyPlugin[] = [];
+/** Orders plugins so dependencies run first, keeping the given order otherwise. */
+export function sortPlugins(instances: readonly AnyPlugin[]): ResolvedPlugin[] {
+  const byName = new Map<string, ResolvedPlugin>();
+  const plugins = instances.map(({ name, create }) => {
+    if (byName.has(name)) {
+      throw new Error(`react-video-kit: plugin "${name}" is installed twice.`);
+    }
+    const plugin = { name, spec: create() };
+    byName.set(name, plugin);
+    return plugin;
+  });
+
+  const sorted: ResolvedPlugin[] = [];
   const visited = new Set<string>();
   const visiting: string[] = [];
 
-  const visit = (plugin: AnyPlugin) => {
+  const visit = (plugin: ResolvedPlugin) => {
     if (visited.has(plugin.name)) return;
     if (visiting.includes(plugin.name)) {
       const cycle = [...visiting, plugin.name].join(" -> ");

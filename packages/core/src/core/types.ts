@@ -107,7 +107,12 @@ export interface MediaState {
   muted: boolean;
   rate: number;
   qualities: readonly QualityLevel[];
-  quality: { mode: "auto" | "manual"; active: string | null };
+  quality: {
+    mode: "auto" | "manual";
+    active: string | null;
+    /** Whether the provider can choose levels itself. */
+    canAuto?: boolean;
+  };
   audioTracks: readonly MediaTrackInfo[];
   audioTrack: string | null;
   textTracks: readonly MediaTrackInfo[];
@@ -212,6 +217,8 @@ export interface PluginContext<State extends object> {
   state(): State;
   set(state: Partial<State>): void;
   media(): MediaState;
+  /** Writes media state, for plugins that normalize something providers can't. */
+  report(state: Partial<MediaState>): void;
   video(): HTMLVideoElement | null;
   root(): HTMLElement | null;
   /** Calls `listener` whenever the selected value changes, until `scope` ends. */
@@ -277,7 +284,8 @@ export interface PluginInstance<
   Commands extends object = object,
 > {
   readonly name: Name;
-  readonly spec: PluginSpec<State, Commands>;
+  /** Builds the spec. Each player calls this, so an instance can be shared safely. */
+  create(): PluginSpec<State, Commands>;
 }
 
 export interface PluginFactory<

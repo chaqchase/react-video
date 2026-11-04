@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { definePlugin } from "../../core/plugin";
 import { usePlayer } from "../../react/context";
 import { useLabel } from "../../react/hooks";
+import type { fullscreen } from "../fullscreen/index";
 
 const DOUBLE_TAP_MS = 280;
 const MOVE_TOLERANCE_PX = 10;
@@ -86,10 +87,7 @@ export const gestures = definePlugin("gestures", (options: GesturesOptions = {})
         if (!onVideo(event) || !context.player.has("fullscreen")) return;
         clearTimeout(clickTimer);
         clickTimer = undefined;
-        (
-          context.find<typeof import("../fullscreen/index").fullscreen>("fullscreen")
-            ?.commands as { toggle(): Promise<void> } | undefined
-        )?.toggle().catch(() => {});
+        context.find<typeof fullscreen>("fullscreen")?.commands.toggle().catch(() => {});
       });
 
       scope.add(() => clearTimeout(clickTimer));

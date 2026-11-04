@@ -791,6 +791,126 @@
     cursor: default;
   }
 
+  /* Captions lift clear of the controls while they're showing. */
+  .rv-root [data-part="captions"] {
+    position: absolute;
+    inset: auto 5% 5%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    pointer-events: none;
+    transition: transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root[data-controls="shown"] [data-part="captions"] {
+    transform: translateY(calc(-1 * var(--rv-control-size) - 34px));
+  }
+
+  .rv-root [data-part="caption-line"] {
+    padding: 0.2em 0.5em;
+    border-radius: 6px;
+    background: var(--rv-caption-background, rgb(0 0 0 / 0.72));
+    color: var(--rv-caption-color, #fff);
+    font: 500 var(--rv-caption-size, clamp(13px, 2.6cqw, 28px)) / 1.3 var(--rv-font);
+    white-space: pre-line;
+  }
+
+  /* Shows native captions in iOS fullscreen, where the player can't draw its own. */
+  .rv-root [data-part="media"]::cue {
+    background: rgb(0 0 0 / 0.72);
+    color: #fff;
+  }
+
+  .rv-root [data-part="captions-toggle"]::before {
+    border-radius: inherit;
+  }
+
+  .rv-root [data-part="captions-toggle"][aria-pressed="true"] {
+    background: var(--rv-glass-hover);
+    color: var(--rv-accent);
+  }
+
+  /* Hotkey confirmation */
+  .rv-root [data-part="hotkeys-feedback"] {
+    position: absolute;
+    inset: 12% auto auto 50%;
+    z-index: 2;
+    padding: 9px 14px;
+    border-radius: var(--rv-pill-radius);
+    background: var(--rv-glass-strong);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    transform: translate(-50%, -4px);
+    pointer-events: none;
+    transition:
+      opacity var(--rv-duration-out) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="hotkeys-feedback"][data-visible] {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    transition-duration: var(--rv-duration-in);
+  }
+
+  .rv-root [data-part="hotkeys-feedback"]:empty {
+    display: none;
+  }
+
+  /* Timeline preview extras */
+  .rv-root [data-part="thumbnail"] {
+    display: none;
+    border-radius: 6px;
+    background-repeat: no-repeat;
+  }
+
+  .rv-root [data-part="thumbnail"][data-visible] {
+    display: block;
+  }
+
+  .rv-root [data-part="chapter-title"]:empty {
+    display: none;
+  }
+
+  .rv-root [data-part="chapter-title"] {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Muted autoplay */
+  .rv-root [data-part="unmute-chip"] {
+    position: absolute;
+    inset: 12px auto auto 12px;
+    z-index: 2;
+    width: auto;
+    height: auto;
+    padding: 9px 14px;
+    background: var(--rv-glass-strong);
+    font-size: 13px;
+    animation: rv-fade var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="unmute-chip"]::after {
+    display: none;
+  }
+
+  /* While retrying, a failure is an implementation detail, so show a stall instead. */
+  .rv-root[data-retrying] [data-part="error-overlay"] {
+    display: none;
+  }
+
+  .rv-root[data-retrying] [data-part="buffering"] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+
   /* Small players drop the slider and shrink. */
   @container rv (max-width: 479px) {
     [data-part="control-group"] {

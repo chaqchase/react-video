@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createPlayer } from "../../src/core/player";
 import { definePlugin } from "../../src/core/plugin";
 import { Media } from "../../src/react/media";
-import { CurrentTime } from "../../src/react/primitives/time";
+import { CurrentTime } from "../../src/react/primitives/current-time";
 import { PlayPause } from "../../src/react/primitives/play-pause";
 import { Root } from "../../src/react/root";
 
