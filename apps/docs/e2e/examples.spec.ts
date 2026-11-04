@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 // Registry import stays out of the browser bundle; only the slugs matter here.
-const SLUGS = ["basic"];
+const SLUGS = ["basic", "fallback", "failed-source", "source-change"];
 
 for (const slug of SLUGS) {
   test.describe(`example: ${slug}`, () => {
