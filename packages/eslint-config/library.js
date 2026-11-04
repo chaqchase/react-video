@@ -1,34 +1,26 @@
-const { resolve } = require("node:path");
+import js from "@eslint/js";
+import reactHooks from "eslint-plugin-react-hooks";
+import tseslint from "typescript-eslint";
 
-const project = resolve(process.cwd(), "tsconfig.json");
-
-/** @type {import("eslint").Linter.Config} */
-module.exports = {
-  extends: ["eslint:recommended", "prettier", "eslint-config-turbo"],
-  plugins: ["only-warn"],
-  globals: {
-    React: true,
-    JSX: true,
-  },
-  env: {
-    node: true,
-  },
-  settings: {
-    "import/resolver": {
-      typescript: {
-        project,
-      },
+export default tseslint.config(
+  { ignores: ["dist/**", "coverage/**"] },
+  js.configs.recommended,
+  tseslint.configs.recommended,
+  reactHooks.configs.flat.recommended,
+  {
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
     },
   },
-  ignorePatterns: [
-    // Ignore dotfiles
-    ".*.js",
-    "node_modules/",
-    "dist/",
-  ],
-  overrides: [
-    {
-      files: ["*.js?(x)", "*.ts?(x)"],
+  {
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: { console: "readonly", process: "readonly", URL: "readonly" },
     },
-  ],
-};
+  }
+);

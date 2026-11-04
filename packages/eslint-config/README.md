@@ -1,3 +1,3 @@
-# `@turbo/eslint-config`
+# `@repo/eslint-config`
 
-Collection of internal eslint configurations.
+Shared ESLint flat config for the workspace. `@repo/eslint-config/library` covers the published package.

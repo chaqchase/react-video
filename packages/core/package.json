@@ -44,7 +44,12 @@
     "build": "tsdown && node scripts/build-css.mjs && node scripts/check-dist.mjs",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
-    "test:treeshake": "node scripts/check-treeshake.mjs"
+    "test:treeshake": "node scripts/check-treeshake.mjs",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:react18": "REACT_VERSION=18 vitest run",
+    "size": "size-limit",
+    "lint:pkg": "node scripts/check-package.mjs"
   },
   "peerDependencies": {
     "dashjs": "^5.0.0",
@@ -64,18 +69,29 @@
     "access": "public"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/react-18": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@rollup/plugin-node-resolve": "16.0.3",
+    "@size-limit/preset-small-lib": "14.3.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "16.3.3",
     "@types/node": "^24.0.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "happy-dom": "21.0.4",
     "lightningcss": "1.33.0",
+    "publint": "0.3.25",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "rollup": "4.67.5",
+    "size-limit": "14.3.0",
     "tsdown": "0.23.5",
     "typescript": "6.0.3",
+    "vitest": "5.1.0",
     "webpack": "5.112.2"
   },
   "author": "Mohamed Achaq <hi@achaq.dev>",
