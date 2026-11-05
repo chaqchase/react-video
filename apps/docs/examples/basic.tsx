@@ -11,10 +11,16 @@ export default function Basic() {
   return (
     <Video.Root src={sources}>
       <Video.Media width={640} height={360} />
-      <Video.PlayPause>
-        <span aria-hidden="true">⏯</span>
-      </Video.PlayPause>
-      <Video.CurrentTime />
+      <Video.Controls>
+        <Video.ControlRow>
+          <Video.ControlGroup>
+            <Video.PlayPause>
+              <span aria-hidden="true">⏯</span>
+            </Video.PlayPause>
+            <Video.CurrentTime />
+          </Video.ControlGroup>
+        </Video.ControlRow>
+      </Video.Controls>
     </Video.Root>
   );
 }

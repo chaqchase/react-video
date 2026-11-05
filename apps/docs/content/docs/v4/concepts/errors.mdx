@@ -1,0 +1,250 @@
+---
+title: Errors
+description: Every error code, what it means, and how to handle it.
+---
+
+When a video can't play, the viewer gets a clear message in their own language instead of an endless spinner, and your code gets a stable code to act on. Try each failure below, and watch what `onError` receives.
+
+<Demo slug="errors" />
+
+## The error object
+
+Every error has the same shape, on `media.error` and in `onError`:
+
+```ts
+interface MediaErrorInfo {
+  code: VideoErrorCode; // "media-decode"
+  message: string; // The browser's or engine's own words, for logs
+  fatal: boolean; // Did this stop playback?
+  retryable?: boolean; // Could trying again work?
+  nativeCode?: number | string; // The browser's or engine's own code
+  cause?: unknown; // The original error or event
+  source?: SourceObject; // The source that failed
+}
+```
+
+`code` stays the same between versions, so it's safe to compare against. `message` isn't: it's whatever the browser or engine said, in English or not, and it can change. Log it, but don't show it to viewers, and don't match on it.
+
+## What the viewer sees
+
+`VideoPlayer` and `ErrorOverlay` show a title and a line of explanation, translated by the [i18n](/docs/v4/plugins/i18n) plugin, with the code underneath so that viewers can quote it to support. **Try again** only appears when trying again could work.
+
+| The failure | The title |
+| --- | --- |
+| Anything `retryable` | This video didn't load. |
+| `drm-denied` and `drm-expired` | You don't have access to this video. |
+| `drm-output-restricted` | This video can't be shown on this screen. |
+| Any other `drm-` code | This protected video can't be played. |
+| Everything else | This video can't be played. |
+
+To change the words for a code, pass `errorMessages` to `VideoPlayer`, or `messages` to `ErrorOverlay`:
+
+```tsx
+<VideoPlayer
+  src="/video.mp4"
+  errorMessages={{
+    "drm-denied": { title: "Subscribe to watch", detail: "Plans start at $5 a month." },
+  }}
+/>
+```
+
+## Handling errors
+
+### Log them
+
+`onError` on `VideoPlayer` or `Video.Root` hears every error, fatal or not. It's the right place to tell an error service.
+
+```tsx
+<VideoPlayer
+  src="/video.mp4"
+  onError={(error) => {
+    Sentry.captureMessage(`Video: ${error.code}`, {
+      level: error.fatal ? "error" : "warning",
+      extra: { message: error.message, nativeCode: error.nativeCode, source: error.source?.src },
+    });
+  }}
+/>
+```
+
+Outside React, or for a player you made yourself, use `player.onError`, which returns a function that stops listening:
+
+```ts
+const stop = player.onError((error) => console.warn(error.code, error.message));
+```
+
+With the [recovery](/docs/v4/plugins/recovery) plugin, `onError` hears each failed try, not only the last. A failed source that a [fallback](/docs/v4/concepts/sources) took over from arrives with `fatal: false`, because the viewer's video kept going.
+
+Sources can hold signed URLs, so check what `source` and `message` contain before sending them to another service.
+
+### Show your own message
+
+Read `media.error` to replace the overlay. Check `fatal`, because the latest error may be one that playback carried on through.
+
+<Demo slug="failed-source" />
+
+```tsx
+function ErrorMessage() {
+  const error = useVideoState((media) => (media.error?.fatal ? media.error : null));
+  const { reload } = useCommands();
+  if (!error) return null;
+  return (
+    <div role="alert">
+      <p>Sorry, this video didn't load. ({error.code})</p>
+      {error.retryable === false ? null : <button onClick={() => reload()}>Try again</button>}
+    </div>
+  );
+}
+```
+
+`reload` picks up where the failure happened, and plays again if the viewer was watching.
+
+### Check a code
+
+`react-video-kit/errors` has the table below as data, for code that needs to know about a code it hasn't seen yet:
+
+```ts
+import { ERROR_CODES, isRetryable } from "react-video-kit/errors";
+
+ERROR_CODES["media-network"]; // { fatal: true, retryable: true }
+isRetryable("drm-denied"); // false
+isRetryable(error); // Uses error.retryable first, then the code
+```
+
+It's a separate entry, so a player that doesn't import it doesn't carry the table.
+
+### Report errors from a plugin
+
+Report a failure with `context.error`, using your own code, and it behaves like any other: a fatal one moves to the next fallback or stops playback, and `onError` hears it.
+
+```ts
+context.error({ code: "my-plugin-expired", message: "The session ended.", fatal: true, retryable: false });
+```
+
+Providers do the same through `sink.error`. From a load gate or a provider's `load`, throw a `VideoKitError` to choose the code:
+
+```ts
+import { VideoKitError } from "react-video-kit/errors";
+
+throw new VideoKitError("my-token-failed", "The token server returned 500.", { retryable: true });
+```
+
+Anything else thrown there is reported as `source-load-failed`. Leave `retryable` out if you can't say: `recovery` won't retry the error, and the overlay still offers **Try again**.
+
+## Fatal and retried
+
+- **Fatal** means playback stopped. If the source was one of several, and nothing has played yet, the player tries the next one first.
+- **Retried** means `retryable` is true. The [recovery](/docs/v4/plugins/recovery) plugin retries it by itself, and the overlay offers **Try again** once retries run out. Without that plugin, the overlay offers it straight away.
+
+## The browser
+
+Reported by the browser's own media element, with its `MediaError` number as `nativeCode`.
+
+| Code | When | Fatal | Retried | What to do |
+| --- | --- | --- | --- | --- |
+| `media-aborted` | The browser stopped the download, usually because the viewer asked it to. | Yes | Yes | Nothing, unless it's frequent. |
+| `media-network` | The connection failed partway through, or the viewer was offline when it started. | Yes | Yes | Nothing. `recovery` waits for the connection to return. |
+| `media-decode` | The browser couldn't decode the file. It's damaged, or uses a codec feature this device doesn't have. | Yes | No | Re-encode the file, or offer a [fallback](/docs/v4/concepts/sources) in another format. |
+| `media-unsupported` | The file wouldn't load: it's missing, the server refused it, or the format isn't supported. Browsers report all of these the same way. | Yes | No | Check the URL, the server's response, and its CORS headers. Then check the format. |
+| `media-unknown` | The browser reported an error it gave no details for. | Yes | No | Check `message` and `cause`. |
+
+## Sources and playing
+
+| Code | When | Fatal | Retried | What to do |
+| --- | --- | --- | --- | --- |
+| `source-no-provider` | Nothing can play this source. | Yes | No | Add the [hls](/docs/v4/plugins/hls) or [dash](/docs/v4/plugins/dash) plugin, or give a source the browser can play. |
+| `source-load-failed` | A plugin or provider threw while loading, without giving a code. | Yes | Yes | Check `message`, and the plugin's load gate. |
+| `play-blocked` | The browser refused to start, usually because of its autoplay policy. | No | No | Let the viewer press play, or use the [autoplay](/docs/v4/plugins/autoplay) plugin, which tries again muted. `media.playRejected` also holds this until playback starts. |
+| `play-failed` | `play()` was refused for another reason. | No | No | Check `nativeCode`, which has the name of the browser's error. |
+| `quality-switch` | A file chosen in the [quality](/docs/v4/plugins/quality) menu wouldn't load, so the previous one came back. | No | No | Check that file. Playback carries on. |
+
+## HLS
+
+Reported when hls.js gives up. It retries downloads and recovers from media errors on its own first, and what it recovers from isn't reported. `nativeCode` is its `details`, such as `fragLoadError`, and `cause` is its whole error, where `cause.response.code` has any HTTP status.
+
+| Code | When | Fatal | Retried | What to do |
+| --- | --- | --- | --- | --- |
+| `hls-engine-load` | hls.js didn't load. | Yes | Yes | Install `hls.js`, or check the `library` option. On a viewer's device, a lost connection does this too. |
+| `hls-manifest` | The manifest couldn't be downloaded. | Yes | Yes | Check the URL and CORS headers. |
+| `hls-manifest-invalid` | The manifest downloaded, but isn't valid. | Yes | No | Fix the packaging, and check that the URL doesn't return an HTML page. |
+| `hls-playlist` | A media, audio, or subtitle playlist couldn't be downloaded, or a live one stopped updating. | Yes | Yes | Check the origin or the encoder. |
+| `hls-segment` | A segment couldn't be downloaded. | Yes | Yes | Check the CDN. |
+| `hls-key` | An AES key couldn't be downloaded. | Yes | Yes | Check the key server and its CORS headers. |
+| `hls-network` | Any other download failed. | Yes | Yes | Check `nativeCode`. |
+| `hls-codecs` | The device can't play any of the stream's codecs. | Yes | No | Add a rendition this device can play, such as H.264 with AAC. |
+| `hls-media` | Decoding failed, and recovering didn't help. | Yes | No | Check the segments' encoding. |
+| `hls-unknown` | hls.js failed in another way. | Yes | No | Check `nativeCode`. |
+
+## DASH
+
+Reported when dash.js gives up. `nativeCode` is its error number. Errors from the media element itself use the [`media-` codes](#the-browser).
+
+| Code | When | Fatal | Retried | What to do |
+| --- | --- | --- | --- | --- |
+| `dash-engine-load` | dash.js didn't load. | Yes | Yes | Install `dashjs`, or check the `library` option. On a viewer's device, a lost connection does this too. |
+| `dash-manifest` | The manifest couldn't be downloaded. | Yes | Yes | Check the URL and CORS headers. |
+| `dash-manifest-invalid` | The manifest downloaded, but isn't valid or has nothing to play. | Yes | No | Fix the packaging. |
+| `dash-segment` | A segment couldn't be downloaded. | Yes | Yes | Check the CDN. |
+| `dash-network` | Any other download failed. | Yes | Yes | Check `nativeCode`. |
+| `dash-unsupported` | This browser has no Media Source, or can't play the stream's type. | Yes | No | Give a fallback source. |
+| `dash-media` | Adding media to the buffer failed. | Yes | No | Check the segments' encoding. |
+| `dash-captions` | Captions in the stream couldn't be read. | No | No | Fix the captions. The video carries on without them. |
+| `dash-time-sync` | The manifest's time server didn't answer. | No | No | Check the `UTCTiming` server. Playback carries on with the manifest's timing. |
+| `dash-unknown` | dash.js failed in another way. | Yes | No | Check `nativeCode`. |
+
+## DRM
+
+The same codes come from the [DRM](/docs/v4/plugins/drm) plugin in native playback, and from hls.js and dash.js.
+
+| Code | When | Fatal | Retried | What to do |
+| --- | --- | --- | --- | --- |
+| `drm-unsupported` | This browser supports none of the configured key systems. | Yes | No | Add a key system it supports. Widevine, PlayReady, and FairPlay each cover different devices. |
+| `drm-config` | The settings don't cover this stream, such as a key system with no licence URL. | Yes | No | Check what's passed to `drm()`. |
+| `drm-certificate` | The FairPlay certificate couldn't be downloaded or used. | Yes | Yes | Check `certificateUrl` and its CORS headers. |
+| `drm-license` | The licence server couldn't be reached, or returned an error. | Yes | Yes | Check `licenseUrl`, its CORS headers, and `nativeCode` for the status. |
+| `drm-denied` | The licence server refused, with a 401 or 403. | Yes | No | The viewer isn't entitled to this video, or their token is wrong. Ask them to sign in, or use `errorMessages` to explain. |
+| `drm-session` | The browser's key session failed, usually because of a licence it couldn't use. | Yes | No | Check that the licence matches the content and key system. |
+| `drm-output-restricted` | The key can't be used on this display, usually because of HDCP. | Yes | No | Offer a rendition with lower requirements. The viewer may need to disconnect a display. |
+| `drm-expired` | The licence has expired. | Yes | No | Issue longer licences, or reload to get a new one. |
+
+## Ads
+
+The [ads](/docs/v4/plugins/ads) plugin fails open, so none of these stop the video. They also reach the plugin's own `onError`.
+
+| Code | When | Fatal | Retried | What to do |
+| --- | --- | --- | --- | --- |
+| `ads-setup` | The engine couldn't start, such as when an ad blocker stopped the IMA SDK. | No | No | Nothing for ad blockers. Otherwise, check the engine's setup. |
+| `ads-request` | The ad tag failed. `nativeCode` has the HTTP status or the IMA error code. | No | No | Check the tag. |
+| `ads-timeout` | No pre-roll started within `timeout`. | No | No | Raise `timeout` if your ads are slow to arrive. |
+| `ads-playback` | An ad failed partway through a break. | No | No | Check the ad's file. |
+
+## Casting
+
+The viewer stays on this device when casting fails, so none of these stop the video. `nativeCode` has the Cast SDK's own code.
+
+| Code | When | Fatal | Retried | What to do |
+| --- | --- | --- | --- | --- |
+| `cast-sdk` | The Cast SDK didn't load. | No | No | Nothing for ad blockers. Otherwise, check `sdkUrl`. |
+| `cast-session` | Casting didn't start. A viewer closing the picker isn't reported. | No | No | Check `nativeCode`, such as `receiver_unavailable`. |
+| `cast-load` | The receiver couldn't load the video. | No | No | Check that the receiver can reach the URL and play the format. The default receiver can't play DRM. |
+
+## Mistakes in code
+
+These are thrown as a `VideoKitError` while you're building, rather than reported to viewers. Each has a `code`, and a message saying how to fix it.
+
+| Code | When |
+| --- | --- |
+| `plugin-reserved-name` | A plugin is named `media`. |
+| `plugin-duplicate` | The same plugin is in `plugins` twice. |
+| `plugin-no-code` | A plugin crossed from a server component to the client and lost its functions. Create `plugins` in a client component. |
+| `plugin-cycle` | Plugins require each other in a loop. |
+| `plugin-missing` | A plugin requires another one that isn't installed. |
+| `plugin-not-installed` | Code asked for a plugin's state or commands, and it isn't in `plugins`. |
+| `part-outside-root` | A part or hook isn't inside `Video.Root`. |
+| `part-outside-menu` | A menu part isn't inside `Video.Menu`. |
+| `part-outside-radio-group` | `Video.MenuRadioItem` isn't inside `Video.MenuRadioGroup`. |
+| `part-outside-timeline` | A timeline part isn't inside `Video.Timeline`. |
+| `provider-no-element` | A provider that needs a video element was attached without one. |
+
+## API
+
+<ApiEntry entry="react-video-kit/errors" />

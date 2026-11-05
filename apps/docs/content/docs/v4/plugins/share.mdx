@@ -1,0 +1,63 @@
+---
+title: Share
+description: Links to a moment in the video, and opens at the moment it's given.
+---
+
+<PluginSummary id="share" />
+
+Adds a share button to the controls. It copies a link to the current position, and on a touch device it opens the system's share sheet instead. A page opened with that link starts from the same moment. Press the share button below.
+
+<Demo slug="share" />
+
+## Usage
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { share } from "react-video-kit/share";
+
+const plugins = [share()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+The time goes in the `t` query parameter. It can be written as seconds or as a position, so `?t=90`, `?t=1:30`, and `?t=1m30s` are all the same moment.
+
+Change the parameter with `param`, and link somewhere other than the current page with `url`:
+
+```tsx
+share({
+  param: "start",
+  url: "https://example.com/watch/first-light",
+});
+```
+
+## Build a link yourself
+
+`link` returns the link for any position, by default the current one.
+
+```tsx
+"use client";
+
+import { useCommands } from "react-video-kit";
+import { share } from "react-video-kit/share";
+
+function ChapterLink({ start, title }: { start: number; title: string }) {
+  const { link } = useCommands(share);
+  return <a href={link(start)}>{title}</a>;
+}
+```
+
+`share` does what the button does, and returns `shared`, `copied`, or `failed`.
+
+## Behaviour
+
+- The time in the page's address applies once, as soon as the video's length is known. A time past the end is ignored, so a link to a video that has since been cut starts from the beginning.
+- A link's time wins over a position saved by the [persistence](/docs/v4/plugins/persistence) plugin.
+- The link keeps the page's other query parameters.
+- Cancelling the share sheet isn't a failure, and shows no message.
+- If the clipboard isn't available, the viewer sees that the link couldn't be copied. The message is announced to screen readers.
+- For a live stream, the button links to the stream without a time.
+
+## API
+
+<PluginApi id="share" />

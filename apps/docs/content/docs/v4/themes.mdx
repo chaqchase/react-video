@@ -1,0 +1,89 @@
+---
+title: Themes
+description: Ready-made looks inspired by popular video platforms, one import each.
+---
+
+The default look needs no theme. For something else, import a theme and put its class on the player. A theme is only CSS, so it changes the look and the layout and costs nothing until you import it. Every control and plugin keeps working the same way, including the keyboard and screen reader behaviour.
+
+<Demo slug="themes" />
+
+## Usage
+
+Import the theme after the main styles, then add its class.
+
+```tsx
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+import "react-video-kit/themes/youtube.css";
+
+const plugins = defaultPlugins();
+
+<VideoPlayer className="rv-theme-youtube" src="/video.mp4" plugins={plugins} />;
+```
+
+## The themes
+
+Each theme's class is `rv-theme-` followed by its file name, such as `rv-theme-disney` for `themes/disney.css`.
+
+| Theme | Import | The look |
+|---|---|---|
+| YouTube | `themes/youtube.css` | A thin red timeline with a dot, over a flat row with the time as `0:41 / 16:53` |
+| Netflix | `themes/netflix.css` | The time left beside a red timeline, large plain icons, and the title in the middle |
+| Disney+ | `themes/disney.css` | The title top left, and a small centred transport right above a thin blue timeline |
+| Prime Video | `themes/prime.css` | The title centred at the top, its buttons in the corner, and a large bare transport in the middle |
+| HBO Max | `themes/max.css` | The title and the time left above a thin white timeline, with a small centred transport under it |
+| Hulu | `themes/hulu.css` | The title over a white timeline, with the buttons running from the left under it |
+| Vimeo | `themes/vimeo.css` | A black play button beside a single dark bar, with a blue timeline |
+| Twitch | `themes/twitch.css` | A purple timeline between its two times, over small round buttons, with a red LIVE pill |
+| Spotify | `themes/spotify.css` | A large title, the times either side of the timeline, and a white circular play button |
+| Udemy | `themes/udemy.css` | A purple timeline over a dense row built for studying |
+| TikTok | `themes/tiktok.css` | Made for [vertical video](/docs/v4/plugins/orientation): a bare column of icons, the name and caption in the corner, and a timeline on the edge |
+| Instagram | `themes/instagram.css` | Also for vertical video, with finer icons and a smaller name and caption |
+| Minimal | `themes/minimal.css` | Slim, white, and on one line |
+
+These are inspired by each platform's public design. They use no logos, and they aren't made, endorsed by, or affiliated with those companies.
+
+A theme arranges the controls your plugins provide, so its buttons come from those plugins: subtitles from [`captions`](/docs/v4/plugins/captions), next and previous from [`playlist`](/docs/v4/plugins/playlist), and the episode list from [`episodes`](/docs/v4/plugins/episodes). Each one keeps the package's own icons. It names the platform's typeface first and falls back to a system font, since no fonts are included.
+
+## Use more than one
+
+Each theme is scoped to its class, so several can share a page. To switch between them, change the class. The player keeps playing.
+
+```tsx
+import "react-video-kit/themes/netflix.css";
+import "react-video-kit/themes/youtube.css";
+
+<VideoPlayer className={cinema ? "rv-theme-netflix" : "rv-theme-youtube"} src="/video.mp4" />;
+```
+
+## Adjust a theme
+
+Themes set the same [tokens](/docs/v4/theming) as the default skin, and they're in the same `rv` layer, so your own CSS still wins.
+
+```css
+.rv-theme-youtube {
+  --rv-accent: #3ea6ff;
+  --rv-radius: 0;
+}
+```
+
+## Write your own
+
+Start from any selector the skin uses, and scope it to a class of your own. To move controls around, the themes in the package take the rows and groups out of the layout with `display: contents`, which makes every control a child of `controls`, and then place them with `order`.
+
+```css
+.my-theme [data-part="controls"] {
+  flex-flow: row wrap;
+  align-content: flex-end;
+}
+
+.my-theme :is([data-part="control-row"], [data-part="control-group"], [data-part="transport"]) {
+  display: contents;
+}
+
+.my-theme [data-part="timeline"] {
+  flex: 0 0 100%;
+}
+```
+
+Read [Parts](/docs/v4/composition/parts) for every `data-part`. If you need a structure CSS can't reach, compose the [parts](/docs/v4/composition/parts) yourself.

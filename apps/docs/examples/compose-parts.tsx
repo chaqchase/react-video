@@ -21,12 +21,10 @@ export default function ComposeParts() {
         <Video.ControlRow>
           <Video.ControlGroup>
             <Video.PlayPause />
-          </Video.ControlGroup>
-          <div style={{ flex: 1 }}>
             <Video.Timeline />
-          </div>
-          <Video.ControlGroup>
             <Video.Time />
+          </Video.ControlGroup>
+          <Video.ControlGroup>
             <Video.Menu>
               <SpeedTrigger />
               <Video.MenuContent>

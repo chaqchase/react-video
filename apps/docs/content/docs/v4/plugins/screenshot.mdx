@@ -1,0 +1,79 @@
+---
+title: Screenshot
+description: Saves the current frame as a PNG, or hands it to you as a Blob.
+---
+
+<PluginSummary id="screenshot" />
+
+Adds a **Save frame** row to the settings menu. Pause on a frame you like below, open the settings menu, and save it.
+
+<Demo slug="screenshot" />
+
+## Usage
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { screenshot } from "react-video-kit/screenshot";
+
+const plugins = [screenshot()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Files are named for the frame's position, such as `frame-00-01-30.png`. Choose your own with `filename`, which gets the position in seconds:
+
+```tsx
+screenshot({
+  filename: (time) => `first-light-${Math.floor(time)}.png`,
+});
+```
+
+## Use the frame yourself
+
+`capture` returns the frame as a Blob, for uploading or showing in your own interface.
+
+```tsx
+"use client";
+
+import { useCommands } from "react-video-kit";
+import { screenshot } from "react-video-kit/screenshot";
+
+function AttachFrame({ onFrame }: { onFrame(frame: Blob): void }) {
+  const { capture } = useCommands(screenshot);
+  return (
+    <button
+      onClick={async () => {
+        const frame = await capture();
+        if (frame) onFrame(frame);
+      }}
+    >
+      Attach this frame
+    </button>
+  );
+}
+```
+
+## Video from another origin
+
+A browser only lets a page read a video's pixels when the video is on the same origin or is served with CORS. For a video on a CDN, allow your site in the `Access-Control-Allow-Origin` header and ask for it with CORS:
+
+```tsx
+<VideoPlayer
+  src="https://cdn.example.com/video.mp4"
+  media={{ crossOrigin: "anonymous" }}
+  plugins={plugins}
+/>
+```
+
+Browsers don't hand out frames of protected video, so [DRM](/docs/v4/plugins/drm) content usually saves as a black picture.
+
+## Behaviour
+
+- `capture` never rejects. If the frame can't be read it returns null and sets `error`, where `tainted` means the browser refused to read the video.
+- `download` saves the file, tells the viewer how it went in a short message, and returns whether it worked.
+- The picture is saved at the video's own size, however large the player is on the page.
+- The message is announced to screen readers.
+
+## API
+
+<PluginApi id="screenshot" />

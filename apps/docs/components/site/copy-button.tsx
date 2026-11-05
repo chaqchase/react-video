@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CheckIcon, CopyIcon } from "./icons";
 
 /** Icons swap in place, like the player's own, and the check holds long enough to read. */
-export function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) {
+export function CopyButton({ text, label = "Copy", className = "" }: { text: string; label?: string; className?: string }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -13,7 +13,7 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
     <button
       type="button"
       aria-label={copied ? "Copied" : label}
-      className="press text-dim hover:text-text hover:bg-line grid size-8 shrink-0 place-items-center rounded-lg"
+      className={`press text-dim hover:text-text hover:bg-hover grid size-8 shrink-0 place-items-center rounded-full ${className}`}
       onClick={() => {
         void navigator.clipboard?.writeText(text).then(() => {
           setCopied(true);

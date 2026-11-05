@@ -1,11 +1,15 @@
-import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { ThemeColor } from "@/components/site/theme-color";
 import "./global.css";
 
-const sans = Geist({ subsets: ["latin"], variable: "--font-geist" });
+// Dark unless someone chose light. This runs before the first paint, so the page never flashes the wrong theme.
+const THEME_SCRIPT = `(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}t=t==="light"?"light":"dark";var r=document.documentElement;r.classList.remove("dark","light");r.classList.add(t);r.style.colorScheme=t})();`;
+
+// Apple's system fonts come first in the stack, and Inter stands in everywhere else.
+const sans = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
@@ -21,16 +25,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0c0a15" },
-    { media: "(prefers-color-scheme: light)", color: "#fbf9f6" },
-  ],
+  themeColor: "#000000",
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable} font-sans`} suppressHydrationWarning>
+    <html lang="en" className={`dark ${sans.variable} ${mono.variable} font-sans`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         {/*
           Counts React commits for the render meter on the home page. React reports to
           this hook in every build, where <Profiler> only works in development.
@@ -38,7 +40,8 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Script id="commit-counter" strategy="beforeInteractive">{`(function(){var w=window,h=w.__REACT_DEVTOOLS_GLOBAL_HOOK__;if(!h){h=w.__REACT_DEVTOOLS_GLOBAL_HOOK__={supportsFiber:true,isDisabled:false,renderers:new Map(),inject:function(){return 1},onCommitFiberRoot:function(){},onCommitFiberUnmount:function(){},onPostCommitFiberRoot:function(){},checkDCE:function(){}}}var o=h.onCommitFiberRoot;w.__rvkCommits=0;h.onCommitFiberRoot=function(){w.__rvkCommits++;return o&&o.apply(this,arguments)}})();`}</Script>
       </head>
       <body className="flex min-h-screen flex-col">
-        <RootProvider theme={{ defaultTheme: "dark" }}>{children}</RootProvider>
+        <ThemeColor />
+        {children}
       </body>
     </html>
   );

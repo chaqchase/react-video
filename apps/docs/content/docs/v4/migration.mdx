@@ -233,7 +233,7 @@ Parts no longer take `*ClassName` props. Use [`data-part`](/docs/v4/theming#styl
 These changes are improvements, but you may have depended on the old behaviour.
 
 - **Sources load when they change.** Changing `src` used to do nothing. It now loads the new source.
-- **Failed sources show an error.** They used to spin forever. There's now an error message, with a retry button.
+- **Failed sources show an error.** They used to spin forever. There's now an error message with a [stable code](/docs/v4/concepts/errors), and a retry button when trying again could help. `onError` on the player hears about every failure.
 - **Controls stay visible while paused**, with the [idle](/docs/v4/plugins/idle) plugin.
 - **`crossOrigin` is opt-in.** Version 3 always set it. Pass it through `media` or `Video.Media` when you need it, such as for captions on another origin.
 - **Menus stay inside the player.** They used to portal to `document.body`, and now they render inside the root, so they work in fullscreen with no special handling.

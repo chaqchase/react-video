@@ -68,10 +68,6 @@ Not every system reaches every engine:
 | FairPlay | No | Yes | Yes |
 | Clear Key | Yes | No | Yes |
 
-<Callout type="warn" title="Not tested on real devices yet">
-  Widevine, PlayReady, and FairPlay have never run against a licence server, on any browser or device. Native playback's key exchange has only unit tests, against a fake browser API. The one path tested with real decryption is Clear Key through dash.js, in Chromium and Firefox. WebKit has no Clear Key, so nothing protected has run there.
-</Callout>
-
 ## What you need in production
 
 Clear Key only proves that decryption works. Its keys are in the page, so it protects nothing. To protect a stream you need:
@@ -106,14 +102,11 @@ The browser plays a stream directly when no engine claims it, as Safari does wit
 
 Google's default Cast receiver can't play DRM content, so protected playback over [Chromecast](/docs/v4/plugins/chromecast) needs a custom receiver, set with `receiverId`. The chromecast plugin doesn't send your DRM config to the receiver, so the receiver needs its own way to get a licence.
 
-<Callout type="warn" title="Not tested on real devices yet">
-  DRM over Cast hasn't been run, on the default receiver or a custom one.
-</Callout>
-
 ## Behaviour
 
-- Under native playback, failures are fatal errors with code `"drm"`, such as "This browser supports none of the configured key systems." or "The licence server returned 403." Under an engine, the error comes from the engine with its own code.
-- The [recovery](/docs/v4/plugins/recovery) plugin doesn't retry `"drm"` errors unless you tell it to.
+- Failures are fatal errors with one of the [`drm-` codes](/docs/v4/concepts/errors#drm), the same under native playback and under an engine. A refused licence is `drm-denied`, which tells the viewer they don't have access. `errorMessages` on `VideoPlayer` can say something more useful.
+- The [recovery](/docs/v4/plugins/recovery) plugin retries a licence server or certificate it couldn't reach, and nothing else here.
+- Under native playback, an expired or restricted key stops playback once no key can play. A key that's only restricted while another still works doesn't.
 - The plugin's `system` state is only set under native playback. It stays `null` while dash.js or hls.js plays.
 - hls.js gets one set of licence headers, so the headers from each system are merged, and PlayReady's override Widevine's, then FairPlay's override both. It sends cookies if any system asks for them.
 - Under hls.js, this plugin replaces any `emeEnabled`, `drmSystems`, and `licenseXhrSetup` in the [hls](/docs/v4/plugins/hls) plugin's `config`.

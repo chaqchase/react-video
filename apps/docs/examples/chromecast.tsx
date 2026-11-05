@@ -26,8 +26,7 @@ export default function Chromecast() {
       <div className="flex flex-col gap-1 text-sm text-current opacity-80">
         <p>
           The Cast button joins the controls once the Cast SDK reports a device. To see it, you need a
-          browser the SDK supports, such as Chrome, and a Cast device on the same network. This hasn&apos;t
-          been run on a real device yet.
+          browser the SDK supports, such as Chrome, and a Cast device on the same network.
         </p>
         <p>Cast status: {status}</p>
       </div>

@@ -92,10 +92,6 @@ import { LiveIndicator } from "react-video-kit/live";
 - On plain live, `capabilities.seek` and `capabilities.rate` are false, so the seek and speed keys in the [hotkeys](/docs/v4/plugins/hotkeys) plugin and the double tap in the [gestures](/docs/v4/plugins/gestures) plugin and the system's seek buttons in the [Media Session](/docs/v4/plugins/media-session) plugin do nothing. `seek` and `setRate` still work from your own code, which is how `goLive` reaches the edge.
 - `media.live` holds `dvr`, `start`, `edge`, and `latency`, for anything you want to build around them. `latency` is `0` under native HLS.
 
-<Callout type="warn" title="Not tested on real devices yet">
-  Live has only been tested against a simulated HLS stream, in Chrome, Firefox, and desktop WebKit. DASH live hasn't run against any stream, and its tests use a fake dash.js. Native live on an iPhone or iPad hasn't been run.
-</Callout>
-
 ## API
 
 <PluginApi id="live" />

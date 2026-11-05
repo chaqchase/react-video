@@ -4,15 +4,29 @@ import { useMemo } from "react";
 import { CopyButton } from "./copy-button";
 
 const TOKEN =
-  /(\/\/.*$)|("(?:[^"\\]|\\.)*")|\b(import|from|const|export|function|return|default)\b|(<\/?[A-Z][\w.]*|\/?>)/g;
+  /(\/\/.*$|\/\*.*\*\/)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(import|from|const|export|function|return|default)\b|(<\/?[A-Z][\w.]*)|(\b[a-zA-Z-]+(?==|:\s))|(\b\w+(?=\())|(\b\d+(?:\.\d+)?\b)|([{}()[\]<>/=,;:.])/g;
 
 function tokens(line: string) {
   const parts: React.ReactNode[] = [];
   let last = 0;
   for (const match of line.matchAll(TOKEN)) {
-    const [text, comment, string, keyword] = match;
+    const [text, comment, string, keyword, tag, attr, fn, num] = match;
     if (match.index > last) parts.push(line.slice(last, match.index));
-    const kind = comment ? "comment" : string ? "string" : keyword ? "keyword" : "tag";
+    const kind = comment
+      ? "comment"
+      : string
+        ? "string"
+        : keyword
+          ? "keyword"
+          : tag
+            ? "tag"
+            : attr
+              ? "attr"
+              : fn
+                ? "fn"
+                : num
+                  ? "num"
+                  : "dim";
     parts.push(
       <span key={match.index} className={`code-tok-${kind}`}>
         {text}
@@ -39,23 +53,21 @@ export function GeneratedCode({ code, label, className = "" }: { code: string; l
   }, [code]);
 
   return (
-    <div className={`bg-code border-line relative overflow-hidden rounded-2xl border ${className}`}>
-      <div className="absolute top-2 right-2 z-10">
-        <CopyButton text={code} label={label} />
+    <div className={`code-frame flex flex-col ${className}`}>
+      <div className="code-frame-corner">
+        <CopyButton text={code} label={label} className="code-copy" />
       </div>
-      <pre
-        tabIndex={0}
-        aria-label={label}
-        className="overflow-x-auto py-4 font-mono text-[12.5px] leading-[1.65] [tab-size:2]"
-      >
-        <code>
-          {lines.map(({ line, key }) => (
-            <span key={key} className="code-line">
-              {tokens(line)}
-            </span>
-          ))}
-        </code>
-      </pre>
+      <div className="code-scroll min-h-0 flex-1" tabIndex={0} role="group" aria-label={label}>
+        <pre className="code-pre">
+          <code>
+            {lines.map(({ line, key }) => (
+              <span key={key} className="code-line">
+                {tokens(line)}
+              </span>
+            ))}
+          </code>
+        </pre>
+      </div>
     </div>
   );
 }

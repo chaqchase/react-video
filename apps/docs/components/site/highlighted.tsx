@@ -1,21 +1,14 @@
-import { highlight } from "fumadocs-core/highlight";
-import { codeThemes } from "@/lib/code-theme";
+import { codeTransformers, getHighlighter, languageOf, THEMES } from "@/lib/docs/highlight";
 
 /** Code highlighted on the server, so no highlighter reaches the browser. */
 export async function Highlighted({ code, lang = "tsx" }: { code: string; lang?: string }) {
-  const rendered = await highlight(code.trimEnd(), {
-    lang,
-    themes: codeThemes,
+  const highlighter = await getHighlighter();
+  const html = highlighter.codeToHtml(code.trimEnd(), {
+    lang: languageOf(lang),
+    themes: THEMES,
     defaultColor: false,
-    components: {
-      pre: (props) => (
-        <pre
-          {...props}
-          style={undefined}
-          className="shiki-themed overflow-x-auto px-[18px] py-4 font-mono text-[13px] leading-[1.65] [tab-size:2]"
-        />
-      ),
-    },
+    transformers: codeTransformers(),
   });
-  return <>{rendered}</>;
+  // Shiki builds this from our own source files, so there's nothing to sanitize.
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }

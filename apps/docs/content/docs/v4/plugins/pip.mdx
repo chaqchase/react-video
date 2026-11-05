@@ -35,10 +35,6 @@ To hide the button for one player, set the attribute through `media`:
 <VideoPlayer src="/video.mp4" plugins={plugins} media={{ disablePictureInPicture: true }} />;
 ```
 
-<Callout type="warn" title="Not tested on real devices yet">
-  The test suite only covers picture in picture in unit tests with a simulated API, not in a browser. Safari's presentation mode path hasn't run on a real Mac, iPhone, or iPad.
-</Callout>
-
 ## Build your own control
 
 `enter` and `toggle` return a promise that rejects if the browser refuses, for example outside a click or key press. Catch that in your own control.
@@ -58,7 +54,7 @@ function PipToggle() {
 }
 ```
 
-`Pip` is the button from the controls, which the plugin adds to the `controls-end` [slot](/docs/v4/composition/slots). It catches a refusal itself, and nothing changes. In your own layout, render the slot or the button itself.
+`Pip` is the button from the controls, which the plugin adds to the `top-start` [slot](/docs/v4/composition/slots). It catches a refusal itself, and nothing changes. In your own layout, render the slot or the button itself.
 
 ## Behaviour
 

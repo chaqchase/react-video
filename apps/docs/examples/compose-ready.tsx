@@ -10,7 +10,6 @@ export default function ComposeReady() {
       src="/media/sample-720.mp4"
       poster="/media/poster.jpg"
       plugins={plugins}
-      load="visible"
     />
   );
 }

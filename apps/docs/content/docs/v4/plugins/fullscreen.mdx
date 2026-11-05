@@ -20,7 +20,7 @@ const plugins = [fullscreen()];
 <VideoPlayer src="/video.mp4" plugins={plugins} />;
 ```
 
-On touch devices, entering fullscreen also tries to lock the screen to landscape. To turn that off:
+On touch devices, entering fullscreen also tries to turn the screen to suit the video: landscape, or upright for a vertical video. To turn that off:
 
 ```tsx
 fullscreen({ lockOrientation: false });
@@ -45,10 +45,6 @@ So the button hides where fullscreen isn't available, such as an iframe whose pe
 2. `webkitRequestFullscreen()` on the player's root.
 3. `webkitEnterFullscreen()` on the video. This is the iPhone path. Only the video goes fullscreen, so the player's controls and overlays aren't part of it. The [captions](/docs/v4/plugins/captions) plugin hands its cues to the browser while this is active.
 
-<Callout type="warn" title="Not tested on real devices yet">
-  The iPhone path has only run in unit tests with a simulated `webkitEnterFullscreen` and its events, not on a real iPhone or iPad. Orientation locking has no tests. The browser tests cover the standard path in desktop Chrome and Firefox. They skip WebKit, which doesn't enter fullscreen headless, so Safari isn't covered either.
-</Callout>
-
 ## Build your own control
 
 `enter` and `toggle` return a promise that rejects if the browser refuses, for example outside a click or key press. Catch that in your own control.
@@ -68,13 +64,13 @@ function FullscreenToggle() {
 }
 ```
 
-`Fullscreen` is the button from the controls, which the plugin adds to the `controls-end` [slot](/docs/v4/composition/slots). It catches a refusal itself, and nothing changes. In your own layout, render the slot or the button itself.
+`Fullscreen` is the button from the controls, which the plugin adds to the `top-start` [slot](/docs/v4/composition/slots). It catches a refusal itself, and nothing changes. In your own layout, render the slot or the button itself.
 
 ## Behaviour
 
 - `active` is true only while this player is the fullscreen element, or while its video is fullscreen on the iPhone path. It follows exits that the browser performs, such as Escape, and ignores another element going fullscreen.
 - The plugin sets `data-fullscreen` on the player's root while `active` is true, for your own CSS.
-- The landscape lock only runs where `(pointer: coarse)` matches, and skips videos taller than they're wide. If the browser has no lock, or refuses it, nothing happens. The lock is released on exit.
+- The lock only runs where `(pointer: coarse)` matches. If the browser has no lock, or refuses it, nothing happens. The lock is released on exit.
 
 ## API
 

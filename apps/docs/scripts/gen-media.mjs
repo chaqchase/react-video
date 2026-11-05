@@ -1,6 +1,8 @@
-// Generates original, license-free media with ffmpeg: a looping dusk landscape as
-// progressive renditions and HLS and DASH ladders, plus captions, chapters,
+// Generates the demo media with ffmpeg: 30 seconds of the View From A Blue Moon trailer
+// as progressive renditions and HLS and DASH ladders, plus captions, chapters,
 // thumbnails, an ad, a protected stream, alternate audio, and a broken source.
+// The trailer belongs to its makers, and Plyr hosts it for demos. It isn't covered by
+// this repo's licence, so none of this output is committed.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -17,6 +19,9 @@ if (existsSync(stamp) && readFileSync(stamp, "utf8") === hash) {
   process.exit(0);
 }
 
+const SOURCE = "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4";
+/** A scene cut, so the clip opens cleanly on the sea cliffs. */
+const SOURCE_START = 21.62;
 const DURATION = 30;
 const FPS = 24;
 const GOP = FPS * 2;
@@ -42,38 +47,7 @@ mkdirSync(file("dash"), { recursive: true });
 mkdirSync(file("drm"), { recursive: true });
 mkdirSync(file("hls-tracks"), { recursive: true });
 
-// Each moving term completes whole cycles, so the picture loops with no seam.
-const wave = (cycles, across, phase = 0) =>
-  `sin(2*PI*(${across}*ld(1)+${cycles}*T/${DURATION})+${phase})`;
-const RIDGES = [
-  { base: 0.56, color: [86, 62, 112], shape: `0.040*${wave(1, 1.5, 0.4)}+0.016*${wave(4, 6, 1.1)}+0.006*${wave(8, 13, 2)}` },
-  { base: 0.67, color: [52, 40, 88], shape: `0.055*${wave(1, 1, 2.1)}+0.020*${wave(3, 3.5, 0.2)}+0.008*${wave(7, 9, 1.7)}` },
-  { base: 0.81, color: [24, 20, 54], shape: `0.070*${wave(1, 0.5, 4)}+0.024*${wave(4, 2, 1)}+0.009*${wave(9, 5, 3)}` },
-];
-const blend = (from, to, amount) => `(${from}+(${to}-${from})*${amount})`;
-const landscape = (index, [top, middle, low], sun) => {
-  const upper = blend(top, middle, "min(ld(0)/0.34,1)");
-  const sky = blend(upper, low, "max(min((ld(0)-0.30)/0.32,1),0)");
-  const glow = `${sun}*(0.85*exp(-ld(2)/0.035)+0.5*exp(-ld(2)/0.003))`;
-  // Each ridge blends over what's behind it across one pixel, which keeps its edge
-  // smooth when the picture is scaled up.
-  const layers = RIDGES.map(({ base, shape, color }, layer) => {
-    // Nearer ridges catch less of the sun's haze than far ones.
-    const haze = `${sun}*${0.16 - layer * 0.06}*exp(-pow((ld(1)-0.36)*2.2,2))`;
-    const cover = `clip((ld(0)-(${base}+${shape}))*H,0,1)`;
-    return `st(3,ld(3)+(${color[index]}+${haze}-ld(3))*${cover});`;
-  }).join("");
-  const sunX = `(0.36+0.012*sin(2*PI*T/${DURATION}))`;
-  const sunY = `(0.47+0.010*cos(2*PI*T/${DURATION}))`;
-  return `st(0,Y/H);st(1,X/W);st(2,pow((ld(1)-${sunX})*1.78,2)+pow(ld(0)-${sunY},2));st(3,min(${sky}+${glow},255));${layers}ld(3)`;
-};
-const scene = [
-  `r='${landscape(0, [20, 88, 250], 255)}'`,
-  `g='${landscape(1, [26, 58, 150], 196)}'`,
-  `b='${landscape(2, [66, 118, 104], 128)}'`,
-].join(":");
-
-// A chord that drifts, with every frequency a multiple of 1/30 Hz so it loops too.
+// A drifting chord for the alternate audio tracks, which only need to sound different.
 const pad = (a, b) =>
   [[110, 0.22], [165, 0.16], [220, 0.13], [275, 0.09], [330, 0.07], [495, 0.03]]
     .map(([hz, level], partial) => {
@@ -84,11 +58,11 @@ const pad = (a, b) =>
 const ambient = (shift) =>
   `aevalsrc='${pad(0, shift)}|${pad(1.7, shift)}':s=48000:d=${DURATION},lowpass=f=1400`;
 
-// Rendered at half rate, then blended up. Motion this slow looks the same, for half the wait.
+// ffmpeg reads only this range, so the trailer's other two and a half minutes never download.
 ffmpeg(
-  "-f", "lavfi", "-i",
-  `color=c=black:s=480x270:r=${FPS / 2}:d=${DURATION},format=gbrp,geq=${scene},framerate=fps=${FPS},scale=1280:720:flags=bicubic,gblur=sigma=1.4,noise=alls=3:allf=t,format=yuv420p`,
-  "-f", "lavfi", "-i", ambient(1),
+  "-ss", String(SOURCE_START), "-t", String(DURATION), "-i", SOURCE,
+  "-vf", `scale=1280:720,fps=${FPS}`,
+  "-af", `afade=t=in:d=0.2,afade=t=out:st=${DURATION - 1}:d=1`,
   "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-c:a", "aac", "-b:a", "192k",
   file("master.mp4")
 );
@@ -185,14 +159,49 @@ writeFileSync(
   })
 );
 
-ffmpeg("-ss", "1", "-i", file("sample-720.mp4"), "-frames:v", "1", "-q:v", "3", file("poster.jpg"));
+// Taken from the source at full size, because a page can show the poster across a whole retina screen.
+ffmpeg("-ss", String(SOURCE_START), "-i", SOURCE, "-frames:v", "1", "-q:v", "3", file("poster.jpg"));
 writeFileSync(file("broken.mp4"), "this is not a video\n");
 
-// A short creative for the ad examples, plainly different from the content.
+// Separate scenes to stand in for episodes, each with a still of its own.
+mkdirSync(file("episodes"), { recursive: true });
+for (const [index, start] of [14, 70, 53, 113, 148, 98].entries()) {
+  ffmpeg(
+    "-ss", String(start), "-t", "14", "-i", SOURCE,
+    "-vf", "scale=960:540,format=yuv420p", "-r", String(FPS),
+    "-af", "afade=t=in:d=0.3,afade=t=out:st=13.5:d=0.5",
+    "-c:v", "libx264", "-preset", "veryfast", "-b:v", "1000k", "-c:a", "aac", "-b:a", "64k",
+    "-movflags", "+faststart",
+    file("episodes", `${index + 1}.mp4`)
+  );
+  ffmpeg(
+    "-ss", String(start + 2), "-i", SOURCE,
+    "-vf", "scale=480:270", "-frames:v", "1", "-q:v", "4",
+    file("episodes", `${index + 1}.jpg`)
+  );
+}
+
+// The same footage cropped upright, for vertical video. These scenes keep their subject in the middle.
 ffmpeg(
-  "-f", "lavfi", "-i", "gradients=s=640x360:r=24:d=8:n=3:c0=0x0d9488:c1=0x22d3ee:c2=0xfde68a:speed=0.03:type=radial,format=yuv420p",
-  "-f", "lavfi", "-i", "aevalsrc='0.2*sin(2*PI*440*t)*(0.5+0.5*sin(2*PI*t))':s=48000:d=8",
-  "-c:v", "libx264", "-preset", "veryfast", "-b:v", "300k", "-c:a", "aac", "-b:a", "64k",
+  "-ss", "56.27", "-t", "16.2", "-i", SOURCE,
+  "-vf", "crop=ih*9/16:ih,scale=720:1280,setsar=1,format=yuv420p", "-r", String(FPS),
+  "-af", "afade=t=in:d=0.3,afade=t=out:st=15.7:d=0.5",
+  "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-c:a", "aac", "-b:a", "96k",
+  "-movflags", "+faststart",
+  file("sample-vertical.mp4")
+);
+ffmpeg(
+  "-ss", "60", "-i", SOURCE,
+  "-vf", "crop=ih*9/16:ih,scale=720:1280", "-frames:v", "1", "-q:v", "3",
+  file("sample-vertical.jpg")
+);
+
+// A short creative for the ad examples, from a later scene so it's plainly not the content.
+ffmpeg(
+  "-ss", "118", "-t", "8", "-i", SOURCE,
+  "-vf", "scale=640:360,format=yuv420p", "-r", String(FPS),
+  "-af", "afade=t=in:d=0.3,afade=t=out:st=7.5:d=0.5",
+  "-c:v", "libx264", "-preset", "veryfast", "-b:v", "700k", "-c:a", "aac", "-b:a", "64k",
   "-movflags", "+faststart",
   file("ad.mp4")
 );

@@ -56,7 +56,7 @@ test.describe("playlist", () => {
     await start(page, "playlist");
     await expectAdvancing(page);
     await nearTheEnd(page);
-    const card = page.getByRole("status");
+    const card = page.getByRole("group", { name: "Up next" });
     await expect(card).toContainText("The long ridge", { timeout: 10_000 });
     await expect.poll(() => videoProperty(page, (element) => element.currentSrc), {
       timeout: 10_000,
@@ -85,6 +85,8 @@ test.describe("playlist", () => {
     await expectAdvancing(page);
   });
 });
+
+const NETWORK_EMPTY = 0;
 
 test.describe("ads", () => {
   const tracked = (page: Page) => {
@@ -117,6 +119,10 @@ test.describe("ads", () => {
     await page.getByRole("button", { name: "Skip ad" }).click({ timeout: 10_000 });
     await expect(page.locator(root)).not.toHaveAttribute("data-ad", "");
     await expect(page.locator(adMedia)).toBeHidden();
+    // Hidden isn't enough: its sound has to have stopped too.
+    expect(
+      await page.locator(adMedia).evaluate((element: HTMLVideoElement) => [element.paused, element.networkState])
+    ).toEqual([true, NETWORK_EMPTY]);
     await expect.poll(() => events).toContain("skip");
     await expectAdvancing(page);
     await expect(page.locator('[data-part="timeline-input"]')).toBeEnabled();
@@ -185,7 +191,8 @@ test.describe("protected playback", () => {
     await page.goto("/examples/drm-missing");
     await expect(page.getByRole("alert")).toBeVisible({ timeout: 20_000 });
     await expect(page.locator(root)).toHaveAttribute("data-status", "error");
-    expect(await videoProperty(page, (element) => element.currentTime)).toBe(0);
+    // The stream starts a couple of frames in, because of B-frames, so it isn't exactly 0.
+    expect(await videoProperty(page, (element) => element.currentTime)).toBeLessThan(0.2);
   });
 });
 

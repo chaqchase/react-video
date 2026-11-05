@@ -45,10 +45,6 @@ When the fullscreen plugin is installed, a click waits 200ms before it plays or 
 - **Double tap** the video, with two taps less than 280ms apart and within 48px of each other, to seek by `seekStep`. The left half of the player seeks back and the right half seeks forward. Browsers can also report this as a double click, which the plugin ignores, so fullscreen doesn't change.
 - **Swipe** doesn't seek or change playback. There are no swipe gestures, and a touch that moves more than 10px isn't a tap, though the idle plugin shows the controls for it. The default skin sets `touch-action: manipulation`, which leaves scrolling to the browser.
 
-<Callout type="warn" title="Not tested on real devices yet">
-  Touch has only run with simulated input, not on a real phone or tablet.
-</Callout>
-
 ## Show your own feedback
 
 `onSeek` tells you when a double tap seeks, with `-1` for back and `1` for forward, and how many seconds it moved. It returns a function that stops listening.

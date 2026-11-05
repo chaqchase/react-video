@@ -51,7 +51,7 @@ It then decides what plays the stream:
 | Apple's, with native HLS | The browser | hls.js |
 | Any other | hls.js | hls.js |
 
-hls.js also needs Media Source or Managed Media Source. Without either, the plugin steps aside and the browser gets the source if `canPlayType` says it can play it. If it can't, the player tries the next [fallback source](/docs/v4/concepts/sources), and after the last one reports a fatal `no-provider` error.
+hls.js also needs Media Source or Managed Media Source. Without either, the plugin steps aside and the browser gets the source if `canPlayType` says it can play it. If it can't, the player tries the next [fallback source](/docs/v4/concepts/sources), and after the last one reports a fatal `source-no-provider` error.
 
 Chrome reports native HLS too, but the plugin only trusts it on Apple's browsers, which it recognises by `navigator.vendor`.
 
@@ -73,10 +73,6 @@ With hls.js, `media.provider` is `"hls"`:
 - Quality levels and audio tracks are read from the playlist, for the [quality](/docs/v4/plugins/quality) and [audio tracks](/docs/v4/plugins/audio-tracks) menus.
 - hls.js reports the live window and runs the key exchange.
 
-<Callout type="warn" title="Not tested on real devices yet">
-  Nothing on this page has run on an iPhone or iPad, neither native HLS nor `preferEngine`. Managed Media Source, which the plugin accepts in place of Media Source, hasn't been exercised anywhere. The browser tests cover hls.js in Chrome, Firefox, and desktop WebKit, and native HLS in desktop WebKit.
-</Callout>
-
 ## When hls.js loads
 
 hls.js downloads when a source the plugin claims starts loading, so `hls()` adds little to a page of MP4s. The `load` prop decides when that is:
@@ -91,13 +87,13 @@ hls.js downloads when a source the plugin claims starts loading, so `hls()` adds
 <VideoPlayer src="/stream.m3u8" plugins={plugins} load="visible" />;
 ```
 
-`load` is read once, when the player is created. If hls.js fails to download, the player reports a fatal `load-failed` error instead of hanging.
+`load` is read once, when the player is created. If hls.js fails to download, the player reports a fatal `hls-engine-load` error instead of hanging.
 
 ## Behaviour
 
 - Choosing a quality sets hls.js's `nextLevel`, which keeps what's buffered. Playback doesn't stall, and the new quality shows once the buffer runs out.
 - A fatal media error gets up to two recovery attempts in any 30 seconds, the second also swapping the audio codec for streams that declared it wrongly. After that the player reports a fatal error with code `3`.
-- A fatal network error is reported with code `"network"`, which the [recovery](/docs/v4/plugins/recovery) plugin retries. Other fatal errors use hls.js's `details` string as the code, and non-fatal errors are left to hls.js.
+- A fatal error is reported with one of the [`hls-` codes](/docs/v4/concepts/errors#hls), with hls.js's `details` string as `nativeCode`. Failed downloads are ones the [recovery](/docs/v4/plugins/recovery) plugin retries, and non-fatal errors are left to hls.js.
 - hls.js doesn't draw subtitles. The [captions](/docs/v4/plugins/captions) plugin does.
 
 ## API

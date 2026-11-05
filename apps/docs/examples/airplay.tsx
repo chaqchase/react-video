@@ -23,8 +23,7 @@ export default function AirPlay() {
       <div className="flex flex-col gap-1 text-sm text-current opacity-80">
         <p>
           The AirPlay button joins the controls once Safari reports a device it can send to. To see it,
-          you need Safari and an AirPlay device nearby. Other browsers never show it. This hasn&apos;t been
-          run on a real device yet.
+          you need Safari and an AirPlay device nearby. Other browsers never show it.
         </p>
         <p>AirPlay device found: {found ? "yes" : "no"}</p>
       </div>

@@ -5,10 +5,10 @@ import { useMemo, useState } from "react";
 import { PLUGINS, type PluginDefinition, type PluginGroup } from "@/lib/catalog";
 import { kb, LAYOUT, marginal } from "@/lib/sizes";
 import { AnimatedNumber } from "./animated-number";
-import { ArrowIcon, CheckIcon, SearchIcon } from "./icons";
+import { CheckIcon, ChevronIcon, SearchIcon } from "./icons";
 import { Segmented } from "./segmented";
 
-const GROUPS: PluginGroup[] = ["Controls", "Menus", "Timeline", "Streaming", "Viewing", "Revenue and rights", "Casting"];
+const GROUPS: PluginGroup[] = ["Controls", "Menus", "Timeline", "Streaming", "Viewing", "Extras", "Revenue and rights", "Casting"];
 type Filter = "All" | PluginGroup;
 const FILTERS = (["All", ...GROUPS] as Filter[]).map((value) => ({ value, label: value }));
 
@@ -19,13 +19,13 @@ function Card({ plugin, selected, onToggle }: { plugin: PluginDefinition; select
   const added = addedBy(plugin);
   return (
     <li
-      className={`group bg-raised relative flex min-w-0 flex-col rounded-2xl border p-4 transition-[border-color,box-shadow,transform] duration-200 ease-rv ${
-        selected ? "border-sun shadow-[0_0_0_1px_var(--site-sun)]" : "border-line hover:border-line-strong"
+      className={`lift-card group bg-raised relative flex min-w-0 flex-col rounded-[20px] p-5 ${
+        selected ? "shadow-[inset_0_0_0_2px_var(--site-sun)]" : ""
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-[15.5px] font-semibold tracking-[-0.015em]">
-          <Link href={`/docs/v4/plugins/${plugin.id}`} className="after:absolute after:inset-0 after:rounded-2xl">
+        <h3 className="text-[17px] font-semibold tracking-[-0.02em]">
+          <Link href={`/docs/v4/plugins/${plugin.id}`} className="after:absolute after:inset-0 after:rounded-[20px]">
             {plugin.title}
           </Link>
         </h3>
@@ -46,9 +46,9 @@ function Card({ plugin, selected, onToggle }: { plugin: PluginDefinition; select
           />
         </button>
       </div>
-      <p className="text-dim mt-1 flex-1 text-[13.5px] leading-snug">{plugin.blurb}</p>
-      <div className="mt-4 flex items-center justify-between gap-2 font-mono text-[12px]">
-        <code className="text-faint truncate">/{plugin.entry}</code>
+      <p className="text-dim mt-1 flex-1 text-[14px] leading-[1.38]">{plugin.blurb}</p>
+      <div className="mt-4 flex items-center justify-between gap-2 text-[13px]">
+        <code className="text-faint truncate font-mono text-[12px]">/{plugin.entry}</code>
         <span className={`shrink-0 tabular-nums ${selected ? "text-sun" : "text-dim"}`}>
           +{added < 1000 ? `${added} B` : kb(added)}
         </span>
@@ -82,7 +82,7 @@ export function Gallery() {
         <div className="max-w-full overflow-x-auto">
           <Segmented label="Filter by group" options={FILTERS} value={filter} size="sm" onChange={(next) => setFilter(next)} />
         </div>
-        <label className="border-line bg-raised focus-within:border-sun flex h-9 items-center gap-2 rounded-[11px] border px-3 transition-colors duration-150 lg:w-[240px]">
+        <label className="flex h-9 items-center gap-2 rounded-full bg-[var(--site-segment)] px-3.5 transition-shadow duration-150 focus-within:shadow-[0_0_0_2px_var(--site-sun)] lg:w-[260px]">
           <SearchIcon className="text-faint shrink-0" />
           <input
             type="search"
@@ -99,8 +99,8 @@ export function Gallery() {
         <p className="text-dim mt-16 text-center text-[15px]">Nothing matches &ldquo;{query}&rdquo;.</p>
       ) : (
         GROUPS.filter((group) => visible.some((plugin) => plugin.group === group)).map((group) => (
-          <section key={group} className="mt-10">
-            <h2 className="text-dim mb-3 font-mono text-[12.5px]">{group}</h2>
+          <section key={group} className="mt-14">
+            <h2 className="mb-4 text-[21px] font-semibold tracking-[-0.02em]">{group}</h2>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {visible
                 .filter((plugin) => plugin.group === group)
@@ -128,20 +128,20 @@ export function Gallery() {
         aria-hidden={selected.length === 0}
         className="selection-bar fixed inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] z-40 mx-auto w-[min(560px,calc(100vw-32px))]"
       >
-        <div className="page-timeline-glass flex items-center justify-between gap-3 rounded-full py-2 pr-2 pl-5 text-white">
+        <div className="glass-bar flex items-center justify-between gap-3 rounded-full py-2 pr-2 pl-5 text-white">
           <p className="min-w-0 truncate text-[13.5px]" aria-live="polite">
             <span className="text-white/70">
               {selected.length} {selected.length === 1 ? "plugin" : "plugins"}, about{" "}
             </span>
-            <AnimatedNumber value={total} format={formatKb} className="font-mono font-medium tabular-nums" />
+            <AnimatedNumber value={total} format={formatKb} className="font-medium tabular-nums" />
           </p>
           <Link
             href={`/playground?p=${selected.join(",")}`}
             tabIndex={selected.length === 0 ? -1 : undefined}
-            className="press group btn h-9 rounded-full bg-white px-4 text-[13.5px] text-[#17132b]"
+            className="press btn h-9 bg-white px-4 text-[14px] text-[#1d1d1f]"
           >
             Try them
-            <ArrowIcon />
+            <ChevronIcon />
           </Link>
         </div>
       </div>

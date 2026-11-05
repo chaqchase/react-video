@@ -1,5 +1,7 @@
 // Pure, so the server can read a shared link and render the same player first time.
-export type SourceId = "mp4" | "hls" | "dash" | "live" | "dvr" | "drm";
+import { THEMES, type ThemeId } from "@/lib/themes";
+
+export type SourceId = "mp4" | "vertical" | "hls" | "dash" | "live" | "dvr" | "drm";
 export type Layout = "complete" | "minimal";
 export type Aspect = "16/9" | "4/3" | "1/1" | "9/16";
 export type StageWidth = "phone" | "tablet" | "full";
@@ -18,15 +20,17 @@ export interface PlaygroundState {
   tokens: Tokens;
   aspect: Aspect;
   width: StageWidth;
+  theme: ThemeId;
 }
 
 export const DEFAULTS: PlaygroundState = {
   source: "mp4",
   plugins: ["idle", "gestures", "hotkeys", "recovery", "captions", "speed", "quality", "pip", "fullscreen"],
   layout: "complete",
-  tokens: { accent: "#ffffff", radius: 16, blur: 22, control: 36 },
+  tokens: { accent: "#ffffff", radius: 20, blur: 30, control: 38 },
   aspect: "16/9",
   width: "full",
+  theme: "default",
 };
 
 const oneOf = <Value extends string>(value: string | null, allowed: readonly Value[], fallback: Value) =>
@@ -41,11 +45,12 @@ export function parseConfig(params: URLSearchParams): PlaygroundState {
   const accent = params.get("accent");
   const plugins = params.get("p");
   return {
-    source: oneOf(params.get("s"), ["mp4", "hls", "dash", "live", "dvr", "drm"], DEFAULTS.source),
+    source: oneOf(params.get("s"), ["mp4", "vertical", "hls", "dash", "live", "dvr", "drm"], DEFAULTS.source),
     plugins: plugins === null ? DEFAULTS.plugins : plugins.split(",").filter(Boolean),
     layout: oneOf(params.get("l"), ["complete", "minimal"], DEFAULTS.layout),
     aspect: oneOf(params.get("a"), ["16/9", "4/3", "1/1", "9/16"], DEFAULTS.aspect),
     width: oneOf(params.get("w"), ["phone", "tablet", "full"], DEFAULTS.width),
+    theme: oneOf(params.get("t"), THEMES.map(({ id }) => id), DEFAULTS.theme),
     tokens: {
       accent: accent && /^[0-9a-f]{6}$/i.test(accent) ? `#${accent}` : DEFAULTS.tokens.accent,
       radius: number(params.get("r"), 0, 36, DEFAULTS.tokens.radius),
@@ -66,6 +71,7 @@ export function serializeConfig(state: PlaygroundState) {
   set("l", state.layout, DEFAULTS.layout);
   set("a", state.aspect, DEFAULTS.aspect);
   set("w", state.width, DEFAULTS.width);
+  set("t", state.theme, DEFAULTS.theme);
   set("accent", state.tokens.accent.slice(1), DEFAULTS.tokens.accent.slice(1));
   set("r", String(state.tokens.radius), String(DEFAULTS.tokens.radius));
   set("b", String(state.tokens.blur), String(DEFAULTS.tokens.blur));

@@ -56,10 +56,6 @@ Touch has no hover, so a tap toggles the controls:
 - A tap anywhere outside the controls hides them if they're showing and nothing above keeps them up. Otherwise it shows them for 4 seconds.
 - A tap on the controls, or a touch that moves more than 10px, never hides them. It shows them for 4 seconds.
 
-<Callout type="warn" title="Not tested on real devices yet">
-  Taps and the 4 second wait have only run in unit tests with simulated touch events, not on a real phone or tablet.
-</Callout>
-
 ## Fade your own UI with the controls
 
 The plugin writes `data-controls="shown"` or `data-controls="hidden"` on the player's root, so CSS can follow it with no render:

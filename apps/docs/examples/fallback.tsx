@@ -1,6 +1,6 @@
 "use client";
 
-import * as Video from "react-video-kit";
+import { VideoPlayer } from "react-video-kit/player";
 
 // Tried in order. The first file is broken, so the player moves on by itself.
 const sources = [
@@ -10,12 +10,5 @@ const sources = [
 ];
 
 export default function Fallback() {
-  return (
-    <Video.Root src={sources} load="visible">
-      <Video.Media width={640} height={360} />
-      <Video.PlayPause>
-        <span aria-hidden="true">⏯</span>
-      </Video.PlayPause>
-    </Video.Root>
-  );
+  return <VideoPlayer src={sources} poster="/media/poster.jpg" load="visible" />;
 }

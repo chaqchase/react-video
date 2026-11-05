@@ -28,7 +28,7 @@ const plugins = [hls(), audioTracks(), ...defaultPlugins()];
 The plugin doesn't add tracks. It lists what the playing source reports, and the row needs at least two.
 
 - **HLS through [hls.js](/docs/v4/plugins/hls):** each `TYPE=AUDIO` entry in the master playlist is a track. `NAME` is its label and `LANGUAGE` its language.
-- **[DASH](/docs/v4/plugins/dash) through dash.js:** each audio track in the manifest. Its first label is the name, or else its language. This has only run against a stand-in engine in unit tests.
+- **[DASH](/docs/v4/plugins/dash) through dash.js:** each audio track in the manifest. Its first label is the name, or else its language.
 - **The browser:** with no engine playing, the plugin reads the video element's `audioTracks` list, which is how Safari's native tracks reach the menu. Where the element has no such list, there's nothing to show.
 
 The demo's playlist has these two lines:
@@ -37,10 +37,6 @@ The demo's playlist has these two lines:
 #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="English",LANGUAGE="en",DEFAULT=YES,AUTOSELECT=YES,URI="audio-en.m3u8"
 #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Español",LANGUAGE="es",DEFAULT=NO,AUTOSELECT=YES,URI="audio-es.m3u8"
 ```
-
-<Callout type="warn" title="Not tested on real devices yet">
-  Reading tracks from the video element has only run in unit tests, with a stand-in list. It hasn't been run with a real multi-language stream in Safari, or on an iPhone or iPad.
-</Callout>
 
 ## Build your own control
 

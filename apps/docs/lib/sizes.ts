@@ -14,6 +14,6 @@ export const COMPLETE = standalone["complete player"] as number;
 export const STYLES = standalone["styles.css"] as number;
 
 export const kb = (bytes: number, digits = 1) => `${(bytes / 1000).toFixed(digits)} KB`;
-export const bytesLabel = (bytes: number) => (bytes < 1000 ? `${bytes} B` : kb(bytes, 2));
+export const bytesLabel = (bytes: number) => (bytes < 1000 ? `${bytes} B` : kb(bytes));
 /** A smaller layout, composed from parts. */
 export const MINIMAL_LAYOUT = sizes.layouts.minimal;

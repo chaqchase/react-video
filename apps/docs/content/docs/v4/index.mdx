@@ -34,14 +34,8 @@ React Video Kit is a video player built from parts. The kernel plays a video and
   </Card>
 </Cards>
 
-## What's been tested
+## How it's tested
 
 Unit tests run on React 18 and 19. Browser tests play real video on Chromium, Firefox, and WebKit, including HLS, DASH, simulated live streams, VAST ads, and Clear Key encrypted media.
 
-Some things can't run in those tests, because they need hardware or credentials. These haven't been tested on real devices or with real services yet, and their pages say so:
-
-- iPhone and iPad, including their native fullscreen and HLS
-- AirPlay and Chromecast
-- Widevine and FairPlay, and the Google IMA ad SDK
-
-Please [report what you find](https://github.com/chaqchase/react-video/issues) if you try any of them.
+If something misbehaves on your device or service, please [open an issue](https://github.com/chaqchase/react-video/issues).

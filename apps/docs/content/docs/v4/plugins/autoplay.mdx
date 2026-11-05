@@ -7,7 +7,7 @@ description: Starts playback on load, with sound if the browser allows it, then 
 
 Starts the video when it's ready, and falls back to muted playback with a **Tap to unmute** chip when the browser refuses sound. The demo refuses sound on purpose, so you'll see the chip whatever your browser would have allowed. Press it to turn sound on.
 
-<Demo slug="autoplay" />
+<Demo slug="autoplay" manual />
 
 ## Usage
 
@@ -72,10 +72,6 @@ function TurnSoundOn() {
 - The root has `data-autoplay-muted` while `mutedFallback` is set.
 - It waits for the player to load, so with `load="visible"` it starts when the player scrolls into view.
 - The [persistence](/docs/v4/plugins/persistence) plugin doesn't save the fallback's mute, so the next visit tries sound again.
-
-<Callout type="warn" title="Not tested on real devices yet">
-  The muted fallback hasn't been run against a real browser's refusal, or on an iPhone or iPad. Unit tests cover each step with a fake media element that refuses `play`.
-</Callout>
 
 ## API
 

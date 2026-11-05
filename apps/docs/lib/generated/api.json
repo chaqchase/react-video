@@ -19,6 +19,7 @@
       "CurrentTimeProps",
       "Duration",
       "DurationProps",
+      "ErrorMessage",
       "ErrorOverlay",
       "ErrorOverlayProps",
       "FullscreenEnterIcon",
@@ -44,7 +45,8 @@
       "MuteProps",
       "NextIcon",
       "PauseIcon",
-      "PipIcon",
+      "PipEnterIcon",
+      "PipExitIcon",
       "PlayIcon",
       "PlayOverlay",
       "PlayOverlayProps",
@@ -57,6 +59,9 @@
       "ReplayIcon",
       "Root",
       "RootProps",
+      "SeekButton",
+      "SeekButtonProps",
+      "SeekIcon",
       "SettingsIcon",
       "SettingsMenu",
       "SettingsMenuProps",
@@ -73,6 +78,10 @@
       "TimelineProps",
       "TimelineThumb",
       "TimelineTrack",
+      "Title",
+      "TitleProps",
+      "Transport",
+      "TransportProps",
       "Volume",
       "VolumeIcon",
       "VolumeProps",
@@ -104,6 +113,7 @@
       "CurrentTimeProps",
       "Duration",
       "DurationProps",
+      "ErrorMessage",
       "ErrorOverlay",
       "ErrorOverlayProps",
       "Media",
@@ -133,6 +143,8 @@
       "RemainingTimeProps",
       "Root",
       "RootProps",
+      "SeekButton",
+      "SeekButtonProps",
       "Slot",
       "Timeline",
       "TimelineBuffered",
@@ -162,8 +174,10 @@
       "Clock",
       "CommandsOf",
       "CoreCommands",
+      "DeveloperErrorCode",
       "Gate",
       "Gates",
+      "KnownVideoErrorCode",
       "LiveState",
       "LoadRequest",
       "LoadStrategy",
@@ -231,6 +245,7 @@
       "gestures"
     ],
     "react-video-kit/hotkeys": [
+      "HotkeyBinding",
       "HotkeysFeedback",
       "HotkeysOptions",
       "hotkeys"
@@ -328,6 +343,7 @@
       "PlaylistNext",
       "PlaylistOptions",
       "PlaylistPrevious",
+      "PlaylistTitle",
       "UpNext",
       "playlist"
     ],
@@ -359,6 +375,111 @@
       "KeySystemConfig",
       "drm"
     ],
+    "react-video-kit/episodes": [
+      "EpisodesButton",
+      "EpisodesButtonProps",
+      "EpisodesOptions",
+      "EpisodesShelf",
+      "episodes"
+    ],
+    "react-video-kit/skip": [
+      "SkipButton",
+      "SkipButtonProps",
+      "SkipOptions",
+      "SkipSegment",
+      "skip"
+    ],
+    "react-video-kit/info": [
+      "InfoButton",
+      "InfoButtonProps",
+      "InfoContent",
+      "InfoCredit",
+      "InfoOptions",
+      "InfoPanel",
+      "info"
+    ],
+    "react-video-kit/ambient": [
+      "AmbientMenu",
+      "AmbientOptions",
+      "ambient"
+    ],
+    "react-video-kit/mini-player": [
+      "MiniPlayerBack",
+      "MiniPlayerButtonProps",
+      "MiniPlayerClose",
+      "MiniPlayerOptions",
+      "miniPlayer"
+    ],
+    "react-video-kit/screenshot": [
+      "ScreenshotError",
+      "ScreenshotMenu",
+      "ScreenshotNotice",
+      "ScreenshotOptions",
+      "screenshot"
+    ],
+    "react-video-kit/loop": [
+      "LoopMenu",
+      "LoopOptions",
+      "LoopRange",
+      "LoopRangeMark",
+      "loop"
+    ],
+    "react-video-kit/shortcuts": [
+      "ShortcutsMenu",
+      "ShortcutsSheet",
+      "shortcuts"
+    ],
+    "react-video-kit/stats": [
+      "StatsMenu",
+      "StatsPanel",
+      "StatsSnapshot",
+      "stats"
+    ],
+    "react-video-kit/share": [
+      "ShareButton",
+      "ShareButtonProps",
+      "ShareNotice",
+      "ShareOptions",
+      "parseShareTime",
+      "share"
+    ],
+    "react-video-kit/fit": [
+      "FitButton",
+      "FitButtonProps",
+      "FitMode",
+      "FitOptions",
+      "fit"
+    ],
+    "react-video-kit/transcript": [
+      "Transcript",
+      "TranscriptCue",
+      "TranscriptOptions",
+      "TranscriptProps",
+      "transcript"
+    ],
+    "react-video-kit/analytics/google": [
+      "GoogleAnalyticsExtra",
+      "GoogleAnalyticsOptions",
+      "GoogleAnalyticsParams",
+      "googleAnalytics"
+    ],
+    "react-video-kit/orientation": [
+      "OrientationOptions",
+      "VideoOrientation",
+      "orientation"
+    ],
+    "react-video-kit/errors": [
+      "DEVELOPER_ERROR_CODES",
+      "DeveloperErrorCode",
+      "ERROR_CODES",
+      "ErrorCodeInfo",
+      "KnownVideoErrorCode",
+      "MediaErrorInfo",
+      "VideoErrorCode",
+      "VideoKitError",
+      "VideoKitErrorOptions",
+      "isRetryable"
+    ],
     "react-video-kit/ads/vast": [
       "VastOptions",
       "vast"
@@ -379,7 +500,7 @@
           "name": "src",
           "type": "SourceInput | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The video to play, which loads afresh when its value changes."
         },
         {
           "name": "plugins",
@@ -400,10 +521,16 @@
           "doc": "Bring your own player instead of creating one."
         },
         {
+          "name": "onError",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
+          "optional": true,
+          "doc": "Called with every error, fatal or not, for logging. It can change between renders."
+        },
+        {
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Content rendered inside the player's root element."
         }
       ]
     },
@@ -417,7 +544,7 @@
           "name": "src",
           "type": "SourceInput | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The video to play, which loads afresh when its value changes."
         },
         {
           "name": "plugins",
@@ -438,10 +565,16 @@
           "doc": "Bring your own player instead of creating one."
         },
         {
+          "name": "onError",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
+          "optional": true,
+          "doc": "Called with every error, fatal or not, for logging. It can change between renders."
+        },
+        {
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Content rendered inside the player's root element."
         }
       ]
     },
@@ -494,6 +627,46 @@
         }
       ]
     },
+    "react-video-kit#SeekButton": {
+      "entry": "react-video-kit",
+      "name": "SeekButton",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "seconds",
+          "type": "number",
+          "optional": false,
+          "doc": "Seconds to move. Negative goes back."
+        },
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#SeekButtonProps": {
+      "entry": "react-video-kit",
+      "name": "SeekButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "seconds",
+          "type": "number",
+          "optional": false,
+          "doc": "Seconds to move. Negative goes back."
+        },
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
     "react-video-kit#SettingsMenu": {
       "entry": "react-video-kit",
       "name": "SettingsMenu",
@@ -504,7 +677,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The rows at the top level of the menu."
         }
       ]
     },
@@ -518,7 +691,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The rows at the top level of the menu."
         }
       ]
     },
@@ -536,6 +709,86 @@
       "doc": "",
       "members": [],
       "definition": "TimeProps"
+    },
+    "react-video-kit#Title": {
+      "entry": "react-video-kit",
+      "name": "Title",
+      "doc": "The video's name, with an optional line above it and a description below.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The video's name."
+        },
+        {
+          "name": "eyebrow",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A short line above the title, such as a series or an episode."
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A sentence or two about the video, which shows while it's paused."
+        }
+      ]
+    },
+    "react-video-kit#TitleProps": {
+      "entry": "react-video-kit",
+      "name": "TitleProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The video's name."
+        },
+        {
+          "name": "eyebrow",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A short line above the title, such as a series or an episode."
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A sentence or two about the video, which shows while it's paused."
+        }
+      ]
+    },
+    "react-video-kit#Transport": {
+      "entry": "react-video-kit",
+      "name": "Transport",
+      "doc": "The buttons in the centre of the picture: seek back, play, and seek forward.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "seekSeconds",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How far the buttons on either side of play jump, in seconds."
+        }
+      ]
+    },
+    "react-video-kit#TransportProps": {
+      "entry": "react-video-kit",
+      "name": "TransportProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "seekSeconds",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How far the buttons on either side of play jump, in seconds."
+        }
+      ]
     },
     "react-video-kit#Volume": {
       "entry": "react-video-kit",
@@ -751,14 +1004,40 @@
     "react-video-kit#ErrorOverlay": {
       "entry": "react-video-kit",
       "name": "ErrorOverlay",
-      "doc": "Explains a fatal error and offers a retry, in place of an endless spinner.",
+      "doc": "Explains a fatal error in the viewer's language, with a code to quote to support, in place of an endless spinner. It offers a retry unless the error rules that out.",
       "kind": "component",
       "props": [
         {
           "name": "title",
           "type": "string | undefined",
           "optional": true,
-          "doc": "Replaces the default message, with access to the error."
+          "doc": "Replaces the title, whatever the error."
+        },
+        {
+          "name": "messages",
+          "type": "Partial<Record<VideoErrorCode, ErrorMessage>> | undefined",
+          "optional": true,
+          "doc": "Replaces the text for particular error codes."
+        }
+      ]
+    },
+    "react-video-kit#ErrorMessage": {
+      "entry": "react-video-kit",
+      "name": "ErrorMessage",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the title."
+        },
+        {
+          "name": "detail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the line under the title."
         }
       ]
     },
@@ -772,7 +1051,13 @@
           "name": "title",
           "type": "string | undefined",
           "optional": true,
-          "doc": "Replaces the default message, with access to the error."
+          "doc": "Replaces the title, whatever the error."
+        },
+        {
+          "name": "messages",
+          "type": "Partial<Record<VideoErrorCode, ErrorMessage>> | undefined",
+          "optional": true,
+          "doc": "Replaces the text for particular error codes."
         }
       ]
     },
@@ -786,7 +1071,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The menu's trigger and content."
         },
         {
           "name": "onOpenChange",
@@ -806,7 +1091,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The menu's trigger and content."
         },
         {
           "name": "onOpenChange",
@@ -826,7 +1111,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The rows at the top level of the menu."
         }
       ]
     },
@@ -840,7 +1125,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The rows at the top level of the menu."
         }
       ]
     },
@@ -854,7 +1139,7 @@
           "name": "disabled",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Stops the item being chosen or reached with the keyboard."
         },
         {
           "name": "onSelect",
@@ -866,7 +1151,7 @@
           "name": "keepOpen",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Leaves the menu open after the item is chosen."
         }
       ]
     },
@@ -880,7 +1165,7 @@
           "name": "disabled",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Stops the item being chosen or reached with the keyboard."
         },
         {
           "name": "onSelect",
@@ -892,7 +1177,7 @@
           "name": "keepOpen",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Leaves the menu open after the item is chosen."
         }
       ]
     },
@@ -906,13 +1191,13 @@
           "name": "value",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The value of the checked item, or null when none is checked."
         },
         {
           "name": "onValueChange",
           "type": "(value: string) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Called with an item's value when the viewer chooses it."
         }
       ]
     },
@@ -926,13 +1211,13 @@
           "name": "value",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The value of the checked item, or null when none is checked."
         },
         {
           "name": "onValueChange",
           "type": "(value: string) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Called with an item's value when the viewer chooses it."
         }
       ]
     },
@@ -946,7 +1231,7 @@
           "name": "value",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Identifies this item to the group, and is what `onValueChange` receives."
         }
       ]
     },
@@ -960,7 +1245,7 @@
           "name": "value",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Identifies this item to the group, and is what `onValueChange` receives."
         }
       ]
     },
@@ -1135,7 +1420,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Replaces the default track, thumb, and preview."
         }
       ]
     },
@@ -1161,7 +1446,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Replaces the default track, thumb, and preview."
         }
       ]
     },
@@ -1274,7 +1559,7 @@
           "name": "name",
           "type": "SlotName",
           "optional": false,
-          "doc": ""
+          "doc": "The slot to render, such as `overlay` or `menu`."
         }
       ]
     },
@@ -1302,7 +1587,7 @@
     "react-video-kit#VolumeIcon": {
       "entry": "react-video-kit",
       "name": "VolumeIcon",
-      "doc": "Each sound wave has a `data-wave`, so the skin can animate the volume level.",
+      "doc": "The speaker. The skin reads `--rv-volume` from the mute button, so each wave fades with the level, and the slash falls across the speaker when it's muted.",
       "kind": "component",
       "props": []
     },
@@ -1320,9 +1605,16 @@
       "kind": "component",
       "props": []
     },
-    "react-video-kit#PipIcon": {
+    "react-video-kit#PipEnterIcon": {
       "entry": "react-video-kit",
-      "name": "PipIcon",
+      "name": "PipEnterIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#PipExitIcon": {
+      "entry": "react-video-kit",
+      "name": "PipExitIcon",
       "doc": "",
       "kind": "component",
       "props": []
@@ -1337,9 +1629,23 @@
     "react-video-kit#SpinnerIcon": {
       "entry": "react-video-kit",
       "name": "SpinnerIcon",
-      "doc": "",
+      "doc": "Eight ticks, fading around the circle. The skin turns it one tick at a time.",
       "kind": "component",
       "props": []
+    },
+    "react-video-kit#SeekIcon": {
+      "entry": "react-video-kit",
+      "name": "SeekIcon",
+      "doc": "A ring with an arrowhead, turning back or forward, and the seconds in the middle.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "seconds",
+          "type": "number",
+          "optional": false,
+          "doc": "The seconds shown in the ring, with a negative number turning the arrow back."
+        }
+      ]
     },
     "react-video-kit#CaptionsIcon": {
       "entry": "react-video-kit",
@@ -1590,14 +1896,40 @@
     "react-video-kit/primitives#ErrorOverlay": {
       "entry": "react-video-kit/primitives",
       "name": "ErrorOverlay",
-      "doc": "Explains a fatal error and offers a retry, in place of an endless spinner.",
+      "doc": "Explains a fatal error in the viewer's language, with a code to quote to support, in place of an endless spinner. It offers a retry unless the error rules that out.",
       "kind": "component",
       "props": [
         {
           "name": "title",
           "type": "string | undefined",
           "optional": true,
-          "doc": "Replaces the default message, with access to the error."
+          "doc": "Replaces the title, whatever the error."
+        },
+        {
+          "name": "messages",
+          "type": "Partial<Record<VideoErrorCode, ErrorMessage>> | undefined",
+          "optional": true,
+          "doc": "Replaces the text for particular error codes."
+        }
+      ]
+    },
+    "react-video-kit/primitives#ErrorMessage": {
+      "entry": "react-video-kit/primitives",
+      "name": "ErrorMessage",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the title."
+        },
+        {
+          "name": "detail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the line under the title."
         }
       ]
     },
@@ -1611,7 +1943,13 @@
           "name": "title",
           "type": "string | undefined",
           "optional": true,
-          "doc": "Replaces the default message, with access to the error."
+          "doc": "Replaces the title, whatever the error."
+        },
+        {
+          "name": "messages",
+          "type": "Partial<Record<VideoErrorCode, ErrorMessage>> | undefined",
+          "optional": true,
+          "doc": "Replaces the text for particular error codes."
         }
       ]
     },
@@ -1625,7 +1963,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The menu's trigger and content."
         },
         {
           "name": "onOpenChange",
@@ -1645,7 +1983,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The menu's trigger and content."
         },
         {
           "name": "onOpenChange",
@@ -1665,7 +2003,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The rows at the top level of the menu."
         }
       ]
     },
@@ -1679,7 +2017,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "The rows at the top level of the menu."
         }
       ]
     },
@@ -1693,7 +2031,7 @@
           "name": "disabled",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Stops the item being chosen or reached with the keyboard."
         },
         {
           "name": "onSelect",
@@ -1705,7 +2043,7 @@
           "name": "keepOpen",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Leaves the menu open after the item is chosen."
         }
       ]
     },
@@ -1719,7 +2057,7 @@
           "name": "disabled",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Stops the item being chosen or reached with the keyboard."
         },
         {
           "name": "onSelect",
@@ -1731,7 +2069,7 @@
           "name": "keepOpen",
           "type": "boolean | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Leaves the menu open after the item is chosen."
         }
       ]
     },
@@ -1745,13 +2083,13 @@
           "name": "value",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The value of the checked item, or null when none is checked."
         },
         {
           "name": "onValueChange",
           "type": "(value: string) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Called with an item's value when the viewer chooses it."
         }
       ]
     },
@@ -1765,13 +2103,13 @@
           "name": "value",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The value of the checked item, or null when none is checked."
         },
         {
           "name": "onValueChange",
           "type": "(value: string) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Called with an item's value when the viewer chooses it."
         }
       ]
     },
@@ -1785,7 +2123,7 @@
           "name": "value",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Identifies this item to the group, and is what `onValueChange` receives."
         }
       ]
     },
@@ -1799,7 +2137,7 @@
           "name": "value",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Identifies this item to the group, and is what `onValueChange` receives."
         }
       ]
     },
@@ -1994,6 +2332,46 @@
       "members": [],
       "definition": "TimeProps"
     },
+    "react-video-kit/primitives#SeekButton": {
+      "entry": "react-video-kit/primitives",
+      "name": "SeekButton",
+      "doc": "Jumps by a fixed amount. Disabled wherever seeking is, such as during an ad.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "seconds",
+          "type": "number",
+          "optional": false,
+          "doc": "Seconds to move. Negative goes back."
+        },
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#SeekButtonProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "SeekButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "seconds",
+          "type": "number",
+          "optional": false,
+          "doc": "Seconds to move. Negative goes back."
+        },
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
     "react-video-kit/primitives#Timeline": {
       "entry": "react-video-kit/primitives",
       "name": "Timeline",
@@ -2016,7 +2394,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Replaces the default track, thumb, and preview."
         }
       ]
     },
@@ -2042,7 +2420,7 @@
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Replaces the default track, thumb, and preview."
         }
       ]
     },
@@ -2155,7 +2533,7 @@
           "name": "src",
           "type": "SourceInput | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The video to play, which loads afresh when its value changes."
         },
         {
           "name": "plugins",
@@ -2176,10 +2554,16 @@
           "doc": "Bring your own player instead of creating one."
         },
         {
+          "name": "onError",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
+          "optional": true,
+          "doc": "Called with every error, fatal or not, for logging. It can change between renders."
+        },
+        {
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Content rendered inside the player's root element."
         }
       ]
     },
@@ -2193,7 +2577,7 @@
           "name": "src",
           "type": "SourceInput | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The video to play, which loads afresh when its value changes."
         },
         {
           "name": "plugins",
@@ -2214,10 +2598,16 @@
           "doc": "Bring your own player instead of creating one."
         },
         {
+          "name": "onError",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
+          "optional": true,
+          "doc": "Called with every error, fatal or not, for logging. It can change between renders."
+        },
+        {
           "name": "children",
           "type": "ReactNode",
           "optional": true,
-          "doc": ""
+          "doc": "Content rendered inside the player's root element."
         }
       ]
     },
@@ -2231,7 +2621,7 @@
           "name": "name",
           "type": "SlotName",
           "optional": false,
-          "doc": ""
+          "doc": "The slot to render, such as `overlay` or `menu`."
         }
       ]
     },
@@ -2299,13 +2689,13 @@
           "name": "dispose",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Ends the scope, aborting `signal` and running its cleanups."
         },
         {
           "name": "signal",
           "type": "AbortSignal",
           "optional": false,
-          "doc": ""
+          "doc": "Aborts when the scope ends, for `fetch` calls and the like."
         },
         {
           "name": "on",
@@ -2331,7 +2721,7 @@
           "name": "signal",
           "type": "AbortSignal",
           "optional": false,
-          "doc": ""
+          "doc": "Aborts when the scope ends, for `fetch` calls and the like."
         },
         {
           "name": "on",
@@ -2371,7 +2761,7 @@
           "name": "name",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "The plugin's name, which must be unique within a player."
         },
         {
           "name": "create",
@@ -2391,7 +2781,7 @@
           "name": "pluginName",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "The name of the plugin this factory creates."
         }
       ]
     },
@@ -2405,13 +2795,13 @@
           "name": "seek",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "False where seeking isn't possible, such as a live stream with no window."
         },
         {
           "name": "rate",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "False where the rate can't change, such as on a Cast receiver."
         },
         {
           "name": "volume",
@@ -2445,13 +2835,13 @@
           "name": "pause",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Pauses playback, unless a lock blocks it."
         },
         {
           "name": "seek",
           "type": "(time: number) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Moves to `time` in seconds, kept within the timeline."
         },
         {
           "name": "scrub",
@@ -2463,43 +2853,43 @@
           "name": "setVolume",
           "type": "(volume: number) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Sets the volume, keeping it between 0 and 1."
         },
         {
           "name": "setMuted",
           "type": "(muted: boolean) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Mutes or unmutes, leaving the volume as it is."
         },
         {
           "name": "setRate",
           "type": "(rate: number) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Sets the playback speed, ignoring anything that isn't above 0."
         },
         {
           "name": "setQuality",
           "type": "(id: string | \"auto\") => void",
           "optional": false,
-          "doc": ""
+          "doc": "Switches to this level, or to automatic choice with `auto` if the provider offers it."
         },
         {
           "name": "setAudioTrack",
           "type": "(id: string) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Switches to the audio track with this id."
         },
         {
           "name": "setTextTrack",
           "type": "(id: string | null) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Tells the provider which text track to use, or none with null."
         },
         {
           "name": "setSource",
           "type": "(source: SourceInput | null) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Changes what plays, or clears it with null."
         },
         {
           "name": "reload",
@@ -2508,6 +2898,14 @@
           "doc": "Loads the current source again, optionally resuming from `startTime`. After a failure it picks up where that interrupted, and plays if the viewer was watching."
         }
       ]
+    },
+    "react-video-kit/core#DeveloperErrorCode": {
+      "entry": "react-video-kit/core",
+      "name": "DeveloperErrorCode",
+      "kind": "type",
+      "doc": "The codes on errors thrown for a mistake in the code using the library.",
+      "members": [],
+      "definition": "DeveloperErrorCode"
     },
     "react-video-kit/core#Gate": {
       "entry": "react-video-kit/core",
@@ -2527,21 +2925,29 @@
           "name": "load",
           "type": "((request: LoadRequest, next: (request: LoadRequest) => void | Promise<void>, context: PluginContext<State>) => void | Promise<void>) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Runs before a source loads, and can change the request or hold it back."
         },
         {
           "name": "play",
           "type": "((request: void, next: (request: void) => void | Promise<void>, context: PluginContext<State>) => void | Promise<void>) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Runs when `play` is called, and can delay or decline it."
         },
         {
           "name": "seek",
           "type": "((request: number, next: (request: number) => void | Promise<void>, context: PluginContext<State>) => void | Promise<void>) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Runs before a seek, and can change the position or decline it."
         }
       ]
+    },
+    "react-video-kit/core#KnownVideoErrorCode": {
+      "entry": "react-video-kit/core",
+      "name": "KnownVideoErrorCode",
+      "kind": "type",
+      "doc": "Every code the library reports. `react-video-kit/errors` lists them with their details.",
+      "members": [],
+      "definition": "KnownVideoErrorCode"
     },
     "react-video-kit/core#LiveState": {
       "entry": "react-video-kit/core",
@@ -2585,19 +2991,19 @@
           "name": "source",
           "type": "SourceObject",
           "optional": false,
-          "doc": ""
+          "doc": "The URL and type to load."
         },
         {
           "name": "renditions",
           "type": "readonly Rendition[] | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "All the files of this video, for providers that switch between them."
         },
         {
           "name": "initialRendition",
           "type": "number | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Position in `renditions` of the file that `source` points to."
         },
         {
           "name": "startTime",
@@ -2631,13 +3037,13 @@
           "name": "id",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Names what holds the lock, such as `ads`."
         },
         {
           "name": "commands",
           "type": "readonly LockableCommand[]",
           "optional": false,
-          "doc": ""
+          "doc": "The commands blocked while the lock is held."
         }
       ]
     },
@@ -2657,27 +3063,45 @@
       "members": [
         {
           "name": "code",
-          "type": "string | number",
+          "type": "VideoErrorCode",
           "optional": false,
-          "doc": ""
+          "doc": "Says what went wrong, in a form that stays the same between versions."
         },
         {
           "name": "message",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "The browser's or engine's own words, for logs. Viewers see translated text instead."
         },
         {
           "name": "fatal",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when the error stopped playback, false when it can carry on."
+        },
+        {
+          "name": "retryable",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "True when trying again could work, which `recovery` and **Try again** go by. When it's left out, `recovery` doesn't retry and the overlay still offers **Try again**."
+        },
+        {
+          "name": "nativeCode",
+          "type": "string | number | undefined",
+          "optional": true,
+          "doc": "The browser's or engine's own code, such as `3` from a `MediaError` or `fragLoadError` from hls.js."
+        },
+        {
+          "name": "cause",
+          "type": "unknown",
+          "optional": true,
+          "doc": "The original error object or event, for logs."
         },
         {
           "name": "source",
           "type": "SourceObject | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The source that failed, when known."
         }
       ]
     },
@@ -2691,7 +3115,7 @@
           "name": "status",
           "type": "MediaStatus",
           "optional": false,
-          "doc": ""
+          "doc": "The load stage, from `idle` through `loading` to `ready`, or `error` after a fatal failure."
         },
         {
           "name": "source",
@@ -2703,31 +3127,31 @@
           "name": "provider",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The name of the active provider, such as `native` or `hls`, or null before one loads."
         },
         {
           "name": "paused",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while playback is paused, and left as it was during scrubbing."
         },
         {
           "name": "ended",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True once playback has reached the end."
         },
         {
           "name": "waiting",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while playback has stalled, waiting for data."
         },
         {
           "name": "seeking",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while a seek is in progress."
         },
         {
           "name": "scrubbing",
@@ -2745,55 +3169,55 @@
           "name": "duration",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "Length in seconds, which is 0 until known and `Infinity` for a stream with no end."
         },
         {
           "name": "buffered",
           "type": "readonly (readonly [number, number])[]",
           "optional": false,
-          "doc": ""
+          "doc": "The ranges downloaded so far, as start and end pairs in seconds."
         },
         {
           "name": "volume",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "The volume, from 0 to 1."
         },
         {
           "name": "muted",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while the sound is muted."
         },
         {
           "name": "rate",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "The playback speed, where 1 is normal."
         },
         {
           "name": "qualities",
           "type": "readonly QualityLevel[]",
           "optional": false,
-          "doc": ""
+          "doc": "The levels the provider offers."
         },
         {
           "name": "quality",
           "type": "{ mode: \"auto\" | \"manual\"; active: string | null; canAuto?: boolean; }",
           "optional": false,
-          "doc": ""
+          "doc": "The active level, and who chose it: the provider or the viewer."
         },
         {
           "name": "audioTracks",
           "type": "readonly MediaTrackInfo[]",
           "optional": false,
-          "doc": ""
+          "doc": "The audio tracks to choose from."
         },
         {
           "name": "audioTrack",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The id of the active audio track, or null when there is none."
         },
         {
           "name": "textTracks",
@@ -2805,37 +3229,37 @@
           "name": "live",
           "type": "LiveState | null",
           "optional": false,
-          "doc": ""
+          "doc": "Details of the live stream, or null when the source isn't live."
         },
         {
           "name": "timeline",
           "type": "Timeline",
           "optional": false,
-          "doc": ""
+          "doc": "The range the viewer can seek through, and what kind of content it covers."
         },
         {
           "name": "capabilities",
           "type": "Capabilities",
           "optional": false,
-          "doc": ""
+          "doc": "What the current provider or stream allows."
         },
         {
           "name": "locks",
           "type": "readonly Lock[]",
           "optional": false,
-          "doc": ""
+          "doc": "The locks in force, which block commands until released."
         },
         {
           "name": "error",
           "type": "MediaErrorInfo | null",
           "optional": false,
-          "doc": ""
+          "doc": "The latest error, cleared by the next load. Check `fatal`, since playback may be carrying on."
         },
         {
           "name": "playRejected",
           "type": "string | null",
           "optional": false,
-          "doc": "Set when the browser refused to start playback, usually autoplay policy."
+          "doc": "The name of the error when the browser refused to start playback, usually autoplay policy."
         }
       ]
     },
@@ -2857,25 +3281,25 @@
           "name": "id",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Identifies the track to commands that select one."
         },
         {
           "name": "label",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Name shown in menus."
         },
         {
           "name": "language",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Language tag, such as `en`."
         },
         {
           "name": "kind",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The track's role as its source reports it, such as `main` or `subtitles`."
         }
       ]
     },
@@ -2889,13 +3313,13 @@
           "name": "commands",
           "type": "CoreCommands",
           "optional": false,
-          "doc": ""
+          "doc": "Core commands, such as `play` and `seek`."
         },
         {
           "name": "clock",
           "type": "Clock",
           "optional": false,
-          "doc": ""
+          "doc": "The clock, for reading and following playback time."
         },
         {
           "name": "getState",
@@ -2913,7 +3337,13 @@
           "name": "subscribe",
           "type": "(listener: () => void) => () => void",
           "optional": false,
-          "doc": ""
+          "doc": "Calls `listener` after state changes, and returns a function that stops it."
+        },
+        {
+          "name": "onError",
+          "type": "(listener: (error: MediaErrorInfo) => void) => () => void",
+          "optional": false,
+          "doc": "Calls `listener` with every error, fatal or not, and returns a function that stops it. That includes what `media.error` doesn't keep: blocked plays, and a source that failed when another one took over, which arrives with `fatal: false`."
         },
         {
           "name": "plugin",
@@ -2925,7 +3355,13 @@
           "name": "has",
           "type": "(name: string) => boolean",
           "optional": false,
-          "doc": ""
+          "doc": "Returns true when a plugin with this name is installed."
+        },
+        {
+          "name": "announce",
+          "type": "(message: string) => void",
+          "optional": false,
+          "doc": "Tells screen readers about a change the viewer's focus isn't on, politely, through a hidden live region. It does nothing until the player mounts. Don't call it on a timer or with the time, since every call is spoken."
         },
         {
           "name": "mount",
@@ -2955,13 +3391,13 @@
           "name": "video",
           "type": "() => HTMLVideoElement | null",
           "optional": false,
-          "doc": ""
+          "doc": "Returns the video element, or null when none is attached."
         },
         {
           "name": "root",
           "type": "() => HTMLElement | null",
           "optional": false,
-          "doc": ""
+          "doc": "Returns the root element, or null when the player isn't mounted."
         }
       ]
     },
@@ -2975,13 +3411,13 @@
           "name": "plugins",
           "type": "readonly AnyPlugin[] | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The plugins to install, fixed once the player is created."
         },
         {
           "name": "src",
           "type": "SourceInput | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The first source to play, which `commands.setSource` can replace."
         },
         {
           "name": "load",
@@ -3001,7 +3437,7 @@
           "name": "media",
           "type": "MediaState",
           "optional": false,
-          "doc": ""
+          "doc": "The kernel's playback state, with each plugin's state beside it under the plugin's name."
         }
       ]
     },
@@ -3015,37 +3451,37 @@
           "name": "player",
           "type": "Player",
           "optional": false,
-          "doc": ""
+          "doc": "The player this plugin is installed on."
         },
         {
           "name": "clock",
           "type": "Clock",
           "optional": false,
-          "doc": ""
+          "doc": "The player's clock, for reading and following playback time."
         },
         {
           "name": "commands",
           "type": "CoreCommands",
           "optional": false,
-          "doc": ""
+          "doc": "The player's core commands."
         },
         {
           "name": "state",
           "type": "() => State",
           "optional": false,
-          "doc": ""
+          "doc": "Reads this plugin's current state."
         },
         {
           "name": "set",
           "type": "(state: Partial<State>) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Merges changes into this plugin's state."
         },
         {
           "name": "media",
           "type": "() => MediaState",
           "optional": false,
-          "doc": ""
+          "doc": "Reads the current media state."
         },
         {
           "name": "report",
@@ -3054,16 +3490,22 @@
           "doc": "Writes media state, for plugins that normalize something providers can't."
         },
         {
+          "name": "error",
+          "type": "(error: MediaErrorInfo) => void",
+          "optional": false,
+          "doc": "Reports a failure, the way a provider does. A fatal one stops playback or moves to the next source."
+        },
+        {
           "name": "video",
           "type": "() => HTMLVideoElement | null",
           "optional": false,
-          "doc": ""
+          "doc": "Returns the video element, or null when none is attached."
         },
         {
           "name": "root",
           "type": "() => HTMLElement | null",
           "optional": false,
-          "doc": ""
+          "doc": "Returns the player's root element, or null when it isn't mounted."
         },
         {
           "name": "watch",
@@ -3081,13 +3523,13 @@
           "name": "isLocked",
           "type": "(command: LockableCommand) => boolean",
           "optional": false,
-          "doc": ""
+          "doc": "Returns true when a lock blocks `command`."
         },
         {
           "name": "registerProvider",
           "type": "(entry: ProviderEntry) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Adds a provider to choose from for each source, tried before the native one."
         },
         {
           "name": "pushProvider",
@@ -3113,7 +3555,7 @@
           "name": "pluginName",
           "type": "Name",
           "optional": false,
-          "doc": ""
+          "doc": "The plugin's name, as given to `definePlugin`."
         }
       ]
     },
@@ -3127,13 +3569,13 @@
           "name": "state",
           "type": "() => StateOf<Factory>",
           "optional": false,
-          "doc": ""
+          "doc": "Reads the plugin's current state."
         },
         {
           "name": "commands",
           "type": "CommandsOf<Factory>",
           "optional": false,
-          "doc": ""
+          "doc": "The commands the plugin offers."
         }
       ]
     },
@@ -3147,7 +3589,7 @@
           "name": "name",
           "type": "Name",
           "optional": false,
-          "doc": ""
+          "doc": "The plugin's name, which must be unique within a player."
         },
         {
           "name": "create",
@@ -3215,7 +3657,7 @@
           "name": "gates",
           "type": "Gates<State> | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Hooks that can change or hold back a load, play, or seek."
         },
         {
           "name": "slots",
@@ -3235,7 +3677,7 @@
           "name": "name",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Appears in `MediaState.provider` while this provider is active."
         },
         {
           "name": "attach",
@@ -3247,37 +3689,37 @@
           "name": "load",
           "type": "(request: LoadRequest, signal: AbortSignal) => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Loads the request, and should stop if `signal` aborts."
         },
         {
           "name": "play",
           "type": "() => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Starts playback, rejecting if the browser refuses."
         },
         {
           "name": "pause",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Pauses playback."
         },
         {
           "name": "seek",
           "type": "(time: number) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Moves to `time`, in seconds."
         },
         {
           "name": "setVolume",
           "type": "(volume: number, muted: boolean) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Applies the volume, from 0 to 1, and the muted setting."
         },
         {
           "name": "setRate",
           "type": "(rate: number) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Applies a playback rate, where 1 is normal speed."
         },
         {
           "name": "time",
@@ -3289,19 +3731,19 @@
           "name": "setQuality",
           "type": "((id: string | \"auto\") => void) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Switches to the level with this id, or to automatic choice with `auto`."
         },
         {
           "name": "setAudioTrack",
           "type": "((id: string) => void) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Switches to the audio track with this id."
         },
         {
           "name": "setTextTrack",
           "type": "((id: string | null) => void) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Uses the text track with this id, or none with null."
         },
         {
           "name": "snapshot",
@@ -3313,7 +3755,7 @@
           "name": "destroy",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Releases everything the provider holds, when it's removed."
         }
       ]
     },
@@ -3327,19 +3769,19 @@
           "name": "name",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Identifies the entry, so registering the same name again replaces it."
         },
         {
           "name": "canPlay",
           "type": "(source: SourceObject, environment: ProviderEnvironment) => boolean",
           "optional": false,
-          "doc": ""
+          "doc": "Returns true when this provider can play `source`."
         },
         {
           "name": "load",
           "type": "() => Promise<new () => Provider>",
           "optional": false,
-          "doc": ""
+          "doc": "Loads the provider's code and resolves to its class."
         }
       ]
     },
@@ -3353,7 +3795,7 @@
           "name": "element",
           "type": "HTMLVideoElement | null",
           "optional": false,
-          "doc": ""
+          "doc": "The player's video element, or null if there isn't one yet."
         }
       ]
     },
@@ -3367,31 +3809,31 @@
           "name": "id",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Identifies the level to `setQuality` and in `quality.active`."
         },
         {
           "name": "label",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Name shown in the quality menu."
         },
         {
           "name": "width",
           "type": "number | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Width in pixels."
         },
         {
           "name": "height",
           "type": "number | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Height in pixels, which sorts the quality menu."
         },
         {
           "name": "bitrate",
           "type": "number | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Bits per second."
         }
       ]
     },
@@ -3405,37 +3847,37 @@
           "name": "label",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Name in the quality menu, defaulting to the height, such as `720p`."
         },
         {
           "name": "width",
           "type": "number | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Width in pixels, passed on to the quality level."
         },
         {
           "name": "height",
           "type": "number | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Height in pixels, which sorts the quality menu."
         },
         {
           "name": "bitrate",
           "type": "number | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Bits per second, passed on to the quality level."
         },
         {
           "name": "src",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "URL of the media file or stream."
         },
         {
           "name": "type",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "MIME type, used instead of the URL's extension to choose a provider."
         }
       ]
     },
@@ -3449,7 +3891,7 @@
           "name": "renditions",
           "type": "Rendition[]",
           "optional": false,
-          "doc": ""
+          "doc": "The files to switch between, one for each quality."
         },
         {
           "name": "initial",
@@ -3469,7 +3911,7 @@
           "name": "update",
           "type": "(state: Partial<MediaState>) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Reports changed state, which the player merges into `MediaState`."
         },
         {
           "name": "sync",
@@ -3481,7 +3923,7 @@
           "name": "error",
           "type": "(error: MediaErrorInfo) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Reports a failure, which stops playback if it's fatal."
         }
       ]
     },
@@ -3511,13 +3953,13 @@
           "name": "src",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "URL of the media file or stream."
         },
         {
           "name": "type",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "MIME type, used instead of the URL's extension to choose a provider."
         }
       ]
     },
@@ -3539,19 +3981,19 @@
           "name": "start",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "Earliest position the viewer can seek to, in seconds."
         },
         {
           "name": "end",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "Latest position the viewer can seek to, in seconds."
         },
         {
           "name": "kind",
           "type": "\"vod\" | \"live\" | \"dvr\" | \"ad\"",
           "optional": false,
-          "doc": ""
+          "doc": "What's playing: on-demand video, a live stream, a live stream with a seek window, or an ad."
         }
       ]
     },
@@ -3572,7 +4014,7 @@
           "name": "poster",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "An image for the video element to show before playback starts."
         },
         {
           "name": "media",
@@ -3587,10 +4029,46 @@
           "doc": "`<track>` elements for the video."
         },
         {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The video's name, shown above the timeline with the controls."
+        },
+        {
+          "name": "eyebrow",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A short line above the title, such as a series or an episode."
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A sentence or two about the video, under the title while it's paused."
+        },
+        {
+          "name": "errorMessages",
+          "type": "Partial<Record<VideoErrorCode, ErrorMessage>> | undefined",
+          "optional": true,
+          "doc": "Replaces the error overlay's text for particular error codes."
+        },
+        {
+          "name": "onError",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
+          "optional": true,
+          "doc": "Called with every error, fatal or not, for logging. It can change between renders."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Content rendered inside the player's root element."
+        },
+        {
           "name": "src",
           "type": "SourceInput | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The video to play, which loads afresh when its value changes."
         },
         {
           "name": "plugins",
@@ -3609,12 +4087,6 @@
           "type": "Player | undefined",
           "optional": true,
           "doc": "Bring your own player instead of creating one."
-        },
-        {
-          "name": "children",
-          "type": "ReactNode",
-          "optional": true,
-          "doc": ""
         }
       ]
     },
@@ -3628,7 +4100,7 @@
           "name": "poster",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "An image for the video element to show before playback starts."
         },
         {
           "name": "media",
@@ -3643,10 +4115,46 @@
           "doc": "`<track>` elements for the video."
         },
         {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The video's name, shown above the timeline with the controls."
+        },
+        {
+          "name": "eyebrow",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A short line above the title, such as a series or an episode."
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A sentence or two about the video, under the title while it's paused."
+        },
+        {
+          "name": "errorMessages",
+          "type": "Partial<Record<VideoErrorCode, ErrorMessage>> | undefined",
+          "optional": true,
+          "doc": "Replaces the error overlay's text for particular error codes."
+        },
+        {
+          "name": "onError",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
+          "optional": true,
+          "doc": "Called with every error, fatal or not, for logging. It can change between renders."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Content rendered inside the player's root element."
+        },
+        {
           "name": "src",
           "type": "SourceInput | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The video to play, which loads afresh when its value changes."
         },
         {
           "name": "plugins",
@@ -3665,12 +4173,6 @@
           "type": "Player | undefined",
           "optional": true,
           "doc": "Bring your own player instead of creating one."
-        },
-        {
-          "name": "children",
-          "type": "ReactNode",
-          "optional": true,
-          "doc": ""
         }
       ]
     },
@@ -3716,13 +4218,13 @@
           "name": "active",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while the player is in fullscreen."
         },
         {
           "name": "supported",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when the browser and page allow fullscreen, known once the player mounts."
         }
       ],
       "commands": [
@@ -3730,19 +4232,19 @@
           "name": "enter",
           "type": "() => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Puts the player in fullscreen, or just the video on iPhones."
         },
         {
           "name": "exit",
           "type": "() => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Leaves fullscreen and releases any orientation lock."
         },
         {
           "name": "toggle",
           "type": "() => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Enters fullscreen, or exits it if already active."
         }
       ]
     },
@@ -3788,13 +4290,13 @@
           "name": "active",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while the video is in picture-in-picture."
         },
         {
           "name": "supported",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when the browser allows picture-in-picture and the video doesn't turn it off."
         }
       ],
       "commands": [
@@ -3802,19 +4304,19 @@
           "name": "enter",
           "type": "() => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Moves the video into picture-in-picture."
         },
         {
           "name": "exit",
           "type": "() => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Brings the video back from picture-in-picture."
         },
         {
           "name": "toggle",
           "type": "() => Promise<void>",
           "optional": false,
-          "doc": ""
+          "doc": "Enters picture-in-picture, or exits it if already active."
         }
       ]
     },
@@ -3905,7 +4407,7 @@
           "name": "visible",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while the controls are showing."
         }
       ],
       "commands": [
@@ -3919,13 +4421,13 @@
           "name": "hide",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Hides the controls until the viewer's next activity."
         },
         {
           "name": "toggle",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Shows the controls if hidden, and hides them if showing."
         }
       ]
     },
@@ -4009,6 +4511,32 @@
         }
       ]
     },
+    "react-video-kit/hotkeys#HotkeyBinding": {
+      "entry": "react-video-kit/hotkeys",
+      "name": "HotkeyBinding",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false,
+          "doc": "What the keys do, such as `seekBack`, or the name given to `bind`."
+        },
+        {
+          "name": "keys",
+          "type": "readonly string[]",
+          "optional": false,
+          "doc": "The keys, as `KeyboardEvent.key` values."
+        },
+        {
+          "name": "seconds",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How far the keys seek, in seconds."
+        }
+      ]
+    },
     "react-video-kit/hotkeys#hotkeys": {
       "entry": "react-video-kit/hotkeys",
       "name": "hotkeys",
@@ -4039,6 +4567,18 @@
       ],
       "state": [],
       "commands": [
+        {
+          "name": "bindings",
+          "type": "() => readonly HotkeyBinding[]",
+          "optional": false,
+          "doc": "The shortcuts this player responds to, given which plugins are installed."
+        },
+        {
+          "name": "bind",
+          "type": "(key: string, id: string, action: () => void) => () => void",
+          "optional": false,
+          "doc": "Adds a shortcut, under the same rules as the built-in ones. Returns a function that removes it."
+        },
         {
           "name": "onFeedback",
           "type": "(listener: FeedbackListener) => () => void",
@@ -4089,7 +4629,7 @@
           "name": "rates",
           "type": "readonly number[]",
           "optional": false,
-          "doc": ""
+          "doc": "The rates offered in the menu, in order."
         }
       ],
       "commands": [
@@ -4097,19 +4637,19 @@
           "name": "set",
           "type": "(rate: number) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Sets the playback rate, which doesn't have to be one of `rates`."
         },
         {
           "name": "faster",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Moves up to the next higher rate in `rates`, if there is one."
         },
         {
           "name": "slower",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Moves down to the next lower rate in `rates`, if there is one."
         }
       ]
     },
@@ -4135,7 +4675,7 @@
           "name": "select",
           "type": "(id: string | \"auto\") => void",
           "optional": false,
-          "doc": ""
+          "doc": "Switches to this level, or to automatic choice with `auto` if the provider offers it."
         }
       ]
     },
@@ -4161,7 +4701,7 @@
           "name": "select",
           "type": "(id: string) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Switches to the audio track with this id."
         }
       ]
     },
@@ -4189,25 +4729,25 @@
           "name": "src",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "URL of the track's WebVTT file."
         },
         {
           "name": "language",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "The track's language tag, such as `en`."
         },
         {
           "name": "label",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "The track's name in the captions menu."
         },
         {
           "name": "kind",
           "type": "\"captions\" | \"subtitles\" | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The kind of track to create, `subtitles` unless set."
         }
       ]
     },
@@ -4258,13 +4798,13 @@
           "name": "tracks",
           "type": "readonly MediaTrackInfo[]",
           "optional": false,
-          "doc": ""
+          "doc": "The caption and subtitle tracks on the video, from any source."
         },
         {
           "name": "active",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The id of the track showing, or null when captions are off."
         },
         {
           "name": "language",
@@ -4278,13 +4818,13 @@
           "name": "select",
           "type": "(id: string | null) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Shows the track with this id, or turns captions off with null."
         },
         {
           "name": "toggle",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Turns captions off, or back on with the last track used or else the first."
         },
         {
           "name": "prefer",
@@ -4296,7 +4836,7 @@
           "name": "onCues",
           "type": "(listener: CueListener) => () => void",
           "optional": false,
-          "doc": ""
+          "doc": "Calls `listener` with the cues as they change, and returns a function that stops it."
         }
       ]
     },
@@ -4418,13 +4958,13 @@
           "name": "start",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "Where the chapter starts, in seconds."
         },
         {
           "name": "title",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "The chapter's name in the menu and the timeline preview."
         }
       ]
     },
@@ -4475,13 +5015,13 @@
           "name": "items",
           "type": "readonly Chapter[]",
           "optional": false,
-          "doc": ""
+          "doc": "The chapters, given directly or read from `src`."
         },
         {
           "name": "active",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "Index of the chapter at the current position, or -1 when there is none."
         }
       ],
       "commands": [
@@ -4489,25 +5029,25 @@
           "name": "at",
           "type": "(time: number) => number",
           "optional": false,
-          "doc": ""
+          "doc": "Returns the index of the chapter at `time`, or -1 when there is none."
         },
         {
           "name": "select",
           "type": "(index: number) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Seeks to the start of the chapter at this index."
         },
         {
           "name": "next",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Seeks to the start of the chapter after the current one, if there is one."
         },
         {
           "name": "previous",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Seeks to the start of the chapter before the current one, if there is one."
         }
       ]
     },
@@ -4590,25 +5130,25 @@
           "name": "title",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name the system shows for the video."
         },
         {
           "name": "artist",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The artist the system shows beside the title."
         },
         {
           "name": "album",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The album the system shows beside the title."
         },
         {
           "name": "artwork",
           "type": "MediaImage[] | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The images the system can show for the video."
         }
       ]
     },
@@ -4622,7 +5162,7 @@
           "name": "metadata",
           "type": "MediaSessionMetadata | ((source: SourceObject) => MediaSessionMetadata) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "What the system shows for the video, set directly or worked out for each source."
         },
         {
           "name": "seekStep",
@@ -4645,7 +5185,7 @@
           "name": "metadata",
           "type": "MediaSessionMetadata | ((source: SourceObject) => MediaSessionMetadata) | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "What the system shows for the video, set directly or worked out for each source."
         },
         {
           "name": "seekStep",
@@ -4667,247 +5207,595 @@
           "name": "play",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the play buttons, and the hotkey message for playing."
         },
         {
           "name": "pause",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the play button during playback, and the hotkey message for pausing."
         },
         {
           "name": "replay",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the play buttons once the video has ended."
+        },
+        {
+          "name": "seekBack",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on a backward seek button, where `{seconds}` stands for the amount."
+        },
+        {
+          "name": "seekForward",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on a forward seek button, where `{seconds}` stands for the amount."
         },
         {
           "name": "seek",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the timeline's slider."
         },
         {
           "name": "of",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The word between the two times the timeline announces, as in `1:00 of 5:00`."
         },
         {
           "name": "mute",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the mute button while the sound is on."
         },
         {
           "name": "unmute",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the mute button while muted."
         },
         {
           "name": "muted",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The hotkey message after muting."
         },
         {
           "name": "unmuted",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The hotkey message after unmuting."
         },
         {
           "name": "volume",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the volume slider, and the start of the hotkey message for volume."
         },
         {
           "name": "settings",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the settings menu button."
+        },
+        {
+          "name": "player",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the player itself, for screen readers, where it has no other."
+        },
+        {
+          "name": "buffering",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Announced when the video has been stalled for a few seconds."
+        },
+        {
+          "name": "transcript",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the transcript's list of lines."
         },
         {
           "name": "back",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the back row of a submenu."
         },
         {
           "name": "fullscreen",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the fullscreen button outside fullscreen."
         },
         {
           "name": "exitFullscreen",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the fullscreen button while in fullscreen."
         },
         {
           "name": "pip",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the picture-in-picture button outside picture-in-picture."
         },
         {
           "name": "exitPip",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the picture-in-picture button while in picture-in-picture."
         },
         {
           "name": "error",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The title on the error overlay when a video can't be played."
+        },
+        {
+          "name": "errorDetail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The line under that title."
+        },
+        {
+          "name": "errorConnection",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The title on the error overlay when trying again could work."
+        },
+        {
+          "name": "errorConnectionDetail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The line under that title."
+        },
+        {
+          "name": "errorProtected",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The title on the error overlay when protected video can't be played."
+        },
+        {
+          "name": "errorProtectedDetail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The line under that title."
+        },
+        {
+          "name": "errorDenied",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The title on the error overlay when the viewer isn't allowed to watch."
+        },
+        {
+          "name": "errorDeniedDetail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The line under that title."
+        },
+        {
+          "name": "errorOutput",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The title on the error overlay when protection rules out this display."
+        },
+        {
+          "name": "errorOutputDetail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The line under that title."
+        },
+        {
+          "name": "errorCode",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The words before the code on the error overlay, with their punctuation."
         },
         {
           "name": "retry",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the error overlay's retry button."
         },
         {
           "name": "speed",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name of the speed row and its submenu in the settings menu."
         },
         {
           "name": "normal",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name of the 1× rate in the speed menu."
         },
         {
           "name": "quality",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name of the quality row and its submenu in the settings menu."
         },
         {
           "name": "auto",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name of the automatic choice in the quality menu."
         },
         {
           "name": "captions",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the captions button, and the name of the captions row in the settings menu."
         },
         {
           "name": "captionsOff",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name of the off choice in the captions menu."
         },
         {
           "name": "audio",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name of the audio row and its submenu in the settings menu."
         },
         {
           "name": "chapters",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name of the chapters row and its submenu in the settings menu."
         },
         {
           "name": "tapToUnmute",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The text on the chip offering sound after a muted autoplay."
         },
         {
           "name": "live",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The text on the live indicator."
         },
         {
           "name": "goLive",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the live indicator when behind the edge or paused."
         },
         {
           "name": "next",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the playlist's next button."
         },
         {
           "name": "previous",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the playlist's previous button."
         },
         {
           "name": "upNext",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The heading on the up-next card."
         },
         {
           "name": "playNow",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the up-next card's button that plays the next item."
         },
         {
           "name": "cancel",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the up-next card's button that stays on the finished video."
         },
         {
           "name": "airplay",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the AirPlay button."
         },
         {
           "name": "cast",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the Cast button."
         },
         {
           "name": "castingTo",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The text before the device name on the casting overlay."
         },
         {
           "name": "ad",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The word before the count and time left on the ad overlay."
         },
         {
           "name": "skipAd",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The label on the ad overlay's skip button once skipping is allowed."
         },
         {
           "name": "skipAdIn",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The text before the seconds on the skip button until skipping is allowed."
         },
         {
           "name": "learnMore",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The text on the ad overlay's link."
+        },
+        {
+          "name": "episodes",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the episodes button and shelf."
+        },
+        {
+          "name": "nowPlaying",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Marks the episode that's playing on the shelf."
+        },
+        {
+          "name": "close",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on a panel's close button."
+        },
+        {
+          "name": "info",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the info button and panel."
+        },
+        {
+          "name": "skipIntro",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The skip button during an intro."
+        },
+        {
+          "name": "skipRecap",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The skip button during a recap."
+        },
+        {
+          "name": "skipCredits",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The skip button during credits, with nothing to move on to."
+        },
+        {
+          "name": "skip",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The skip button during any other part."
+        },
+        {
+          "name": "nextEpisode",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The skip button during credits, with another item in the playlist."
+        },
+        {
+          "name": "ambient",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the ambient light row in the settings menu."
+        },
+        {
+          "name": "backToVideo",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the mini player's button that scrolls back to the video."
+        },
+        {
+          "name": "screenshot",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the row that saves the current frame."
+        },
+        {
+          "name": "screenshotSaved",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The message after saving a frame."
+        },
+        {
+          "name": "screenshotFailed",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The message when a frame can't be saved."
+        },
+        {
+          "name": "loop",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the loop row and its submenu in the settings menu."
+        },
+        {
+          "name": "loopVideo",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The choice in the loop menu that repeats the whole video."
+        },
+        {
+          "name": "loopStart",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The row in the loop menu that starts a section at the current position."
+        },
+        {
+          "name": "loopEnd",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The row in the loop menu that ends a section at the current position."
+        },
+        {
+          "name": "shortcuts",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The title of the shortcuts list, and its row in the settings menu."
+        },
+        {
+          "name": "shortcutPlayPause",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the play and pause shortcut."
+        },
+        {
+          "name": "shortcutVolumeUp",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the shortcut that raises the volume."
+        },
+        {
+          "name": "shortcutVolumeDown",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the shortcut that lowers the volume."
+        },
+        {
+          "name": "shortcutMute",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the mute shortcut."
+        },
+        {
+          "name": "shortcutFaster",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the shortcut that speeds playback up."
+        },
+        {
+          "name": "shortcutSlower",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the shortcut that slows playback down."
+        },
+        {
+          "name": "shortcutStart",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the shortcut to the start."
+        },
+        {
+          "name": "shortcutEnd",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the shortcut to the end."
+        },
+        {
+          "name": "shortcutJump",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The name of the number keys, which jump through the video."
+        },
+        {
+          "name": "stats",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The title of the stats readout, and its row in the settings menu."
+        },
+        {
+          "name": "statsVideo",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The stats row for the picture's size."
+        },
+        {
+          "name": "statsViewport",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The stats row for the player's size on the page."
+        },
+        {
+          "name": "statsFrames",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The stats row for dropped frames."
+        },
+        {
+          "name": "statsBuffer",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The stats row for how much is downloaded ahead."
+        },
+        {
+          "name": "statsEngine",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The stats row for the active provider."
+        },
+        {
+          "name": "statsLatency",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The stats row for the distance from the live edge."
+        },
+        {
+          "name": "copy",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the stats readout's copy button."
+        },
+        {
+          "name": "copied",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on that button just after copying."
+        },
+        {
+          "name": "share",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the share button."
+        },
+        {
+          "name": "linkCopied",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The message after copying a link."
+        },
+        {
+          "name": "linkFailed",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The message when a link can't be copied."
+        },
+        {
+          "name": "fill",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the fit button while the whole picture shows."
+        },
+        {
+          "name": "fitWhole",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the fit button while the picture fills the frame."
+        },
+        {
+          "name": "transcriptResume",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The label on the transcript's button that returns to the current line."
         }
       ]
     },
@@ -4970,19 +5858,19 @@
           "name": "locale",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "The current language, written to Root as `lang`."
         },
         {
           "name": "strings",
           "type": "Record<string, string>",
           "optional": false,
-          "doc": ""
+          "doc": "Translations for that language, where anything missing falls back to English."
         },
         {
           "name": "dir",
           "type": "\"ltr\" | \"rtl\"",
           "optional": false,
-          "doc": ""
+          "doc": "The text direction, written to Root as `dir`."
         }
       ],
       "commands": [
@@ -5048,7 +5936,7 @@
           "name": "mutedFallback",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while playback is muted only because the browser refused sound."
         }
       ],
       "commands": [
@@ -5056,7 +5944,7 @@
           "name": "unmute",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Turns the sound back on and dismisses the unmute chip."
         }
       ]
     },
@@ -5082,7 +5970,7 @@
           "name": "retryOn",
           "type": "((error: MediaErrorInfo) => boolean) | undefined",
           "optional": true,
-          "doc": "Decides which errors are worth retrying."
+          "doc": "Decides which errors are worth retrying. By default, those marked `retryable`."
         }
       ]
     },
@@ -5111,7 +5999,7 @@
           "name": "retryOn",
           "type": "((error: MediaErrorInfo) => boolean) | undefined",
           "optional": true,
-          "doc": "Decides which errors are worth retrying."
+          "doc": "Decides which errors are worth retrying. By default, those marked `retryable`."
         }
       ],
       "state": [
@@ -5119,13 +6007,13 @@
           "name": "attempt",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "Retries used so far, back to 0 once playback recovers or the source changes."
         },
         {
           "name": "retrying",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True from a retryable failure until the video is ready again or the plugin gives up."
         }
       ],
       "commands": []
@@ -5148,7 +6036,7 @@
           "name": "type",
           "type": "AnalyticsEventType",
           "optional": false,
-          "doc": ""
+          "doc": "What happened."
         },
         {
           "name": "position",
@@ -5157,10 +6045,22 @@
           "doc": "Playback position when it happened, in seconds."
         },
         {
+          "name": "duration",
+          "type": "number",
+          "optional": false,
+          "doc": "The video's length in seconds, which is 0 until known and `Infinity` for a live stream."
+        },
+        {
+          "name": "percent",
+          "type": "number",
+          "optional": false,
+          "doc": "How far through the video that is, from 0 to 100. A `progress` event gives the mark it passed."
+        },
+        {
           "name": "source",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "URL of the current source, or null when there isn't one."
         },
         {
           "name": "startupMs",
@@ -5178,13 +6078,19 @@
           "name": "quality",
           "type": "string | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The new level's id, on `quality-change`."
+        },
+        {
+          "name": "complete",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "True on `ended` when playback, rather than a seek, carried the video past its last mark."
         },
         {
           "name": "error",
           "type": "MediaErrorInfo | null | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "What went wrong, on `error`."
         }
       ]
     },
@@ -5198,13 +6104,19 @@
           "name": "onEvent",
           "type": "(event: AnalyticsEvent) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Called with each event as it happens."
         },
         {
           "name": "heartbeat",
           "type": "number | undefined",
           "optional": true,
           "doc": "Seconds of playback between heartbeats. 0 turns them off."
+        },
+        {
+          "name": "progress",
+          "type": "readonly number[] | undefined",
+          "optional": true,
+          "doc": "The percentages that send a `progress` event once each, as playback passes them."
         }
       ]
     },
@@ -5221,13 +6133,19 @@
           "name": "onEvent",
           "type": "(event: AnalyticsEvent) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Called with each event as it happens."
         },
         {
           "name": "heartbeat",
           "type": "number | undefined",
           "optional": true,
           "doc": "Seconds of playback between heartbeats. 0 turns them off."
+        },
+        {
+          "name": "progress",
+          "type": "readonly number[] | undefined",
+          "optional": true,
+          "doc": "The percentages that send a `progress` event once each, as playback passes them."
         }
       ],
       "state": [],
@@ -5391,19 +6309,19 @@
           "name": "active",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while the current source is live."
         },
         {
           "name": "dvr",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when the viewer can seek back through a window of the stream."
         },
         {
           "name": "atEdge",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True within `edgeTolerance` seconds of the live edge, and when the source isn't live."
         }
       ],
       "commands": [
@@ -5443,6 +6361,13 @@
         }
       ]
     },
+    "react-video-kit/playlist#PlaylistTitle": {
+      "entry": "react-video-kit/playlist",
+      "name": "PlaylistTitle",
+      "doc": "The current item's title, eyebrow, and description. Hidden when it has none of them.",
+      "kind": "component",
+      "props": []
+    },
     "react-video-kit/playlist#UpNext": {
       "entry": "react-video-kit/playlist",
       "name": "UpNext",
@@ -5460,19 +6385,49 @@
           "name": "src",
           "type": "SourceInput",
           "optional": false,
-          "doc": ""
+          "doc": "The video, in any form the player's `src` accepts."
         },
         {
           "name": "title",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The name shown with the controls and on the up-next card."
+        },
+        {
+          "name": "eyebrow",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A short line above the title, such as `Season 1, Episode 2`."
+        },
+        {
+          "name": "description",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A sentence or two about this item, under the title while it's paused."
         },
         {
           "name": "poster",
           "type": "string | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "An image set as the video's poster while this item is current."
+        },
+        {
+          "name": "thumbnail",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A small image of this item, for browsing the queue."
+        },
+        {
+          "name": "duration",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How long this item runs, in seconds, for browsing the queue."
+        },
+        {
+          "name": "season",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The season this item belongs to, which groups it when browsing the queue."
         }
       ]
     },
@@ -5486,7 +6441,7 @@
           "name": "items",
           "type": "readonly PlaylistItem[]",
           "optional": false,
-          "doc": ""
+          "doc": "The videos in the queue, in play order."
         },
         {
           "name": "start",
@@ -5521,7 +6476,7 @@
           "name": "items",
           "type": "readonly PlaylistItem[]",
           "optional": false,
-          "doc": ""
+          "doc": "The videos in the queue, in play order."
         },
         {
           "name": "start",
@@ -5547,19 +6502,19 @@
           "name": "items",
           "type": "readonly PlaylistItem[]",
           "optional": false,
-          "doc": ""
+          "doc": "The videos in the queue."
         },
         {
           "name": "index",
           "type": "number",
           "optional": false,
-          "doc": ""
+          "doc": "Position of the current item in `items`."
         },
         {
           "name": "loop",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when the queue wraps around at both ends."
         },
         {
           "name": "remaining",
@@ -5579,19 +6534,19 @@
           "name": "select",
           "type": "(index: number, play?: boolean) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Moves to the item at this index and plays it, unless `play` is false."
         },
         {
           "name": "next",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Moves to the next item and plays it, wrapping around if `loop` is on."
         },
         {
           "name": "previous",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Moves to the previous item and plays it, wrapping around if `loop` is on."
         },
         {
           "name": "cancel",
@@ -5669,13 +6624,13 @@
           "name": "available",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when Safari has found a device to send to."
         },
         {
           "name": "active",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while the video is playing on an AirPlay device."
         }
       ],
       "commands": [
@@ -5781,19 +6736,19 @@
           "name": "available",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when the Cast SDK reports a device to cast to."
         },
         {
           "name": "active",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True while playback is on a Cast receiver."
         },
         {
           "name": "device",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The name of the receiver in use, or null if there's none or it has no name."
         }
       ],
       "commands": [
@@ -5801,7 +6756,7 @@
           "name": "toggle",
           "type": "() => void",
           "optional": false,
-          "doc": "Opens the device picker. Must run from a click or key press."
+          "doc": "Opens the device picker, or ends the session if one is running. Must run from a click or key press."
         }
       ]
     },
@@ -5874,19 +6829,19 @@
           "name": "play",
           "type": "() => Promise<void> | void",
           "optional": false,
-          "doc": ""
+          "doc": "Resumes the current ad."
         },
         {
           "name": "pause",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Pauses the current ad."
         },
         {
           "name": "skip",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Skips the current ad."
         },
         {
           "name": "clicked",
@@ -5898,7 +6853,7 @@
           "name": "setVolume",
           "type": "(volume: number, muted: boolean) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Applies the viewer's volume, from 0 to 1, and muted setting to the ad."
         },
         {
           "name": "contentEnded",
@@ -5910,7 +6865,7 @@
           "name": "destroy",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Stops the engine and removes what it added to the page."
         }
       ]
     },
@@ -5942,7 +6897,7 @@
           "name": "adStart",
           "type": "(ad: AdInfo) => void",
           "optional": false,
-          "doc": ""
+          "doc": "Tells the player an ad has begun, so the timeline and overlay follow it."
         },
         {
           "name": "error",
@@ -6016,9 +6971,9 @@
         },
         {
           "name": "onError",
-          "type": "((error: unknown) => void) | undefined",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
           "optional": true,
-          "doc": "Told about every failure, since the viewer never sees them."
+          "doc": "Told about every failure, since the viewer never sees them. `Root`'s `onError` hears these too."
         }
       ]
     },
@@ -6045,9 +7000,9 @@
         },
         {
           "name": "onError",
-          "type": "((error: unknown) => void) | undefined",
+          "type": "((error: MediaErrorInfo) => void) | undefined",
           "optional": true,
-          "doc": "Told about every failure, since the viewer never sees them."
+          "doc": "Told about every failure, since the viewer never sees them. `Root`'s `onError` hears these too."
         }
       ],
       "state": [
@@ -6055,19 +7010,19 @@
           "name": "active",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True during an ad break."
         },
         {
           "name": "ad",
           "type": "AdInfo | null",
           "optional": false,
-          "doc": ""
+          "doc": "The current ad, or null until one starts and after the break."
         },
         {
           "name": "ownsUi",
           "type": "boolean",
           "optional": false,
-          "doc": ""
+          "doc": "True when the engine draws its own ad controls, which hides the built-in overlay."
         }
       ],
       "commands": [
@@ -6075,7 +7030,7 @@
           "name": "skip",
           "type": "() => void",
           "optional": false,
-          "doc": ""
+          "doc": "Asks the engine to skip the current ad."
         },
         {
           "name": "clicked",
@@ -6109,25 +7064,25 @@
           "name": "widevine",
           "type": "KeySystemConfig | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Licence settings for Widevine."
         },
         {
           "name": "playready",
           "type": "KeySystemConfig | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Licence settings for PlayReady."
         },
         {
           "name": "fairplay",
           "type": "FairPlayConfig | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "Licence and certificate settings for FairPlay."
         },
         {
           "name": "clearkey",
           "type": "ClearKeyConfig | undefined",
           "optional": true,
-          "doc": ""
+          "doc": "The keys for Clear Key, which needs no licence server."
         }
       ]
     },
@@ -6141,13 +7096,13 @@
           "name": "certificateUrl",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Where to fetch the FairPlay server certificate."
         },
         {
           "name": "licenseUrl",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Where licence requests are sent."
         },
         {
           "name": "headers",
@@ -6173,7 +7128,7 @@
           "name": "licenseUrl",
           "type": "string",
           "optional": false,
-          "doc": ""
+          "doc": "Where licence requests are sent."
         },
         {
           "name": "headers",
@@ -6211,10 +7166,1627 @@
           "name": "system",
           "type": "string | null",
           "optional": false,
-          "doc": ""
+          "doc": "The key system the current source plays through natively, or null until it needs one."
         }
       ],
       "commands": []
+    },
+    "react-video-kit/episodes#EpisodesShelf": {
+      "entry": "react-video-kit/episodes",
+      "name": "EpisodesShelf",
+      "doc": "The shelf of episodes. It renders nothing until it first opens.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/episodes#EpisodesOptions": {
+      "entry": "react-video-kit/episodes",
+      "name": "EpisodesOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "progress",
+          "type": "((item: PlaylistItem, index: number) => number | null | undefined) | undefined",
+          "optional": true,
+          "doc": "How far through an episode the viewer is, from 0 to 1, for the bar on its thumbnail. The episode that's playing always shows its real position instead."
+        }
+      ]
+    },
+    "react-video-kit/episodes#episodes": {
+      "entry": "react-video-kit/episodes",
+      "name": "episodes",
+      "doc": "A shelf of the queue's episodes, grouped into seasons. The queue itself comes from the playlist plugin, so this adds only what the viewer browses it with.",
+      "kind": "plugin",
+      "pluginName": "episodes",
+      "required": false,
+      "optionsType": "EpisodesOptions",
+      "options": [
+        {
+          "name": "progress",
+          "type": "((item: PlaylistItem, index: number) => number | null | undefined) | undefined",
+          "optional": true,
+          "doc": "How far through an episode the viewer is, from 0 to 1, for the bar on its thumbnail. The episode that's playing always shows its real position instead."
+        }
+      ],
+      "state": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the shelf is showing."
+        },
+        {
+          "name": "season",
+          "type": "string | null",
+          "optional": false,
+          "doc": "The season on the shelf, or null when episodes have no seasons."
+        },
+        {
+          "name": "progress",
+          "type": "((item: PlaylistItem, index: number) => number | null | undefined) | null",
+          "optional": false,
+          "doc": "The function that reads an episode's progress."
+        }
+      ],
+      "commands": [
+        {
+          "name": "open",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Opens the shelf on the season that's playing."
+        },
+        {
+          "name": "close",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Closes the shelf, and returns focus to its button."
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Opens the shelf if closed, and closes it if open."
+        },
+        {
+          "name": "setSeason",
+          "type": "(season: string | null) => void",
+          "optional": false,
+          "doc": "Shows this season's episodes on the shelf."
+        }
+      ]
+    },
+    "react-video-kit/episodes#EpisodesButtonProps": {
+      "entry": "react-video-kit/episodes",
+      "name": "EpisodesButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/episodes#EpisodesButton": {
+      "entry": "react-video-kit/episodes",
+      "name": "EpisodesButton",
+      "doc": "Opens the shelf. Hidden with a single item, since there's nothing to browse.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/skip#SkipSegment": {
+      "entry": "react-video-kit/skip",
+      "name": "SkipSegment",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "kind",
+          "type": "\"intro\" | \"recap\" | \"credits\" | \"custom\" | undefined",
+          "optional": true,
+          "doc": "What this part of the video is, which picks the button's label. Defaults to `custom`."
+        },
+        {
+          "name": "start",
+          "type": "number",
+          "optional": false,
+          "doc": "Where the button appears, in seconds."
+        },
+        {
+          "name": "end",
+          "type": "number",
+          "optional": false,
+          "doc": "Where the button skips to, and where it goes away, in seconds."
+        },
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The button's text, in place of the one for its `kind`."
+        }
+      ]
+    },
+    "react-video-kit/skip#SkipOptions": {
+      "entry": "react-video-kit/skip",
+      "name": "SkipOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "segments",
+          "type": "readonly SkipSegment[] | ((source: SourceObject) => readonly SkipSegment[] | null | undefined) | undefined",
+          "optional": true,
+          "doc": "The parts that can be skipped, or a function that picks them for each source."
+        },
+        {
+          "name": "auto",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Skip each part as playback reaches it, with no button."
+        }
+      ]
+    },
+    "react-video-kit/skip#skip": {
+      "entry": "react-video-kit/skip",
+      "name": "skip",
+      "doc": "A button that skips an intro, a recap, or credits while one is playing. Credits with another item in a playlist move on to it instead.",
+      "kind": "plugin",
+      "pluginName": "skip",
+      "required": false,
+      "optionsType": "SkipOptions",
+      "options": [
+        {
+          "name": "segments",
+          "type": "readonly SkipSegment[] | ((source: SourceObject) => readonly SkipSegment[] | null | undefined) | undefined",
+          "optional": true,
+          "doc": "The parts that can be skipped, or a function that picks them for each source."
+        },
+        {
+          "name": "auto",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Skip each part as playback reaches it, with no button."
+        }
+      ],
+      "state": [
+        {
+          "name": "segments",
+          "type": "readonly SkipSegment[]",
+          "optional": false,
+          "doc": "The parts that can be skipped in the current source."
+        },
+        {
+          "name": "active",
+          "type": "number",
+          "optional": false,
+          "doc": "Index of the part at the current position, or -1 when there is none."
+        },
+        {
+          "name": "next",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True when skipping the active part moves on to the next item in a playlist."
+        }
+      ],
+      "commands": [
+        {
+          "name": "skip",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Skips the active part. Does nothing when there isn't one."
+        },
+        {
+          "name": "setSegments",
+          "type": "(parts: readonly SkipSegment[]) => void",
+          "optional": false,
+          "doc": "Replaces the parts for the current source."
+        }
+      ]
+    },
+    "react-video-kit/skip#SkipButtonProps": {
+      "entry": "react-video-kit/skip",
+      "name": "SkipButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/skip#SkipButton": {
+      "entry": "react-video-kit/skip",
+      "name": "SkipButton",
+      "doc": "Shows while a part can be skipped, including while the other controls are hidden.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/info#InfoPanel": {
+      "entry": "react-video-kit/info",
+      "name": "InfoPanel",
+      "doc": "The panel. It renders nothing until it first opens.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/info#InfoCredit": {
+      "entry": "react-video-kit/info",
+      "name": "InfoCredit",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "role",
+          "type": "string",
+          "optional": false,
+          "doc": "What they did, such as `Director`."
+        },
+        {
+          "name": "names",
+          "type": "string | readonly string[]",
+          "optional": false,
+          "doc": "Who did it."
+        }
+      ]
+    },
+    "react-video-kit/info#InfoContent": {
+      "entry": "react-video-kit/info",
+      "name": "InfoContent",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The video's name."
+        },
+        {
+          "name": "eyebrow",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A short line above the title, such as a series or an episode."
+        },
+        {
+          "name": "description",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "What the video is about. It can be as long as it needs to be, because the panel scrolls."
+        },
+        {
+          "name": "artwork",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "An image to show beside the text."
+        },
+        {
+          "name": "facts",
+          "type": "readonly string[] | undefined",
+          "optional": true,
+          "doc": "Short details on one line, such as the year, rating, and running time."
+        },
+        {
+          "name": "credits",
+          "type": "readonly InfoCredit[] | undefined",
+          "optional": true,
+          "doc": "Who made it."
+        }
+      ]
+    },
+    "react-video-kit/info#InfoOptions": {
+      "entry": "react-video-kit/info",
+      "name": "InfoOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The video's name."
+        },
+        {
+          "name": "eyebrow",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A short line above the title, such as a series or an episode."
+        },
+        {
+          "name": "description",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "What the video is about. It can be as long as it needs to be, because the panel scrolls."
+        },
+        {
+          "name": "artwork",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "An image to show beside the text."
+        },
+        {
+          "name": "facts",
+          "type": "readonly string[] | undefined",
+          "optional": true,
+          "doc": "Short details on one line, such as the year, rating, and running time."
+        },
+        {
+          "name": "credits",
+          "type": "readonly InfoCredit[] | undefined",
+          "optional": true,
+          "doc": "Who made it."
+        }
+      ]
+    },
+    "react-video-kit/info#info": {
+      "entry": "react-video-kit/info",
+      "name": "info",
+      "doc": "A panel about the video: its artwork, what it's about, and who made it. Whatever isn't given here comes from the current item when there's a playlist.",
+      "kind": "plugin",
+      "pluginName": "info",
+      "required": false,
+      "optionsType": "InfoContent",
+      "options": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The video's name."
+        },
+        {
+          "name": "eyebrow",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A short line above the title, such as a series or an episode."
+        },
+        {
+          "name": "description",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "What the video is about. It can be as long as it needs to be, because the panel scrolls."
+        },
+        {
+          "name": "artwork",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "An image to show beside the text."
+        },
+        {
+          "name": "facts",
+          "type": "readonly string[] | undefined",
+          "optional": true,
+          "doc": "Short details on one line, such as the year, rating, and running time."
+        },
+        {
+          "name": "credits",
+          "type": "readonly InfoCredit[] | undefined",
+          "optional": true,
+          "doc": "Who made it."
+        }
+      ],
+      "state": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the panel is showing."
+        },
+        {
+          "name": "content",
+          "type": "InfoContent",
+          "optional": false,
+          "doc": "What the panel shows."
+        }
+      ],
+      "commands": [
+        {
+          "name": "open",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Opens the panel."
+        },
+        {
+          "name": "close",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Closes the panel, and returns focus to its button."
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Opens the panel if closed, and closes it if open."
+        },
+        {
+          "name": "setInfo",
+          "type": "(content: InfoContent) => void",
+          "optional": false,
+          "doc": "Replaces what the panel shows."
+        }
+      ]
+    },
+    "react-video-kit/info#InfoButtonProps": {
+      "entry": "react-video-kit/info",
+      "name": "InfoButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/info#InfoButton": {
+      "entry": "react-video-kit/info",
+      "name": "InfoButton",
+      "doc": "Opens the panel.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/ambient#AmbientMenu": {
+      "entry": "react-video-kit/ambient",
+      "name": "AmbientMenu",
+      "doc": "Renders nothing once the browser refuses to read the video.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/ambient#AmbientOptions": {
+      "entry": "react-video-kit/ambient",
+      "name": "AmbientOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "enabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Start with the glow on."
+        },
+        {
+          "name": "rate",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Times per second to sample while playing, up to 4."
+        }
+      ]
+    },
+    "react-video-kit/ambient#ambient": {
+      "entry": "react-video-kit/ambient",
+      "name": "ambient",
+      "doc": "A soft glow around the player in the colours at the picture's edges. It samples a tiny copy of the frame and writes straight to CSS variables, so it never renders.",
+      "kind": "plugin",
+      "pluginName": "ambient",
+      "required": false,
+      "optionsType": "AmbientOptions",
+      "options": [
+        {
+          "name": "enabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Start with the glow on."
+        },
+        {
+          "name": "rate",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Times per second to sample while playing, up to 4."
+        }
+      ],
+      "state": [
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the viewer wants the glow."
+        },
+        {
+          "name": "available",
+          "type": "boolean",
+          "optional": false,
+          "doc": "False once the browser refuses to read the video, as it does cross-origin without CORS."
+        }
+      ],
+      "commands": [
+        {
+          "name": "set",
+          "type": "(enabled: boolean) => void",
+          "optional": false,
+          "doc": "Turns the glow on or off."
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Turns the glow off, or back on."
+        }
+      ]
+    },
+    "react-video-kit/mini-player#MiniPlayerOptions": {
+      "entry": "react-video-kit/mini-player",
+      "name": "MiniPlayerOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "corner",
+          "type": "\"top-start\" | \"top-end\" | \"bottom-start\" | \"bottom-end\" | undefined",
+          "optional": true,
+          "doc": "The corner to float in, where `start` and `end` follow the text direction."
+        }
+      ]
+    },
+    "react-video-kit/mini-player#miniPlayer": {
+      "entry": "react-video-kit/mini-player",
+      "name": "miniPlayer",
+      "doc": "Floats a playing video in a corner once it scrolls out of view. The same element moves, so playback never restarts, and an empty slot holds its place in the page.",
+      "kind": "plugin",
+      "pluginName": "mini-player",
+      "required": false,
+      "optionsType": "MiniPlayerOptions",
+      "options": [
+        {
+          "name": "corner",
+          "type": "\"top-start\" | \"top-end\" | \"bottom-start\" | \"bottom-end\" | undefined",
+          "optional": true,
+          "doc": "The corner to float in, where `start` and `end` follow the text direction."
+        }
+      ],
+      "state": [
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the video is floating."
+        },
+        {
+          "name": "corner",
+          "type": "\"top-start\" | \"top-end\" | \"bottom-start\" | \"bottom-end\"",
+          "optional": false,
+          "doc": "The corner it floats in."
+        }
+      ],
+      "commands": [
+        {
+          "name": "close",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Pauses and returns the video to the page. It won't float again until scrolled back to."
+        },
+        {
+          "name": "back",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Scrolls back to the video's place in the page, which ends the floating."
+        }
+      ]
+    },
+    "react-video-kit/mini-player#MiniPlayerButtonProps": {
+      "entry": "react-video-kit/mini-player",
+      "name": "MiniPlayerButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/mini-player#MiniPlayerClose": {
+      "entry": "react-video-kit/mini-player",
+      "name": "MiniPlayerClose",
+      "doc": "Renders nothing unless the video is floating.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/mini-player#MiniPlayerBack": {
+      "entry": "react-video-kit/mini-player",
+      "name": "MiniPlayerBack",
+      "doc": "Renders nothing unless the video is floating.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/screenshot#ScreenshotMenu": {
+      "entry": "react-video-kit/screenshot",
+      "name": "ScreenshotMenu",
+      "doc": "The row that saves the frame.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/screenshot#ScreenshotNotice": {
+      "entry": "react-video-kit/screenshot",
+      "name": "ScreenshotNotice",
+      "doc": "Says whether the frame was saved, also announced to screen readers.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/screenshot#ScreenshotOptions": {
+      "entry": "react-video-kit/screenshot",
+      "name": "ScreenshotOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "filename",
+          "type": "((time: number) => string) | undefined",
+          "optional": true,
+          "doc": "Names a saved file, given the position of the frame in seconds."
+        }
+      ]
+    },
+    "react-video-kit/screenshot#ScreenshotError": {
+      "entry": "react-video-kit/screenshot",
+      "name": "ScreenshotError",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "ScreenshotError"
+    },
+    "react-video-kit/screenshot#screenshot": {
+      "entry": "react-video-kit/screenshot",
+      "name": "screenshot",
+      "doc": "Saves the current frame as a PNG.",
+      "kind": "plugin",
+      "pluginName": "screenshot",
+      "required": false,
+      "optionsType": "ScreenshotOptions",
+      "options": [
+        {
+          "name": "filename",
+          "type": "((time: number) => string) | undefined",
+          "optional": true,
+          "doc": "Names a saved file, given the position of the frame in seconds."
+        }
+      ],
+      "state": [
+        {
+          "name": "error",
+          "type": "ScreenshotError | null",
+          "optional": false,
+          "doc": "Why the last attempt failed, or null. `tainted` means the browser refused to read the video."
+        },
+        {
+          "name": "notice",
+          "type": "\"saved\" | \"failed\" | null",
+          "optional": false,
+          "doc": "The message on show, or null."
+        },
+        {
+          "name": "noticeVisible",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True until that message starts to fade."
+        }
+      ],
+      "commands": [
+        {
+          "name": "capture",
+          "type": "() => Promise<Blob | null>",
+          "optional": false,
+          "doc": "The current frame as a PNG, or null with `error` set when it can't be read. Never rejects."
+        },
+        {
+          "name": "download",
+          "type": "() => Promise<boolean>",
+          "optional": false,
+          "doc": "Saves the current frame, shows the viewer the outcome, and returns whether it worked."
+        }
+      ]
+    },
+    "react-video-kit/loop#LoopRangeMark": {
+      "entry": "react-video-kit/loop",
+      "name": "LoopRangeMark",
+      "doc": "Picks out the repeating section on the timeline. Renders nothing without one.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/loop#LoopMenu": {
+      "entry": "react-video-kit/loop",
+      "name": "LoopMenu",
+      "doc": "Renders nothing for a live stream, which has no end to go back from.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/loop#LoopOptions": {
+      "entry": "react-video-kit/loop",
+      "name": "LoopOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "enabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Start with the whole video looping."
+        }
+      ]
+    },
+    "react-video-kit/loop#LoopRange": {
+      "entry": "react-video-kit/loop",
+      "name": "LoopRange",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "start",
+          "type": "number",
+          "optional": false,
+          "doc": "Where the section starts, in seconds."
+        },
+        {
+          "name": "end",
+          "type": "number",
+          "optional": false,
+          "doc": "Where it ends and goes back to the start, in seconds."
+        }
+      ]
+    },
+    "react-video-kit/loop#loop": {
+      "entry": "react-video-kit/loop",
+      "name": "loop",
+      "doc": "Repeats the whole video or a section of it. A new source starts without a section.",
+      "kind": "plugin",
+      "pluginName": "loop",
+      "required": false,
+      "optionsType": "LoopOptions",
+      "options": [
+        {
+          "name": "enabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Start with the whole video looping."
+        }
+      ],
+      "state": [
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the whole video repeats."
+        },
+        {
+          "name": "range",
+          "type": "LoopRange | null",
+          "optional": false,
+          "doc": "The section that repeats, or null. It takes priority over `enabled`."
+        }
+      ],
+      "commands": [
+        {
+          "name": "set",
+          "type": "(enabled: boolean) => void",
+          "optional": false,
+          "doc": "Repeats the whole video, or stops repeating. Clears any section."
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Stops repeating, or repeats the whole video. Clears any section."
+        },
+        {
+          "name": "setRange",
+          "type": "(start: number, end: number) => boolean",
+          "optional": false,
+          "doc": "Repeats a section, in seconds. Returns false if it's too short or outside the video."
+        },
+        {
+          "name": "clear",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Stops repeating altogether."
+        },
+        {
+          "name": "markStart",
+          "type": "() => boolean",
+          "optional": false,
+          "doc": "Starts a section at the current position, keeping its end if that's still later."
+        },
+        {
+          "name": "markEnd",
+          "type": "() => boolean",
+          "optional": false,
+          "doc": "Ends a section at the current position, keeping its start if that's still earlier."
+        }
+      ]
+    },
+    "react-video-kit/shortcuts#ShortcutsSheet": {
+      "entry": "react-video-kit/shortcuts",
+      "name": "ShortcutsSheet",
+      "doc": "The list of shortcuts. It reads them from the hotkeys plugin, so it can't go stale.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/shortcuts#ShortcutsMenu": {
+      "entry": "react-video-kit/shortcuts",
+      "name": "ShortcutsMenu",
+      "doc": "The row that opens the list.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/shortcuts#shortcuts": {
+      "entry": "react-video-kit/shortcuts",
+      "name": "shortcuts",
+      "doc": "Lists the keyboard shortcuts in a sheet, opened with `?` or from the settings menu.",
+      "kind": "plugin",
+      "pluginName": "shortcuts",
+      "required": false,
+      "optionsType": null,
+      "options": [],
+      "state": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the list is showing."
+        }
+      ],
+      "commands": [
+        {
+          "name": "bindings",
+          "type": "() => readonly HotkeyBinding[]",
+          "optional": false,
+          "doc": "The shortcuts to list, as the hotkeys plugin reports them."
+        },
+        {
+          "name": "show",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Shows the list."
+        },
+        {
+          "name": "hide",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Closes the list."
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Shows the list, or closes it if it's showing."
+        }
+      ]
+    },
+    "react-video-kit/stats#StatsPanel": {
+      "entry": "react-video-kit/stats",
+      "name": "StatsPanel",
+      "doc": "The readout. Its figures go straight to the DOM once a second, with no renders.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/stats#StatsMenu": {
+      "entry": "react-video-kit/stats",
+      "name": "StatsMenu",
+      "doc": "The row that opens and closes the readout.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/stats#StatsSnapshot": {
+      "entry": "react-video-kit/stats",
+      "name": "StatsSnapshot",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "video",
+          "type": "string",
+          "optional": false,
+          "doc": "The picture's size in pixels."
+        },
+        {
+          "name": "viewport",
+          "type": "string",
+          "optional": false,
+          "doc": "The player's size on the page, and the screen's pixel density."
+        },
+        {
+          "name": "frames",
+          "type": "string",
+          "optional": false,
+          "doc": "Frames dropped and frames shown so far."
+        },
+        {
+          "name": "buffer",
+          "type": "string",
+          "optional": false,
+          "doc": "Seconds of video downloaded ahead of the current position."
+        },
+        {
+          "name": "rate",
+          "type": "string",
+          "optional": false,
+          "doc": "The playback speed."
+        },
+        {
+          "name": "engine",
+          "type": "string",
+          "optional": false,
+          "doc": "The active provider."
+        },
+        {
+          "name": "level",
+          "type": "string | null",
+          "optional": false,
+          "doc": "The active quality level, when the provider has levels."
+        },
+        {
+          "name": "latency",
+          "type": "string | null",
+          "optional": false,
+          "doc": "Seconds behind the live edge, for a live stream."
+        }
+      ]
+    },
+    "react-video-kit/stats#stats": {
+      "entry": "react-video-kit/stats",
+      "name": "stats",
+      "doc": "A developer's readout of what the player is doing. It only runs while it's open.",
+      "kind": "plugin",
+      "pluginName": "stats",
+      "required": false,
+      "optionsType": null,
+      "options": [],
+      "state": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the readout is showing."
+        }
+      ],
+      "commands": [
+        {
+          "name": "show",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Shows the readout."
+        },
+        {
+          "name": "hide",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Closes the readout."
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Shows the readout, or closes it if it's showing."
+        },
+        {
+          "name": "read",
+          "type": "() => StatsSnapshot",
+          "optional": false,
+          "doc": "The current figures as text."
+        }
+      ]
+    },
+    "react-video-kit/share#parseShareTime": {
+      "entry": "react-video-kit/share",
+      "name": "parseShareTime",
+      "doc": "Reads `90`, `1:30`, or `1m30s` as seconds, or null when it's none of those.",
+      "kind": "function",
+      "signature": "(value: string) => number | null"
+    },
+    "react-video-kit/share#ShareNotice": {
+      "entry": "react-video-kit/share",
+      "name": "ShareNotice",
+      "doc": "Says whether the link was copied, also announced to screen readers.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/share#ShareOptions": {
+      "entry": "react-video-kit/share",
+      "name": "ShareOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "param",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The query parameter that holds the time."
+        },
+        {
+          "name": "url",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The page to link to, instead of the current one."
+        }
+      ]
+    },
+    "react-video-kit/share#share": {
+      "entry": "react-video-kit/share",
+      "name": "share",
+      "doc": "Links to a moment in the video: it opens links at their time, and makes new ones.",
+      "kind": "plugin",
+      "pluginName": "share",
+      "required": false,
+      "optionsType": "ShareOptions",
+      "options": [
+        {
+          "name": "param",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The query parameter that holds the time."
+        },
+        {
+          "name": "url",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The page to link to, instead of the current one."
+        }
+      ],
+      "state": [
+        {
+          "name": "notice",
+          "type": "\"failed\" | \"copied\" | null",
+          "optional": false,
+          "doc": "The message on show, or null."
+        },
+        {
+          "name": "noticeVisible",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True until that message starts to fade."
+        }
+      ],
+      "commands": [
+        {
+          "name": "link",
+          "type": "(time?: number) => string",
+          "optional": false,
+          "doc": "The link to a moment, by default the current one."
+        },
+        {
+          "name": "share",
+          "type": "() => Promise<\"shared\" | \"copied\" | \"failed\">",
+          "optional": false,
+          "doc": "Opens the system's share sheet on touch devices, and otherwise copies the link."
+        }
+      ]
+    },
+    "react-video-kit/share#ShareButtonProps": {
+      "entry": "react-video-kit/share",
+      "name": "ShareButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/share#ShareButton": {
+      "entry": "react-video-kit/share",
+      "name": "ShareButton",
+      "doc": "Shares a link to the current moment.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/fit#FitMode": {
+      "entry": "react-video-kit/fit",
+      "name": "FitMode",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "FitMode"
+    },
+    "react-video-kit/fit#FitOptions": {
+      "entry": "react-video-kit/fit",
+      "name": "FitOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "mode",
+          "type": "FitMode | undefined",
+          "optional": true,
+          "doc": "How to fit the picture at first: whole, or filling the frame."
+        }
+      ]
+    },
+    "react-video-kit/fit#fit": {
+      "entry": "react-video-kit/fit",
+      "name": "fit",
+      "doc": "Switches between showing the whole picture and filling the frame.",
+      "kind": "plugin",
+      "pluginName": "fit",
+      "required": false,
+      "optionsType": "FitOptions",
+      "options": [
+        {
+          "name": "mode",
+          "type": "FitMode | undefined",
+          "optional": true,
+          "doc": "How to fit the picture at first: whole, or filling the frame."
+        }
+      ],
+      "state": [
+        {
+          "name": "mode",
+          "type": "FitMode",
+          "optional": false,
+          "doc": "How the picture fits the frame."
+        },
+        {
+          "name": "available",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True when the picture and the frame have different shapes, so switching shows a change."
+        }
+      ],
+      "commands": [
+        {
+          "name": "set",
+          "type": "(mode: FitMode) => void",
+          "optional": false,
+          "doc": "Sets how the picture fits the frame."
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Switches between the two."
+        }
+      ]
+    },
+    "react-video-kit/fit#FitButtonProps": {
+      "entry": "react-video-kit/fit",
+      "name": "FitButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/fit#FitButton": {
+      "entry": "react-video-kit/fit",
+      "name": "FitButton",
+      "doc": "Renders nothing when the picture already matches the frame's shape.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/transcript#TranscriptOptions": {
+      "entry": "react-video-kit/transcript",
+      "name": "TranscriptOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "language",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The language to show while captions are off. Defaults to the first track."
+        }
+      ]
+    },
+    "react-video-kit/transcript#TranscriptCue": {
+      "entry": "react-video-kit/transcript",
+      "name": "TranscriptCue",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "start",
+          "type": "number",
+          "optional": false,
+          "doc": "Where the line starts, in seconds."
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "optional": false,
+          "doc": "The line, as plain text."
+        }
+      ]
+    },
+    "react-video-kit/transcript#transcript": {
+      "entry": "react-video-kit/transcript",
+      "name": "transcript",
+      "doc": "The words of the video as a list to read and to jump around in. It follows the captions track that's on, or else `language` or the first track.",
+      "kind": "plugin",
+      "pluginName": "transcript",
+      "required": false,
+      "optionsType": "TranscriptOptions",
+      "options": [
+        {
+          "name": "language",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The language to show while captions are off. Defaults to the first track."
+        }
+      ],
+      "state": [
+        {
+          "name": "cues",
+          "type": "readonly TranscriptCue[]",
+          "optional": false,
+          "doc": "The lines of the track being shown, in order."
+        },
+        {
+          "name": "language",
+          "type": "string | null",
+          "optional": false,
+          "doc": "The language of those lines, or null before there are any."
+        }
+      ],
+      "commands": []
+    },
+    "react-video-kit/transcript#TranscriptProps": {
+      "entry": "react-video-kit/transcript",
+      "name": "TranscriptProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "The player to follow. Needed only when this part is outside `Root`."
+        }
+      ]
+    },
+    "react-video-kit/transcript#Transcript": {
+      "entry": "react-video-kit/transcript",
+      "name": "Transcript",
+      "doc": "The transcript itself. Put it inside `Root`, or anywhere else on the page with the `player` prop. It highlights the current line through the clock, with no renders.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "The player to follow. Needed only when this part is outside `Root`."
+        }
+      ]
+    },
+    "react-video-kit/analytics/google#googleAnalytics": {
+      "entry": "react-video-kit/analytics/google",
+      "name": "googleAnalytics",
+      "doc": "Sends the `analytics` plugin's events to Google Analytics 4 under Google's own names for video. It uses the `gtag` or `dataLayer` already on the page: it never loads Google's script or changes consent, which stay with your site. Keeps no state, so players can share one.",
+      "kind": "function",
+      "signature": "(options?: GoogleAnalyticsOptions) => (event: AnalyticsEvent) => void"
+    },
+    "react-video-kit/analytics/google#GoogleAnalyticsParams": {
+      "entry": "react-video-kit/analytics/google",
+      "name": "GoogleAnalyticsParams",
+      "kind": "type",
+      "doc": "The parameters sent with an event.",
+      "members": [],
+      "definition": "GoogleAnalyticsParams"
+    },
+    "react-video-kit/analytics/google#GoogleAnalyticsExtra": {
+      "entry": "react-video-kit/analytics/google",
+      "name": "GoogleAnalyticsExtra",
+      "kind": "type",
+      "doc": "Optional events beyond Google's own video events.",
+      "members": [],
+      "definition": "GoogleAnalyticsExtra"
+    },
+    "react-video-kit/analytics/google#GoogleAnalyticsOptions": {
+      "entry": "react-video-kit/analytics/google",
+      "name": "GoogleAnalyticsOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "measurementId",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Sends only to this measurement ID, as `send_to`, for a page with more than one."
+        },
+        {
+          "name": "title",
+          "type": "string | ((event: AnalyticsEvent) => string | undefined) | undefined",
+          "optional": true,
+          "doc": "The `video_title`, or a function to work it out from the event."
+        },
+        {
+          "name": "provider",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "The `video_provider`. Defaults to `react-video-kit`."
+        },
+        {
+          "name": "events",
+          "type": "readonly GoogleAnalyticsExtra[] | undefined",
+          "optional": true,
+          "doc": "Turns on events beyond `video_start`, `video_progress`, and `video_complete`."
+        },
+        {
+          "name": "url",
+          "type": "((source: string) => string | undefined) | undefined",
+          "optional": true,
+          "doc": "Turns the source into `video_url`. By default that drops the query string and hash, which may hold tokens. Return `undefined` to send no URL."
+        },
+        {
+          "name": "send",
+          "type": "((name: string, params: GoogleAnalyticsParams) => void) | undefined",
+          "optional": true,
+          "doc": "Sends the event yourself, in place of `gtag` or `dataLayer`."
+        }
+      ]
+    },
+    "react-video-kit/orientation#VideoOrientation": {
+      "entry": "react-video-kit/orientation",
+      "name": "VideoOrientation",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "VideoOrientation"
+    },
+    "react-video-kit/orientation#OrientationOptions": {
+      "entry": "react-video-kit/orientation",
+      "name": "OrientationOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "initial",
+          "type": "VideoOrientation | undefined",
+          "optional": true,
+          "doc": "The shape to reserve until the video's own is known, so the page doesn't shift when it loads. It also renders on the server."
+        },
+        {
+          "name": "resize",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Set to false to keep the player's shape, and only report the video's."
+        }
+      ]
+    },
+    "react-video-kit/orientation#orientation": {
+      "entry": "react-video-kit/orientation",
+      "name": "orientation",
+      "doc": "Gives the player the shape of its video, so a vertical video needs no setup.",
+      "kind": "plugin",
+      "pluginName": "orientation",
+      "required": false,
+      "optionsType": "OrientationOptions",
+      "options": [
+        {
+          "name": "initial",
+          "type": "VideoOrientation | undefined",
+          "optional": true,
+          "doc": "The shape to reserve until the video's own is known, so the page doesn't shift when it loads. It also renders on the server."
+        },
+        {
+          "name": "resize",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Set to false to keep the player's shape, and only report the video's."
+        }
+      ],
+      "state": [
+        {
+          "name": "orientation",
+          "type": "VideoOrientation | null",
+          "optional": false,
+          "doc": "The video's shape, or the `initial` option until it's known."
+        },
+        {
+          "name": "ratio",
+          "type": "number | null",
+          "optional": false,
+          "doc": "The video's width divided by its height, or null until it's known."
+        }
+      ],
+      "commands": []
+    },
+    "react-video-kit/errors#isRetryable": {
+      "entry": "react-video-kit/errors",
+      "name": "isRetryable",
+      "doc": "Whether trying again could work, from an error or a code. An error's own `retryable` wins, and a code this library doesn't know is taken as not retryable.",
+      "kind": "function",
+      "signature": "(error: MediaErrorInfo | VideoErrorCode) => boolean"
+    },
+    "react-video-kit/errors#VideoKitError": {
+      "entry": "react-video-kit/errors",
+      "name": "VideoKitError",
+      "doc": "What the library throws, with a `code` that stays the same between versions. A plugin can also throw one from a load gate or a provider to choose the code the player reports.",
+      "kind": "value",
+      "signature": "typeof VideoKitError"
+    },
+    "react-video-kit/errors#VideoKitErrorOptions": {
+      "entry": "react-video-kit/errors",
+      "name": "VideoKitErrorOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "retryable",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "True when trying again could work, for failures reported while loading."
+        },
+        {
+          "name": "nativeCode",
+          "type": "string | number | undefined",
+          "optional": true,
+          "doc": "The browser's or engine's own code."
+        },
+        {
+          "name": "cause",
+          "type": "unknown",
+          "optional": true,
+          "doc": "The original error."
+        }
+      ]
+    },
+    "react-video-kit/errors#DeveloperErrorCode": {
+      "entry": "react-video-kit/errors",
+      "name": "DeveloperErrorCode",
+      "kind": "type",
+      "doc": "The codes on errors thrown for a mistake in the code using the library.",
+      "members": [],
+      "definition": "DeveloperErrorCode"
+    },
+    "react-video-kit/errors#KnownVideoErrorCode": {
+      "entry": "react-video-kit/errors",
+      "name": "KnownVideoErrorCode",
+      "kind": "type",
+      "doc": "Every code the library reports. `react-video-kit/errors` lists them with their details.",
+      "members": [],
+      "definition": "KnownVideoErrorCode"
+    },
+    "react-video-kit/errors#MediaErrorInfo": {
+      "entry": "react-video-kit/errors",
+      "name": "MediaErrorInfo",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "code",
+          "type": "VideoErrorCode",
+          "optional": false,
+          "doc": "Says what went wrong, in a form that stays the same between versions."
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "optional": false,
+          "doc": "The browser's or engine's own words, for logs. Viewers see translated text instead."
+        },
+        {
+          "name": "fatal",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True when the error stopped playback, false when it can carry on."
+        },
+        {
+          "name": "retryable",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "True when trying again could work, which `recovery` and **Try again** go by. When it's left out, `recovery` doesn't retry and the overlay still offers **Try again**."
+        },
+        {
+          "name": "nativeCode",
+          "type": "string | number | undefined",
+          "optional": true,
+          "doc": "The browser's or engine's own code, such as `3` from a `MediaError` or `fragLoadError` from hls.js."
+        },
+        {
+          "name": "cause",
+          "type": "unknown",
+          "optional": true,
+          "doc": "The original error object or event, for logs."
+        },
+        {
+          "name": "source",
+          "type": "SourceObject | undefined",
+          "optional": true,
+          "doc": "The source that failed, when known."
+        }
+      ]
+    },
+    "react-video-kit/errors#VideoErrorCode": {
+      "entry": "react-video-kit/errors",
+      "name": "VideoErrorCode",
+      "kind": "type",
+      "doc": "A known code, or a plugin's own.",
+      "members": [],
+      "definition": "VideoErrorCode"
+    },
+    "react-video-kit/errors#ErrorCodeInfo": {
+      "entry": "react-video-kit/errors",
+      "name": "ErrorCodeInfo",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "fatal",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True when this error stops playback."
+        },
+        {
+          "name": "retryable",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True when trying again could work, so `recovery` retries it and the overlay offers **Try again**."
+        }
+      ]
+    },
+    "react-video-kit/errors#ERROR_CODES": {
+      "entry": "react-video-kit/errors",
+      "name": "ERROR_CODES",
+      "doc": "Every code the player and its plugins report on `media.error` and `onError`.",
+      "kind": "value",
+      "signature": "Readonly<Record<KnownVideoErrorCode, ErrorCodeInfo>>"
+    },
+    "react-video-kit/errors#DEVELOPER_ERROR_CODES": {
+      "entry": "react-video-kit/errors",
+      "name": "DEVELOPER_ERROR_CODES",
+      "doc": "Every code on a `VideoKitError` the library throws for a mistake in the code using it.",
+      "kind": "value",
+      "signature": "readonly DeveloperErrorCode[]"
     },
     "react-video-kit/ads/vast#vast": {
       "entry": "react-video-kit/ads/vast",

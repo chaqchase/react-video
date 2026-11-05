@@ -76,13 +76,13 @@ test("the controls hide while playing and return on movement", async ({ page }) 
   await start(page);
   const box = await page.locator(root).boundingBox();
   if (!box) throw new Error("no root box");
-  await page.mouse.move(box.x + 40, box.y + 40);
-  await page.mouse.move(box.x + 60, box.y + 60);
+  await page.mouse.move(box.x + box.width * 0.25, box.y + box.height * 0.4);
+  await page.mouse.move(box.x + box.width * 0.25 + 20, box.y + box.height * 0.4);
   await expect(page.locator(root)).toHaveAttribute("data-controls", "shown");
   await expect(page.locator(root)).toHaveAttribute("data-controls", "hidden", { timeout: 6000 });
-  const controls = page.locator('[data-part="controls"]');
+  const controls = page.locator('[data-part="play-pause"]');
   await expect(controls).toHaveCSS("opacity", "0");
-  await page.mouse.move(box.x + 100, box.y + 100);
+  await page.mouse.move(box.x + box.width * 0.25, box.y + box.height * 0.5);
   await expect(page.locator(root)).toHaveAttribute("data-controls", "shown");
   await expect(controls).toHaveCSS("opacity", "1");
 });
@@ -137,10 +137,13 @@ test("a narrow player fits, with no sideways scroll", async ({ page }) => {
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth
   );
   expect(overflow).toBeLessThanOrEqual(0);
-  const row = await page.locator('[data-part="control-row"]').boundingBox();
   const player = await page.locator(root).boundingBox();
-  if (!row || !player) throw new Error("no boxes");
-  expect(row.x + row.width).toBeLessThanOrEqual(player.x + player.width);
+  if (!player) throw new Error("no player box");
+  for (const row of await page.locator('[data-part="control-row"]').all()) {
+    const box = await row.boundingBox();
+    if (!box) throw new Error("no row box");
+    expect(box.x + box.width).toBeLessThanOrEqual(player.x + player.width);
+  }
 });
 
 test("reduced motion removes movement from the controls", async ({ page }) => {

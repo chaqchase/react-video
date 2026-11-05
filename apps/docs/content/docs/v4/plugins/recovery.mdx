@@ -40,30 +40,19 @@ const plugins = [
 
 ## What's retried
 
-Fatal errors with one of these codes:
-
-- `2`, the browser's own network error.
-- `"network"`, which the [hls](/docs/v4/plugins/hls) and [dash](/docs/v4/plugins/dash) plugins report for failed downloads.
-
-Everything else is reported straight away:
-
-- The browser's other codes: `1` (aborted), `3` (can't decode), and `4` (unsupported source).
-- `"drm"`, from the [DRM](/docs/v4/plugins/drm) plugin.
-- `"no-provider"`, when nothing can play the source.
-- `"load-failed"`, when a provider or its engine fails to load.
-- Any other code from hls.js or dash.js.
+Fatal errors marked `retryable`, which are failures that can pass: lost connections, failed downloads, and licence servers that couldn't be reached. Everything else is reported straight away, such as `media-decode`, `source-no-provider`, and `drm-denied`. [Errors](/docs/v4/concepts/errors) lists every code, and which of them are retried.
 
 `retryOn` replaces that rule. It's only asked about fatal errors:
 
 ```tsx
 recovery({
-  retryOn: ({ code }) => code === 2 || code === "network" || code === 3,
+  retryOn: ({ code, retryable }) => retryable === true || code === "media-decode",
 });
 ```
 
 ## When retries run out
 
-`retrying` goes back to `false`, and the error stays. `VideoPlayer` shows its error overlay, with the error's message and a **Try again** button. That button picks up where the failure happened, and plays again if the viewer was watching. It also starts a fresh set of retries.
+`retrying` goes back to `false`, and the error stays. `VideoPlayer` shows its error overlay, with an explanation, the error's code, and a **Try again** button. That button picks up where the failure happened, and plays again if the viewer was watching. It also starts a fresh set of retries.
 
 While retries are running, the default skin hides the overlay and shows the spinner, using `data-retrying` on the root.
 

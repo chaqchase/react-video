@@ -27,12 +27,14 @@ export function Player() {
       <Video.BufferingIndicator />
       <Video.ErrorOverlay />
       <Video.Controls>
-        <Video.Timeline />
         <Video.ControlRow>
           <Video.ControlGroup>
             <Video.PlayPause />
-            <Video.Volume />
+            <Video.Timeline />
             <Video.Time />
+          </Video.ControlGroup>
+          <Video.ControlGroup>
+            <Video.Volume />
           </Video.ControlGroup>
         </Video.ControlRow>
       </Video.Controls>
@@ -41,7 +43,54 @@ export function Player() {
 }
 ```
 
-`Controls` is what hides and shows with the [idle](/docs/v4/plugins/idle) plugin. `ControlRow` lays out its groups, and `ControlGroup` is one glass pill.
+`Controls` is what hides and shows with the [idle](/docs/v4/plugins/idle) plugin. `ControlRow` lays out its groups, and `ControlGroup` is one glass pill. A group that holds a `Timeline` stretches to fill the row and becomes a pill, as above.
+
+`VideoPlayer` does it differently. Its `Timeline` sits directly in a row, which makes it a thick bare track with no pill behind it. Set `data-position="scrubber"` on that row to put the times underneath:
+
+```tsx
+<Video.ControlRow data-position="scrubber">
+  <Video.Timeline />
+  <Video.CurrentTime />
+  <Video.RemainingTime />
+</Video.ControlRow>
+```
+
+On players under 480px wide, the times move beside the track so it all fits on one line.
+
+`Video.Title` is the video's name, with an optional line above it and a description below. Put it in the row above the timeline, as `VideoPlayer` does:
+
+```tsx
+<Video.ControlRow data-position="details">
+  <Video.Title eyebrow="Season 1, Episode 1" title="The Green Coast" description="The swell meets the land." />
+  <Video.SettingsMenu />
+</Video.ControlRow>
+```
+
+## Transport
+
+`Transport` is the row in the centre of `VideoPlayer`: a back button, play, and a forward button. `seekSeconds` sets how far they go, and defaults to 10.
+
+```tsx
+<Video.Controls>
+  <Video.Transport seekSeconds={15} />
+</Video.Controls>
+```
+
+For one on its own, `SeekButton` takes `seconds`, and a negative number goes back. It's also in `react-video-kit/primitives` without styles.
+
+```tsx
+<Video.SeekButton seconds={-30} />
+```
+
+## Mute
+
+The speaker follows the volume. Each of its three waves fades on its own stretch of the level, and when it's muted, the speaker dims and a slash falls across it. `Mute` sets `--rv-volume` from 0 to 1, and to 0 while muted, so your own icon can do the same:
+
+```css
+.my-icon {
+  opacity: calc(0.4 + var(--rv-volume) * 0.6);
+}
+```
 
 ## Timeline
 

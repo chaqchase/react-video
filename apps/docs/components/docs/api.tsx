@@ -4,44 +4,53 @@ import { pluginById, PLUGINS, type PluginGroup } from "@/lib/catalog";
 import { REPO } from "@/lib/site";
 import { bytesLabel, marginal, standalone } from "@/lib/sizes";
 import { CopyButton } from "@/components/site/copy-button";
+import { ChevronIcon } from "@/components/site/icons";
 import { DocText } from "./inline-code";
+import { ScrollArea } from "./scroll-area";
 
 const tidy = (type: string) => type.replace(/ \| undefined$/, "").replace(/\s+/g, " ");
 
 function MemberTable({ members, nameLabel = "Name" }: { members: readonly ApiMember[]; nameLabel?: string }) {
+  const described = members.some(({ doc }) => doc);
   return (
-    <div className="not-prose border-line my-4 overflow-x-auto rounded-xl border">
-      <table className="w-full min-w-[520px] border-collapse text-left text-[13.5px]">
+    <ScrollArea label={`${nameLabel}s`} className="my-4 overflow-x-auto">
+      <table className="w-full min-w-[520px] border-collapse text-left text-[13.5px] leading-[1.45]">
         <thead>
-          <tr className="border-line text-dim border-b text-[12.5px]">
-            <th scope="col" className="w-[26%] px-3.5 py-2 font-medium">{nameLabel}</th>
-            <th scope="col" className="w-[34%] px-3.5 py-2 font-medium">Type</th>
-            <th scope="col" className="px-3.5 py-2 font-medium">Description</th>
+          <tr className="border-line-strong text-dim border-b text-[12.5px]">
+            <th scope="col" className="w-[24%] py-2 pe-4 font-medium">{nameLabel}</th>
+            <th scope="col" className="w-[30%] py-2 pe-4 font-medium">Type</th>
+            {described ? <th scope="col" className="py-2 font-medium">Description</th> : null}
           </tr>
         </thead>
-        <tbody className="divide-line divide-y">
+        <tbody>
           {members.map(({ name, type, optional, doc }) => (
-            <tr key={name} className="hover:bg-sun-soft/40 transition-colors duration-150">
-              <td className="px-3.5 py-2.5 align-top font-mono text-[12.5px] font-medium whitespace-nowrap">
+            <tr key={name} className="border-line border-b">
+              <td className="text-text py-2.5 pe-4 align-top font-mono text-[12.5px] whitespace-nowrap">
                 {name}
-                {optional ? <span className="text-faint">?</span> : null}
+                {optional ? <span className="text-dim">?</span> : null}
               </td>
-              <td className="text-dusk px-3.5 py-2.5 align-top font-mono text-[12px] leading-snug break-words">
-                {tidy(type)}
-              </td>
-              <td className="text-dim px-3.5 py-2.5 align-top leading-snug">
-                {doc ? <DocText>{doc}</DocText> : <span className="text-faint">—</span>}
-              </td>
+              <td className="text-dim py-2.5 pe-4 align-top font-mono text-[12.5px] break-words">{tidy(type)}</td>
+              {described ? (
+                <td className="py-2.5 align-top text-[var(--doc-text)]">{doc ? <DocText>{doc}</DocText> : null}</td>
+              ) : null}
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollArea>
   );
 }
 
 function SubHeading({ children }: { children: React.ReactNode }) {
-  return <h3 className="not-prose mt-7 mb-1 text-[15px] font-semibold tracking-[-0.01em]">{children}</h3>;
+  return <h3 className="text-text mt-9 mb-1.5 text-[17px] font-semibold tracking-[-0.014em]">{children}</h3>;
+}
+
+function Note({ children }: { children: React.ReactNode }) {
+  return <p className="text-dim mt-1 text-[14px] leading-[1.5]">{children}</p>;
+}
+
+function Mono({ children }: { children: React.ReactNode }) {
+  return <code className="text-text font-mono text-[13px]">{children}</code>;
 }
 
 /** The header for a plugin's page: how to import it, and what it costs. */
@@ -54,32 +63,21 @@ export function PluginSummary({ id }: { id: string }) {
   const added = marginal[id];
   const alone = standalone[id];
   return (
-    <div className="not-prose bg-raised border-line mb-7 overflow-hidden rounded-2xl border">
-      <div className="border-line flex items-center justify-between gap-2 border-b py-1.5 pr-1.5 pl-4">
-        <code className="truncate font-mono text-[13px]">{line}</code>
-        <CopyButton text={line} label="Copy import" />
+    <div className="mb-7">
+      <div className="doc-import">
+        <code className="code-scroll font-mono text-[13px] whitespace-nowrap">{line}</code>
+        <CopyButton text={line} label="Copy import" className="code-copy" />
       </div>
-      <dl className="divide-line grid grid-cols-2 divide-x text-[13px] sm:grid-cols-3">
-        <div className="px-4 py-2.5">
-          <dt className="text-dim text-[12px]">Adds to a player</dt>
-          <dd className="text-sun mt-0.5 font-mono">{added === undefined ? "—" : bytesLabel(added)}</dd>
-        </div>
-        <div className="px-4 py-2.5">
-          <dt className="text-dim text-[12px]">On its own</dt>
-          <dd className="mt-0.5 font-mono">{alone === undefined ? "—" : bytesLabel(alone)}</dd>
-        </div>
-        <div className="col-span-2 px-4 py-2.5 max-sm:border-line max-sm:border-t sm:col-span-1">
-          <dt className="text-dim text-[12px]">Source</dt>
-          <dd className="mt-0.5">
-            <a
-              className="hover:text-sun font-mono transition-colors duration-150"
-              href={`${REPO}/tree/feat/v4/packages/core/src/plugins/${plugin.entry}`}
-            >
-              plugins/{plugin.entry}
-            </a>
-          </dd>
-        </div>
-      </dl>
+      <p className="text-dim mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[13px] tabular-nums">
+        {added === undefined ? null : <span>Adds {bytesLabel(added)} to a player</span>}
+        {alone === undefined ? null : <span>{bytesLabel(alone)} on its own</span>}
+        <a
+          className="hover:text-text underline decoration-[var(--site-line-strong)] underline-offset-3 transition-colors duration-150"
+          href={`${REPO}/tree/feat/v4/packages/core/src/plugins/${plugin.entry}`}
+        >
+          Source
+        </a>
+      </p>
     </div>
   );
 }
@@ -97,50 +95,55 @@ export function PluginApi({ id }: { id: string }) {
       {api.options?.length ? (
         <MemberTable members={api.options} nameLabel="Option" />
       ) : api.optionsType ? (
-        <p className="not-prose text-dim mt-1 text-[14px]">
-          Takes <code className="font-mono text-[13px]">{api.optionsType}</code>.
-        </p>
+        <Note>
+          Takes <Mono>{api.optionsType}</Mono>.
+        </Note>
       ) : (
-        <p className="not-prose text-dim mt-1 text-[14px]">This plugin takes no options.</p>
+        <Note>This plugin takes no options.</Note>
       )}
       <SubHeading>State</SubHeading>
       {api.state?.length ? (
         <>
-          <p className="not-prose text-dim mt-1 text-[14px]">
-            Read it with <code className="font-mono text-[13px]">useVideoState({api.name}, (state) =&gt; …)</code>.
-          </p>
+          <Note>
+            Read it with <Mono>useVideoState({api.name}, (state) =&gt; …)</Mono>.
+          </Note>
           <MemberTable members={api.state} nameLabel="Field" />
         </>
       ) : (
-        <p className="not-prose text-dim mt-1 text-[14px]">This plugin has no state of its own.</p>
+        <Note>This plugin has no state of its own.</Note>
       )}
       <SubHeading>Commands</SubHeading>
       {api.commands?.length ? (
         <>
-          <p className="not-prose text-dim mt-1 text-[14px]">
-            Call them with <code className="font-mono text-[13px]">useCommands({api.name})</code>.
-          </p>
+          <Note>
+            Call them with <Mono>useCommands({api.name})</Mono>.
+          </Note>
           <MemberTable members={api.commands} nameLabel="Command" />
         </>
       ) : (
-        <p className="not-prose text-dim mt-1 text-[14px]">This plugin has no commands of its own.</p>
+        <Note>This plugin has no commands of its own.</Note>
       )}
       {parts.length > 0 ? (
         <>
           <SubHeading>Parts</SubHeading>
-          <ul className="not-prose my-3 flex flex-col gap-2 text-[14px]">
-            {parts.map((part) => (
-              <li key={part.name}>
-                <code className="font-mono text-[13px] font-medium">{part.name}</code>
-                {part.doc ? (
-                  <span className="text-dim">
-                    {" "}
-                    — <DocText>{part.doc}</DocText>
-                  </span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
+          <ScrollArea label="Parts" className="my-4 overflow-x-auto">
+            <table className="w-full border-collapse text-left text-[13.5px] leading-[1.45]">
+              <thead>
+                <tr className="border-line-strong text-dim border-b text-[12.5px]">
+                  <th scope="col" className="w-[24%] py-2 pe-4 font-medium">Part</th>
+                  <th scope="col" className="py-2 font-medium">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parts.map((part) => (
+                  <tr key={part.name} className="border-line border-b">
+                    <td className="text-text py-2.5 pe-4 align-top font-mono text-[12.5px] whitespace-nowrap">{part.name}</td>
+                    <td className="py-2.5 align-top text-[var(--doc-text)]">{part.doc ? <DocText>{part.doc}</DocText> : null}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </ScrollArea>
         </>
       ) : null}
     </>
@@ -153,19 +156,19 @@ export function Api({ entry = "react-video-kit", name }: { entry?: string; name:
   if (!item) throw new Error(`${entry} doesn't export ${name}`);
   const members = item.props ?? item.members ?? [];
   return (
-    <div className="not-prose my-5">
+    <div className="my-5">
       {item.doc ? (
-        <p className="text-dim mb-2 text-[14.5px] leading-relaxed">
+        <p className="mb-3 text-[14px] leading-[1.5] text-[var(--doc-text)]">
           <DocText>{item.doc}</DocText>
         </p>
       ) : null}
       {item.signature ? (
-        <pre className="bg-code border-line text-dusk overflow-x-auto rounded-xl border px-3.5 py-3 font-mono text-[12px] leading-relaxed whitespace-pre-wrap">
+        <pre className="code-frame doc-signature">
           {item.signature}
         </pre>
       ) : null}
       {item.definition ? (
-        <pre className="bg-code border-line text-dusk overflow-x-auto rounded-xl border px-3.5 py-3 font-mono text-[12px] leading-relaxed whitespace-pre-wrap">
+        <pre className="code-frame doc-signature">
           {item.definition}
         </pre>
       ) : null}
@@ -174,8 +177,9 @@ export function Api({ entry = "react-video-kit", name }: { entry?: string; name:
   );
 }
 
-const KIND_ORDER = ["component", "hook", "plugin", "function", "value", "type"] as const;
-const KIND_TITLES = { component: "Components", hook: "Hooks", plugin: "Plugin", function: "Functions", value: "Values", type: "Types" };
+const KIND_ORDER = ["component", "icon", "hook", "plugin", "function", "value", "type"] as const;
+const KIND_TITLES = { component: "Components", icon: "Icons", hook: "Hooks", plugin: "Plugin", function: "Functions", value: "Values", type: "Types" };
+const kindOf = (item: ApiSymbol) => (item.kind === "component" && item.name.endsWith("Icon") ? "icon" : item.kind);
 
 /** All of an entry's exports, generated, so nothing can be left undocumented. */
 export function ApiEntry({ entry }: { entry: string }) {
@@ -183,29 +187,31 @@ export function ApiEntry({ entry }: { entry: string }) {
   return (
     <>
       {KIND_ORDER.map((kind) => {
-        const group = items.filter((item) => item.kind === kind);
+        const group = items.filter((item) => kindOf(item) === kind);
         if (group.length === 0) return null;
         return (
-          <section key={kind}>
-            <h2 className="not-prose text-dim mt-8 mb-2 font-mono text-[12.5px]">
+          <section key={kind} className="mt-10">
+            <h2 className="border-line-strong text-text border-b pb-2 text-[17px] font-semibold tracking-[-0.014em]">
               {KIND_TITLES[kind]}
             </h2>
             {group.map((item) => (
-              <details key={item.name} className="not-prose border-line group/api border-b py-2.5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-mono text-[13.5px] font-medium">
+              <details key={item.name} className="doc-disclosure border-line group/api border-b">
+                <summary className="hover:text-text flex cursor-pointer list-none items-center justify-between gap-3 py-2 font-mono text-[13px] text-[var(--doc-text)] transition-colors duration-150 group-open/api:text-[var(--site-text)] [&::-webkit-details-marker]:hidden">
                   {item.name}
-                  <span aria-hidden="true" className="text-faint transition-transform duration-200 ease-rv group-open/api:rotate-90">›</span>
+                  <ChevronIcon width={11} height={11} className="text-dim shrink-0 transition-transform duration-200 ease-rv group-open/api:rotate-90" />
                 </summary>
-                {item.kind === "plugin" ? (
-                  <p className="text-dim mt-2 text-[14px]">
-                    <DocText>{item.doc}</DocText>{" "}
-                    <Link className="text-sun" href={`/docs/v4/plugins/${item.pluginName}`}>
-                      Read the {item.pluginName} page.
-                    </Link>
-                  </p>
-                ) : (
-                  <Api entry={entry} name={item.name} />
-                )}
+                <div className="pb-3">
+                  {item.kind === "plugin" ? (
+                    <p className="text-[14px] leading-[1.5] text-[var(--doc-text)]">
+                      <DocText>{item.doc}</DocText>{" "}
+                      <Link className="text-text underline decoration-[var(--site-line-strong)] underline-offset-3" href={`/docs/v4/plugins/${item.pluginName}`}>
+                        Read the {item.pluginName} page.
+                      </Link>
+                    </p>
+                  ) : (
+                    <Api entry={entry} name={item.name} />
+                  )}
+                </div>
               </details>
             ))}
           </section>
@@ -215,29 +221,27 @@ export function ApiEntry({ entry }: { entry: string }) {
   );
 }
 
-const GROUPS: PluginGroup[] = ["Controls", "Menus", "Timeline", "Streaming", "Viewing", "Revenue and rights", "Casting"];
+const GROUPS: PluginGroup[] = ["Controls", "Menus", "Timeline", "Streaming", "Viewing", "Extras", "Revenue and rights", "Casting"];
 
 /** Every plugin by group, with what it adds to a player. */
 export function PluginList() {
   return (
-    <div className="not-prose">
+    <div>
       {GROUPS.map((group) => (
-        <section key={group} className="mt-7 first:mt-2">
-          <h2 className="text-dim mb-2 font-mono text-[12.5px]">{group}</h2>
+        <section key={group} className="mt-9 first:mt-6">
+          <h2 className="text-text mb-3 text-[17px] font-semibold tracking-[-0.014em]">{group}</h2>
           <ul className="grid gap-2 sm:grid-cols-2">
             {PLUGINS.filter((plugin) => plugin.group === group).map((plugin) => (
-              <li key={plugin.id}>
+              <li key={plugin.id} className="min-w-0">
                 <Link
                   href={`/docs/v4/plugins/${plugin.id}`}
-                  className="group bg-raised border-line hover:border-line-strong flex h-full items-start justify-between gap-3 rounded-xl border px-3.5 py-3 transition-colors duration-150"
+                  className="border-line hover:border-line-strong flex h-full items-start justify-between gap-3 rounded-[var(--doc-radius)] border-[0.5px] bg-[var(--doc-panel)] px-4 py-3 transition-colors duration-150"
                 >
                   <span className="min-w-0">
-                    <span className="block text-[14px] font-medium">{plugin.title}</span>
+                    <span className="text-text block text-[14px] font-medium tracking-[-0.008em]">{plugin.title}</span>
                     <span className="text-dim mt-0.5 block text-[13px] leading-snug">{plugin.blurb}</span>
                   </span>
-                  <span className="text-faint shrink-0 font-mono text-[12px] tabular-nums">
-                    +{bytesLabel(marginal[plugin.id] ?? 0)}
-                  </span>
+                  <span className="text-dim shrink-0 text-[12.5px] tabular-nums">+{bytesLabel(marginal[plugin.id] ?? 0)}</span>
                 </Link>
               </li>
             ))}

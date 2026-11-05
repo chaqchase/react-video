@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import * as Video from "react-video-kit";
 import type { Player } from "react-video-kit/core";
 import { VideoPlayer } from "react-video-kit/player";
-import { createPlugins, playerKey, sourceInput, type BuilderConfig } from "@/lib/builder";
+import { createPlugins, playerKey, sourceInput, sourcePoster, type BuilderConfig } from "@/lib/builder";
 
 interface BuilderPlayerProps {
   config: BuilderConfig;
@@ -27,6 +27,7 @@ export function BuilderPlayer({ config, style, className }: BuilderPlayerProps) 
     [key]
   );
   const src = sourceInput(config);
+  const poster = sourcePoster(config);
 
   useEffect(() => {
     const current = player.current;
@@ -53,20 +54,21 @@ export function BuilderPlayer({ config, style, className }: BuilderPlayerProps) 
   if (config.layout === "minimal") {
     return (
       <Video.Root key={key} ref={player} src={src} plugins={plugins} load="visible" style={style} className={className}>
-        <Video.Media poster="/media/poster.jpg" {...media} />
+        <Video.Media poster={poster} {...media} />
         <Video.Slot name="overlay" />
         <Video.BufferingIndicator />
         <Video.PlayOverlay />
         <Video.ErrorOverlay />
         <Video.Controls>
-          <Video.Timeline />
           <Video.ControlRow>
             <Video.ControlGroup>
               <Video.PlayPause />
+              <Video.Timeline />
               <Video.Time />
             </Video.ControlGroup>
             <Video.ControlGroup>
               <Video.Slot name="controls-end" />
+              <Video.Slot name="top-start" />
               <Video.SettingsMenu />
             </Video.ControlGroup>
           </Video.ControlRow>
@@ -81,7 +83,7 @@ export function BuilderPlayer({ config, style, className }: BuilderPlayerProps) 
       src={src}
       plugins={plugins}
       load="visible"
-      poster="/media/poster.jpg"
+      poster={poster}
       media={media}
       style={style}
       className={className}

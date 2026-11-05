@@ -128,7 +128,7 @@ test("the track shows gaps at chapter boundaries", async ({ page }) => {
 
 test("keyboard shortcuts work, and confirm what they did", async ({ page }) => {
   await open(page);
-  await page.locator(root).click({ position: { x: 5, y: 5 } }).catch(() => {});
+  await page.locator(root).click({ position: { x: 5, y: 120 } }).catch(() => {});
   await page.keyboard.press("m");
   await expect(page.locator('[data-part="hotkeys-feedback"]')).toHaveText("Muted");
   expect(await page.locator(video).evaluate((element: HTMLVideoElement) => element.muted)).toBe(true);
