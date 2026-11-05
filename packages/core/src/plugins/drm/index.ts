@@ -44,7 +44,8 @@ async function requestLicense(system: KeySystemConfig, message: ArrayBuffer) {
 /**
  * Protected playback from one description. Engines handle their own key systems, and
  * this runs the same exchange for streams the browser plays directly, as FairPlay
- * does in Safari. The first system in the config that the browser supports is used.
+ * does in Safari. Systems are tried in a fixed order, Widevine, PlayReady, FairPlay,
+ * then Clear Key, whatever order the config lists them in.
  */
 export const drm = definePlugin("drm", (options: DrmOptions) => ({
   state: () => ({ system: null as string | null }),

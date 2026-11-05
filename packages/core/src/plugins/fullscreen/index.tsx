@@ -23,7 +23,7 @@ type LockableOrientation = ScreenOrientation & {
 };
 
 export interface FullscreenOptions {
-  /** Lock phones to landscape while in fullscreen. Defaults to true. */
+  /** Lock touch devices to landscape while in fullscreen. Defaults to true. */
   lockOrientation?: boolean;
 }
 
@@ -40,7 +40,7 @@ export const fullscreen = definePlugin("fullscreen", (options: FullscreenOptions
     const lock = () => {
       if (options.lockOrientation === false) return;
       const video = context.video();
-      // Only phones lock, and only videos that fill a landscape screen better.
+      // Only touch devices lock, and only videos that fill a landscape screen better.
       if (!matchMedia("(pointer: coarse)").matches) return;
       if (video && video.videoHeight > video.videoWidth) return;
       (screen.orientation as LockableOrientation | undefined)?.lock?.("landscape")?.catch(() => {});
@@ -84,7 +84,12 @@ export const fullscreen = definePlugin("fullscreen", (options: FullscreenOptions
   },
   attach(context, element, scope) {
     const video = element as WebkitVideo;
-    if (!context.state().supported && video.webkitEnterFullscreen) {
+    // False means a page or iframe has turned it off, which this mustn't get around.
+    if (
+      !context.state().supported &&
+      document.fullscreenEnabled !== false &&
+      video.webkitEnterFullscreen
+    ) {
       context.set({ supported: true });
     }
     scope.on(element, "webkitbeginfullscreen", () => context.set({ active: true }));
@@ -114,7 +119,8 @@ export const Fullscreen = forwardRef<HTMLButtonElement, FullscreenProps>(functio
       aria-label={active ? exit : enter}
       onClick={(event) => {
         onClick?.(event);
-        if (!event.defaultPrevented) void toggle();
+        // The browser can refuse, and there's nothing for the viewer to do about it.
+        if (!event.defaultPrevented) void toggle().catch(() => {});
       }}
       {...props}
     >

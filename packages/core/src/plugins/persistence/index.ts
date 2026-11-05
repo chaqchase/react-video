@@ -1,4 +1,5 @@
 import { definePlugin } from "../../core/plugin";
+import type { autoplay } from "../autoplay/index";
 import type { captions } from "../captions/index";
 
 export interface PersistenceOptions {
@@ -66,15 +67,31 @@ export const persistence = definePlugin("persistence", (options: PersistenceOpti
         }
         const save = () => {
           const { volume, muted, rate } = context.media();
-          const active = captionsHandle?.state();
-          const language = active?.tracks.find(({ id }) => id === active.active)?.language;
-          write("preferences", { volume, muted, rate, captions: language ?? null });
+          // Autoplay's fallback mute is the browser's choice, not the viewer's.
+          const forced = context.find<typeof autoplay>("autoplay")?.state().mutedFallback;
+          write("preferences", {
+            volume,
+            muted: muted && !forced,
+            rate,
+            captions: captionsHandle?.state().language ?? null,
+          });
         };
         context.watch(
           scope,
           ({ volume, muted, rate }) => `${volume}|${muted}|${rate}`,
           save
         );
+        if (captionsHandle) {
+          let language = captionsHandle.state().language;
+          scope.add(
+            context.player.subscribe(() => {
+              const next = captionsHandle.state().language;
+              if (next === language) return;
+              language = next;
+              save();
+            })
+          );
+        }
       }
 
       if (!resume) return;

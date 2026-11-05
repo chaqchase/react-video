@@ -114,7 +114,7 @@ describe("clock", () => {
     expect(write).toHaveBeenCalledTimes(1);
     move(1.1);
     vi.advanceTimersByTime(1000);
-    expect(write).toHaveBeenLastCalledWith(1.1);
+    expect(write).toHaveBeenLastCalledWith(1.1, false);
     clock.dispose();
   });
 
@@ -147,7 +147,7 @@ describe("clock", () => {
     write.mockClear();
     move(3);
     clock.sync();
-    expect(write).toHaveBeenCalledWith(3);
+    expect(write).toHaveBeenCalledWith(3, true);
     clock.dispose();
   });
 

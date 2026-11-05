@@ -14,8 +14,6 @@ import { useTimelinePreview } from "../../react/primitives/timeline-context";
 
 export interface Chapter {
   start: number;
-  /** Defaults to the next chapter's start, or the end of the video. */
-  end?: number;
   title: string;
 }
 
@@ -73,7 +71,7 @@ export const chapters = definePlugin("chapters", (options: ChaptersOptions = {})
       .then((response) => (response.ok ? response.text() : ""))
       .then((text) => {
         context.set({
-          items: parseVtt(text).map(({ start, end, text: title }) => ({ start, end, title })),
+          items: parseVtt(text).map(({ start, text: title }) => ({ start, title })),
         });
       })
       .catch(() => {});

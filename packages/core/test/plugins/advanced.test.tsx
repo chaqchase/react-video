@@ -280,6 +280,7 @@ describe("chromecast", () => {
       removeEventListener: (type: string) => void contextListeners.delete(type),
       requestSession: vi.fn(async () => {}),
       getCurrentSession: vi.fn((): typeof session | null => null),
+      getCastState: vi.fn(() => "NO_DEVICES"),
     };
     vi.stubGlobal("cast", {
       framework: {
@@ -418,6 +419,63 @@ describe("chromecast", () => {
     act(() => cast.startSession());
     await settle();
     expect(screen.getByRole("status").textContent).toContain("Living room");
+  });
+
+  it("shows the button when devices were found before this player mounted", async () => {
+    const cast = fakeCast();
+    cast.castContext.getCastState.mockReturnValue("NOT_CONNECTED");
+    const { player } = await mounted({ src: "/a.mp4", plugins: [chromecast()] });
+    expect(player.plugin(chromecast).state().available).toBe(true);
+  });
+
+  it("sends each source's title to the receiver", async () => {
+    const cast = fakeCast();
+    const { player } = await mounted({
+      src: "/a.mp4",
+      plugins: [chromecast({ title: ({ src }) => `Title of ${src}` })],
+    });
+    cast.startSession();
+    await settle();
+    cast.session.loadMedia.mockClear();
+    player.commands.setSource("/b.mp4");
+    await settle();
+    const [request] = cast.session.loadMedia.mock.calls[0] as unknown as [
+      { media: { metadata?: { title?: string } } },
+    ];
+    expect(request.media.metadata?.title).toBe("Title of /b.mp4");
+  });
+
+  it("reports that speed can't change while casting, and restores it after", async () => {
+    const cast = fakeCast();
+    const { media } = await mounted({ src: "/a.mp4", plugins: [chromecast(), speed()] });
+    expect(media().capabilities.rate).toBe(true);
+    cast.startSession();
+    await settle();
+    expect(media().capabilities.rate).toBe(false);
+    cast.endSession();
+    await settle();
+    expect(media().capabilities.rate).toBe(true);
+  });
+
+  it("restores speed after casting through a source change too", async () => {
+    const cast = fakeCast();
+    const { player, media } = await mounted({ src: "/a.mp4", plugins: [chromecast(), speed()] });
+    cast.startSession();
+    await settle();
+    player.commands.setSource("/b.mp4");
+    await settle();
+    expect(media().capabilities.rate).toBe(false);
+    cast.endSession();
+    await settle();
+    expect(media().capabilities.rate).toBe(true);
+  });
+
+  it("requests the SDK only from browsers that can use it", async () => {
+    vi.stubGlobal("cast", undefined);
+    vi.stubGlobal("chrome", undefined);
+    const before = document.querySelectorAll("script").length;
+    await mounted({ src: "/a.mp4", plugins: [chromecast()] });
+    expect(document.querySelectorAll("script").length).toBe(before);
   });
 });
 
@@ -619,6 +677,79 @@ describe("ads", () => {
     await settle();
     expect(document.querySelector('[data-part="ad-overlay"]')).toBeNull();
   });
+
+  it("doesn't show a pre-roll again after reloading the same video", async () => {
+    const fake = fakeEngine({ break: false });
+    const create = vi.fn(() => fake.engine);
+    const { player } = await mounted({ src: "/a.mp4", plugins: [ads({ engine: create })] });
+    await act(async () => {
+      await player.commands.play();
+    });
+    expect(fake.calls).toEqual(["prepare", "request"]);
+    expect(create).toHaveBeenCalledTimes(1);
+    player.commands.reload(10);
+    await settle();
+    await act(async () => {
+      await player.commands.play();
+    });
+    expect(fake.calls).toEqual(["prepare", "request"]);
+    expect(create).toHaveBeenCalledTimes(1);
+    player.commands.setSource("/b.mp4");
+    await settle();
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it("works with a source that only loads on play", async () => {
+    const fake = fakeEngine({ break: false });
+    const { player, video } = await mounted({
+      src: "/a.mp4",
+      load: "play",
+      plugins: [ads({ engine: () => fake.engine })],
+    });
+    expect(video.src).toBe("");
+    void player.commands.play();
+    expect(fake.calls).toEqual(["prepare", "request"]);
+    await settle();
+    expect(video.src).toContain("/a.mp4");
+  });
+
+  it("tells the engine when the viewer follows the link", async () => {
+    const fake = fakeEngine();
+    const clicked = vi.fn();
+    fake.engine.clicked = clicked;
+    const plugins = [ads({ engine: () => fake.engine })];
+    const player = createPlayer({ src: "/a.mp4", plugins });
+    render(
+      <Root player={player}>
+        <Media />
+        <AdOverlay />
+      </Root>
+    );
+    await settle();
+    await act(async () => {
+      await player.commands.play();
+    });
+    await settle();
+    const link = screen.getByRole("link");
+    link.addEventListener("click", (event) => event.preventDefault());
+    fireEvent.click(link);
+    expect(clicked).toHaveBeenCalledOnce();
+  });
+
+  it("hears about failures partway through a break", async () => {
+    const fake = fakeEngine();
+    const onError = vi.fn();
+    const { player } = await mounted({
+      src: "/a.mp4",
+      plugins: [ads({ engine: () => fake.engine, onError })],
+    });
+    await act(async () => {
+      await player.commands.play();
+    });
+    const failure = new Error("Broken file");
+    fake.host().error(failure);
+    expect(onError).toHaveBeenCalledWith(failure);
+  });
 });
 
 describe("vast", () => {
@@ -752,6 +883,78 @@ describe("vast", () => {
     await settle();
     expect(pings).not.toContain("https://track.test/complete");
     expect(media().provider).toBe("native");
+  });
+
+  it("reports a broken ad file, then moves on", async () => {
+    stubFetch({ "/tag.xml": xml(inline) });
+    const onError = vi.fn();
+    const { player, root, media } = await mounted({
+      src: "/content.mp4",
+      plugins: [ads({ engine: vast({ tag: "/tag.xml" }), onError })],
+    });
+    await act(async () => {
+      await player.commands.play();
+    });
+    await settle();
+    root.querySelector('[data-part="ad-media"]')?.dispatchEvent(new Event("error"));
+    await settle();
+    expect(onError).toHaveBeenCalledOnce();
+    expect(media().provider).toBe("native");
+  });
+
+  it("moves on when the browser refuses to play the ad", async () => {
+    stubFetch({ "/tag.xml": xml(inline) });
+    const onError = vi.fn();
+    const { player, root, media } = await mounted({
+      src: "/content.mp4",
+      plugins: [ads({ engine: vast({ tag: "/tag.xml" }), onError })],
+    });
+    const original = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
+      if (this.getAttribute("data-part") === "ad-media" && this.src) {
+        return Promise.reject(Object.assign(new Error("Refused"), { name: "NotAllowedError" }));
+      }
+      return original.call(this);
+    };
+    cleanups.push(() => {
+      HTMLMediaElement.prototype.play = original;
+    });
+    await act(async () => {
+      await player.commands.play();
+    });
+    await settle();
+    expect(root.querySelector('[data-part="ad-media"]')).toBeTruthy();
+    expect(onError).toHaveBeenCalledOnce();
+    expect(media().provider).toBe("native");
+  });
+
+  it("keeps every wrapper's tracking through nested redirects", async () => {
+    const wrapper = (next: string, name: string) => `<Ad><Wrapper>
+      <VASTAdTagURI>${next}</VASTAdTagURI>
+      <Impression>https://track.test/${name}</Impression>
+      <Creatives><Creative><Linear>
+        <TrackingEvents><Tracking event="start">https://track.test/${name}-start</Tracking></TrackingEvents>
+        <VideoClicks><ClickTracking>https://track.test/${name}-click</ClickTracking></VideoClicks>
+      </Linear></Creative></Creatives>
+    </Wrapper></Ad>`;
+    stubFetch({
+      "/tag.xml": xml(wrapper("/middle.xml", "outer")),
+      "/middle.xml": xml(wrapper("/inner.xml", "middle")),
+      "/inner.xml": xml(inline),
+    });
+    const { player } = await start();
+    for (const url of ["outer", "outer-start", "middle", "middle-start", "impression", "start"]) {
+      expect(pings).toContain(`https://track.test/${url}`);
+    }
+    player.plugin(ads).commands.clicked();
+    expect(pings).toContain("https://track.test/outer-click");
+    expect(pings).toContain("https://track.test/middle-click");
+  });
+
+  it("reads a skip offset given as a percentage", async () => {
+    stubFetch({ "/tag.xml": xml(inline.replace('skipoffset="00:00:05"', 'skipoffset="20%"')) });
+    const { player } = await start();
+    expect(player.plugin(ads).state().ad?.skipAfter).toBe(3);
   });
 });
 

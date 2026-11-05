@@ -3,9 +3,10 @@ export interface Clock {
   time(): number;
   /**
    * Calls `write` with the time whenever it has moved by at least `resolution()`
-   * seconds, plus once immediately and after every discontinuity. Returns unbind.
+   * seconds, plus once immediately and after every discontinuity, which `jumped`
+   * marks. Returns unbind.
    */
-  bind(write: (time: number) => void, resolution: () => number): () => void;
+  bind(write: (time: number, jumped: boolean) => void, resolution: () => number): () => void;
   /** Writes every binding now, for seeks, source changes, and provider swaps. */
   sync(): void;
 }
@@ -19,7 +20,7 @@ export interface OwnedClock extends Clock {
 }
 
 interface Binding {
-  write: (time: number) => void;
+  write: (time: number, jumped: boolean) => void;
   resolution: () => number;
   last: number;
 }
@@ -83,7 +84,7 @@ export function createClock(): OwnedClock {
       if (!(resolution > 0)) continue;
       if (Math.abs(now - binding.last) >= resolution) {
         binding.last = now;
-        binding.write(now);
+        binding.write(now, false);
       }
     }
     schedule();
@@ -94,7 +95,7 @@ export function createClock(): OwnedClock {
     bind(write, resolution) {
       const binding: Binding = { write, resolution, last: time() };
       bindings.add(binding);
-      write(binding.last);
+      write(binding.last, true);
       schedule();
       return () => {
         bindings.delete(binding);
@@ -114,7 +115,7 @@ export function createClock(): OwnedClock {
       const now = time();
       for (const binding of bindings) {
         binding.last = now;
-        binding.write(now);
+        binding.write(now, true);
       }
       schedule();
     },

@@ -23,6 +23,10 @@ const textOf = (element: Element | null | undefined) => element?.textContent?.tr
 const seconds = (value: string) =>
   value.split(":").reduce((total, part) => total * 60 + Number(part), 0);
 
+/** A skip offset is a time, or a percentage of the ad's length. */
+const offsetOf = (value: string, duration: number) =>
+  value.endsWith("%") ? (duration * Number.parseFloat(value)) / 100 : seconds(value);
+
 const urls = (parent: Element, selector: string) =>
   [...parent.querySelectorAll(selector)].map(textOf).filter(Boolean);
 
@@ -35,6 +39,14 @@ function trackingOf(parent: Element) {
     tracking.set(name, [...(tracking.get(name) ?? []), url]);
   }
   return tracking;
+}
+
+function mergeTracking(outer: Map<string, string[]> | undefined, inner: Map<string, string[]>) {
+  const merged = new Map(inner);
+  for (const [name, list] of outer ?? []) {
+    merged.set(name, [...list, ...(merged.get(name) ?? [])]);
+  }
+  return merged;
 }
 
 /** Takes the largest file the browser can play progressively. */
@@ -66,9 +78,9 @@ async function loadAds(url: string, redirects: number, signal: AbortSignal, inhe
           duration: 0,
           skipAfter: null,
           clickThrough: null,
-          impressions: urls(wrapper, "Impression"),
-          tracking: trackingOf(wrapper),
-          clicks: urls(wrapper, "ClickTracking"),
+          impressions: [...(inherited?.impressions ?? []), ...urls(wrapper, "Impression")],
+          tracking: mergeTracking(inherited?.tracking, trackingOf(wrapper)),
+          clicks: [...(inherited?.clicks ?? []), ...urls(wrapper, "ClickTracking")],
         }))
       );
       continue;
@@ -77,17 +89,14 @@ async function loadAds(url: string, redirects: number, signal: AbortSignal, inhe
     const media = linear ? pickMedia(linear) : "";
     if (!linear || !media) continue;
     const skipoffset = linear.getAttribute("skipoffset");
-    const tracking = trackingOf(linear);
-    for (const [name, list] of inherited?.tracking ?? []) {
-      tracking.set(name, [...list, ...(tracking.get(name) ?? [])]);
-    }
+    const duration = seconds(textOf(linear.querySelector("Duration")));
     ads.push({
       media,
-      duration: seconds(textOf(linear.querySelector("Duration"))),
-      skipAfter: skipoffset ? seconds(skipoffset) : null,
+      duration,
+      skipAfter: skipoffset ? offsetOf(skipoffset, duration) : null,
       clickThrough: textOf(linear.querySelector("ClickThrough")) || null,
       impressions: [...(inherited?.impressions ?? []), ...urls(ad, "Impression")],
-      tracking,
+      tracking: mergeTracking(inherited?.tracking, trackingOf(linear)),
       clicks: [...(inherited?.clicks ?? []), ...urls(linear, "ClickTracking")],
     });
   }
@@ -118,6 +127,7 @@ export function vast(options: VastOptions) {
     let host: AdHost | null = null;
     let element: HTMLVideoElement | null = null;
     let finish: () => void = () => {};
+    let clicks: readonly string[] = [];
 
     const playAd = (ad: VastAd, info: AdInfo) =>
       new Promise<void>((resolve) => {
@@ -129,11 +139,19 @@ export function vast(options: VastOptions) {
         const scope = new AbortController();
         const options_ = { signal: scope.signal };
         const pending = new Set(QUARTILES);
+        const active = host;
         let started = false;
+        clicks = ad.clicks;
         const done = () => {
           scope.abort();
           finish = () => {};
+          clicks = [];
           resolve();
+        };
+        // A broken ad moves on, since the viewer must never be stuck behind it.
+        const fail = (error: unknown) => {
+          active.error(error);
+          done();
         };
         finish = () => {
           ping(ad.tracking.get("skip"));
@@ -169,12 +187,19 @@ export function vast(options: VastOptions) {
           },
           options_
         );
-        // A broken ad moves on, since the viewer must never be stuck behind it.
-        video.addEventListener("error", done, options_);
-        host.adStart(info);
+        video.addEventListener(
+          "error",
+          () => fail(new Error(`The ad file couldn't play: ${ad.media}`)),
+          options_
+        );
+        active.adStart(info);
         video.src = ad.media;
         video.load();
-        video.play().catch(() => {});
+        video.play().catch((error: unknown) => {
+          // Pausing the ad before it starts rejects this too, and isn't a failure.
+          const aborted = error instanceof Error && error.name === "AbortError";
+          if (!aborted && !scope.signal.aborted) fail(error);
+        });
       });
 
     return {
@@ -226,6 +251,9 @@ export function vast(options: VastOptions) {
       },
       skip() {
         finish();
+      },
+      clicked() {
+        ping(clicks);
       },
       setVolume(volume, muted) {
         if (!element) return;

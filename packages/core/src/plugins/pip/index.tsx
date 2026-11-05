@@ -41,8 +41,9 @@ export const pip = definePlugin("pip", () => ({
     const video = element as WebkitVideo;
     context.set({
       supported:
-        (Boolean(document.pictureInPictureEnabled) && !video.disablePictureInPicture) ||
-        Boolean(video.webkitSupportsPresentationMode?.("picture-in-picture")),
+        !video.disablePictureInPicture &&
+        (Boolean(document.pictureInPictureEnabled) ||
+          Boolean(video.webkitSupportsPresentationMode?.("picture-in-picture"))),
     });
     scope.on(element, "enterpictureinpicture", () => context.set({ active: true }));
     scope.on(element, "leavepictureinpicture", () => context.set({ active: false }));
@@ -79,7 +80,8 @@ export const Pip = forwardRef<HTMLButtonElement, PipProps>(function Pip(
       aria-label={active ? exit : enter}
       onClick={(event) => {
         onClick?.(event);
-        if (!event.defaultPrevented) void toggle();
+        // The browser can refuse, and there's nothing for the viewer to do about it.
+        if (!event.defaultPrevented) void toggle().catch(() => {});
       }}
       {...props}
     >

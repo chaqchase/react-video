@@ -6,6 +6,7 @@ export { createScope } from "./scope";
 export type { OwnedScope, Scope } from "./scope";
 export { sourceKey, toLoadRequests } from "./source";
 export type {
+  AnyPlugin,
   AnyPluginFactory,
   Capabilities,
   CommandsOf,

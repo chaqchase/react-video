@@ -6,6 +6,7 @@ import { toLoadRequests } from "./source";
 import { createStore } from "./store";
 import type {
   AnyPluginFactory,
+  Capabilities,
   CoreCommands,
   Gate,
   Gates,
@@ -64,7 +65,6 @@ function createInitialMedia(): MediaState {
     audioTracks: [],
     audioTrack: null,
     textTracks: [],
-    textTrack: null,
     live: null,
     timeline: { start: 0, end: 0, kind: "vod" },
     capabilities: { seek: true, rate: true, volume: true },
@@ -127,6 +127,9 @@ export function createPlayer(options: PlayerOptions = {}): Player {
   let loadTriggered = false;
   let loadGeneration = 0;
   let resumeAt: number | undefined;
+  // What a failure interrupted, so that reloading can pick it back up.
+  let failedAt = 0;
+  let failedPlaying = false;
   let pendingPlays: ((started: boolean) => void)[] = [];
 
   const top = () => stack[stack.length - 1]?.provider ?? null;
@@ -166,9 +169,13 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     }
   };
 
+  // What the provider under a pushed one reports, for when that comes off again.
+  let coveredCapabilities: Capabilities | null = null;
+
   const sinkFor = (provider: Provider): Sink => ({
     update(state) {
       if (top() === provider) applyProviderState(state);
+      else if (state.capabilities) coveredCapabilities = state.capabilities;
     },
     sync() {
       if (top() === provider) clock.sync();
@@ -186,6 +193,9 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       setMedia({ error });
       return;
     }
+    const time = top()?.time ?? 0;
+    if (time > 0) failedAt = time;
+    if (!media().paused || pendingPlays.length > 0) failedPlaying = true;
     settlePendingPlays(false);
     setMedia({ error, status: "error", waiting: false, paused: true });
     clock.sync();
@@ -401,6 +411,8 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     const observer = new IntersectionObserver((records) => {
       if (records.some((record) => record.isIntersecting)) {
         observer.disconnect();
+        // A play may have started the load already.
+        if (loadTriggered) return;
         loadTriggered = true;
         beginLoad();
       }
@@ -412,6 +424,13 @@ export function createPlayer(options: PlayerOptions = {}): Player {
   const commands: CoreCommands = {
     play() {
       if (isLocked("play")) return Promise.resolve(false);
+      // Before the gates, which may need what the source hooks set up. Inside the
+      // gesture: unlock the element, since the load may finish after activation expires.
+      if (element && mountScope && !loadTriggered && !loadScheduled) {
+        element.play().catch(() => {});
+        loadTriggered = true;
+        beginLoad();
+      }
       return new Promise((settle) => {
         let reached = false;
         const outcome = runGates(gatesOf("play"), undefined, () => {
@@ -438,11 +457,6 @@ export function createPlayer(options: PlayerOptions = {}): Player {
           if (!element) {
             settle(false);
             return;
-          }
-          if (!loadTriggered) {
-            element.play().catch(() => {});
-            loadTriggered = true;
-            beginLoad();
           }
           if (media().status === "idle") {
             settle(false);
@@ -509,14 +523,19 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     setSource(source) {
       input = source;
       resumeAt = undefined;
+      failedAt = 0;
+      failedPlaying = false;
       if (element && mountScope) {
         loadTriggered = loadTriggered || loadStrategy === "eager";
         if (loadTriggered) scheduleLoad();
       }
     },
     reload(startTime) {
-      resumeAt = startTime;
+      const failed = media().status === "error";
+      resumeAt = startTime ?? (failed && failedAt > 0 ? failedAt : undefined);
       if (element && mountScope) {
+        if (failed && failedPlaying && !isLocked("play")) pendingPlays.push(() => {});
+        if (failed) failedPlaying = false;
         loadTriggered = true;
         scheduleLoad();
       }
@@ -525,8 +544,8 @@ export function createPlayer(options: PlayerOptions = {}): Player {
 
   const pushProvider = (provider: Provider) => {
     const scope = createScope();
-    // An ad brings its own timeline, and the content's must come back afterwards.
-    const { timeline } = media();
+    // A pushed provider brings its own timeline and limits, and the content's come back.
+    const { timeline, capabilities } = media();
     stack.push({ provider, scope });
     setClockSource(provider);
     provider.attach(element, sinkFor(provider), scope);
@@ -541,7 +560,8 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       provider.destroy();
       const current = top();
       setClockSource(current);
-      setMedia({ timeline });
+      setMedia({ timeline, capabilities: coveredCapabilities ?? capabilities });
+      coveredCapabilities = null;
       if (current) {
         applyProviderState({ provider: current.name, ...current.snapshot?.() });
       }

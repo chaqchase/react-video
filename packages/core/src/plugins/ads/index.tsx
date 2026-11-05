@@ -84,6 +84,8 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
   const { timeout = 3000, onError } = options;
   let engine: AdEngine | null = null;
   let requested = false;
+  // Reloading a video mustn't show its pre-roll again.
+  let requestedFor: string | null = null;
   let inBreak = false;
   let endBreak: () => void = () => {};
   let adProvider: AdProvider | null = null;
@@ -95,9 +97,15 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
       skip() {
         engine?.skip();
       },
+      /** Tells the engine the viewer followed the ad's link, for its tracking. */
+      clicked() {
+        engine?.clicked?.();
+      },
     }),
     source(context, source, scope) {
       requested = false;
+      if (source.src === requestedFor) return;
+      requestedFor = null;
       try {
         engine = options.engine(source);
       } catch (error) {
@@ -127,6 +135,7 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
         const root = context.root();
         if (!current || requested || !video || !root) return next(request);
         requested = true;
+        requestedFor = context.media().source?.src ?? null;
 
         // Unlocks this element for later, since it'll resume after the break, without
         // a gesture. Pausing in the same tick means no sound can play.
@@ -162,6 +171,9 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
           adStart(ad) {
             adProvider?.show(ad.duration);
             context.set({ ad });
+          },
+          error(error) {
+            onError?.(error);
           },
           breakEnd() {
             if (!inBreak) return;
@@ -218,7 +230,7 @@ AdOverlay.displayName = "Video.AdOverlay";
 
 function ActiveAd({ ad }: { ad: AdInfo }) {
   const time = useCurrentTime();
-  const { skip } = useCommands(ads);
+  const { skip, clicked } = useCommands(ads);
   const label = useLabel("ad", "Ad");
   const skipAd = useLabel("skipAd", "Skip ad");
   const skipIn = useLabel("skipAdIn", "Skip in");
@@ -235,7 +247,13 @@ function ActiveAd({ ad }: { ad: AdInfo }) {
         {count} · {remaining}
       </span>
       {ad.clickThrough ? (
-        <a data-part="ad-link" href={ad.clickThrough} target="_blank" rel="noopener noreferrer">
+        <a
+          data-part="ad-link"
+          href={ad.clickThrough}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => clicked()}
+        >
           {learnMore}
         </a>
       ) : null}

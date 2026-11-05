@@ -3,6 +3,7 @@
 import { forwardRef, type HTMLAttributes } from "react";
 import { usePlayer } from "../context";
 import { useCommands, useLabel, useVideoState } from "../hooks";
+import { HIDDEN_INPUT } from "./as-child";
 import { useSliderGesture } from "./slider-gesture";
 
 export interface VolumeSliderProps extends HTMLAttributes<HTMLDivElement> {
@@ -57,6 +58,7 @@ export const VolumeSlider = forwardRef<HTMLDivElement, VolumeSliderProps>(
       >
         <input
           type="range"
+          style={HIDDEN_INPUT}
           data-part="volume-input"
           aria-label={label}
           aria-valuetext={`${Math.round(value * 100)}%`}

@@ -13,10 +13,11 @@ const code = (name, path, limit) => ({
 
 export default [
   // The floor every player pays: the kernel, native provider, Root, and Media.
-  { ...code("kernel (Root, Media)", "dist/react/index.js", 5.25), import: "{ Root, Media }" },
+  { ...code("kernel (Root, Media)", "dist/react/index.js", 5.5), import: "{ Root, Media }" },
   code("headless (all primitives)", "dist/react/index.js", 12),
   code("styled parts", "dist/ui/index.js", 13),
-  code("complete player", "dist/player/index.js", 17),
+  { ...code("player layout, no plugins", "dist/player/index.js", 13.5), import: "{ VideoPlayer }" },
+  code("complete player", "dist/player/index.js", 17.5),
   code("fullscreen", "dist/plugins/fullscreen/index.js", 2),
   code("pip", "dist/plugins/pip/index.js", 2),
   code("idle", "dist/plugins/idle/index.js", 1.5),
@@ -25,7 +26,7 @@ export default [
   code("speed", "dist/plugins/speed/index.js", 1.75),
   code("quality", "dist/plugins/quality/index.js", 3),
   code("audio-tracks", "dist/plugins/audio-tracks/index.js", 1.75),
-  code("captions", "dist/plugins/captions/index.js", 3),
+  code("captions", "dist/plugins/captions/index.js", 3.25),
   code("thumbnails", "dist/plugins/thumbnails/index.js", 1.5),
   code("chapters", "dist/plugins/chapters/index.js", 2.5),
   code("persistence", "dist/plugins/persistence/index.js", 1),

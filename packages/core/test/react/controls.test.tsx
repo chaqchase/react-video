@@ -3,6 +3,7 @@ import { Profiler, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { definePlugin } from "../../src/core/plugin";
 import type { Player } from "../../src/core/types";
+import { defaultPlugins } from "../../src/player/default-plugins";
 import { VideoPlayer } from "../../src/player/video-player";
 import { Media } from "../../src/react/media";
 import { BufferingIndicator } from "../../src/react/primitives/buffering";
@@ -561,7 +562,7 @@ describe("Menu", () => {
 
 describe("VideoPlayer", () => {
   it("renders a complete, working player", async () => {
-    const { container } = render(<VideoPlayer src="/video.mp4" poster="/poster.jpg" />);
+    const { container } = render(<VideoPlayer src="/video.mp4" poster="/poster.jpg" plugins={defaultPlugins()} />);
     await flush();
     expect(getRoot(container).className).toContain("rv-root");
     expect(getRoot(container).dataset.controls).toBe("shown");

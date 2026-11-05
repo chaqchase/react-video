@@ -42,6 +42,7 @@ export const analytics = definePlugin("analytics", (options: AnalyticsOptions) =
       let loadStart = 0;
       let stallStart = 0;
       let stalled = false;
+      let seekStall = false;
 
       const send = (type: AnalyticsEventType, extra?: Partial<AnalyticsEvent>) => {
         const media = context.media();
@@ -76,8 +77,11 @@ export const analytics = definePlugin("analytics", (options: AnalyticsOptions) =
           send("quality-change", { quality: media.quality.active });
         }
 
-        // A stall caused by seeking is expected, so it isn't counted as a rebuffer.
-        const stalling = media.waiting && !media.seeking && !media.paused && media.started;
+        // A stall caused by seeking is expected, so it isn't counted as a rebuffer. It
+        // can outlast the seek itself, since `seeked` comes before playback picks up.
+        if (media.seeking) seekStall = true;
+        else if (!media.waiting) seekStall = false;
+        const stalling = media.waiting && !seekStall && !media.paused && media.started;
         if (stalling && !stalled) {
           stalled = true;
           stallStart = performance.now();
@@ -90,15 +94,19 @@ export const analytics = definePlugin("analytics", (options: AnalyticsOptions) =
       scope.add(unsubscribe);
 
       if (heartbeat > 0) {
-        let first = true;
+        let played = 0;
+        let last = context.clock.time();
         scope.add(
           context.clock.bind(
-            () => {
-              // Binding writes once immediately, before any playback.
-              if (first) first = false;
-              else send("heartbeat");
+            (time, jumped) => {
+              // A seek isn't playback, but the viewer's time until then still counts.
+              if (!jumped) played += Math.abs(time - last);
+              last = time;
+              if (played < heartbeat) return;
+              played -= heartbeat;
+              send("heartbeat");
             },
-            () => heartbeat
+            () => Math.min(heartbeat, 1)
           )
         );
       }

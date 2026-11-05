@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState, type ReactNode, type VideoHTMLAttributes } from "react";
+import { forwardRef, type ReactNode, type VideoHTMLAttributes } from "react";
 import type { Player } from "../core/types";
 import { Media } from "../react/media";
 import { ControlGroup } from "../react/primitives/control-group";
@@ -16,7 +16,6 @@ import { SettingsMenu } from "../ui/parts/settings-menu";
 import { Time } from "../ui/parts/time";
 import { Volume } from "../ui/parts/volume";
 import { Root, type RootProps } from "../ui/parts/root";
-import { defaultPlugins } from "./default-plugins";
 
 export interface VideoPlayerProps extends RootProps {
   poster?: string;
@@ -27,16 +26,15 @@ export interface VideoPlayerProps extends RootProps {
 }
 
 /**
- * The complete player: every control, styled, with sensible plugins. Pass
- * `plugins` to change them, or compose your own from the same parts.
+ * The complete player layout: every control, styled. Features come from `plugins`,
+ * and `defaultPlugins()` is a sensible set. Leaving it out keeps it out of the bundle.
  */
 export const VideoPlayer = forwardRef<Player, VideoPlayerProps>(function VideoPlayer(
-  { plugins, poster, media, tracks, children, ...props },
+  { poster, media, tracks, children, ...props },
   ref
 ) {
-  const [installed] = useState(() => plugins ?? defaultPlugins());
   return (
-    <Root ref={ref} plugins={installed} {...props}>
+    <Root ref={ref} {...props}>
       <Media poster={poster} {...media}>
         {tracks}
       </Media>

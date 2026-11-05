@@ -91,6 +91,7 @@ export type MediaStatus = "idle" | "loading" | "ready" | "error";
 /** Everything the kernel knows about playback. Time is on the clock, not here. */
 export interface MediaState {
   status: MediaStatus;
+  /** The source that was asked for. Switching rendition doesn't change it. */
   source: SourceObject | null;
   provider: string | null;
   paused: boolean;
@@ -115,8 +116,11 @@ export interface MediaState {
   };
   audioTracks: readonly MediaTrackInfo[];
   audioTrack: string | null;
+  /**
+   * Text tracks as an engine names them, for those it adds to the video, whose own
+   * `label` it can't set. Empty when the video's list says all there is to know.
+   */
   textTracks: readonly MediaTrackInfo[];
-  textTrack: string | null;
   live: LiveState | null;
   timeline: Timeline;
   capabilities: Capabilities;
@@ -206,7 +210,10 @@ export interface CoreCommands {
   setAudioTrack(id: string): void;
   setTextTrack(id: string | null): void;
   setSource(source: SourceInput | null): void;
-  /** Loads the current source again, optionally resuming from `startTime`. */
+  /**
+   * Loads the current source again, optionally resuming from `startTime`. After a
+   * failure it picks up where that interrupted, and plays if the viewer was watching.
+   */
   reload(startTime?: number): void;
 }
 

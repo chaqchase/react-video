@@ -20,12 +20,14 @@ export interface AdHost {
   /** Pauses the content and locks seeking and rate, until `breakEnd`. */
   breakStart(): void;
   adStart(ad: AdInfo): void;
+  /** Reports a failure partway through a break. Ending the break is still the engine's job. */
+  error(error: unknown): void;
   /** Unlocks and resumes the content. */
   breakEnd(): void;
 }
 
 /**
- * A source of ads. The default is `ima()`, and `vast()` plays VAST tags with no SDK.
+ * A source of ads. `ima()` uses Google's SDK, and `vast()` plays VAST tags with none.
  * Anything an engine throws or rejects with means the content simply plays.
  */
 export interface AdEngine {
@@ -43,6 +45,8 @@ export interface AdEngine {
   play(): Promise<void> | void;
   pause(): void;
   skip(): void;
+  /** The viewer followed the ad's link. */
+  clicked?(): void;
   setVolume(volume: number, muted: boolean): void;
   /** The content ended, so any post-roll can play. */
   contentEnded?(): void;

@@ -71,7 +71,8 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 24px max(var(--rv-inset), env(safe-area-inset-right)) max(var(--rv-inset), env(safe-area-inset-bottom)) max(var(--rv-inset), env(safe-area-inset-left));
+    --rv-inset-scaled: calc(var(--rv-inset) * var(--rv-inset-scale, 1));
+    padding: 24px max(var(--rv-inset-scaled), env(safe-area-inset-right)) max(var(--rv-inset-scaled), env(safe-area-inset-bottom)) max(var(--rv-inset-scaled), env(safe-area-inset-left));
     background: linear-gradient(to top, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0));
     transition:
       opacity var(--rv-duration-in) var(--rv-ease),
@@ -99,14 +100,24 @@
   }
 
   .rv-root [data-part="control-group"] {
+    position: relative;
     display: flex;
     align-items: center;
     min-width: 0;
-    height: calc(var(--rv-control-size) + 4px);
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1) + 4px);
     padding: 2px;
     border-radius: var(--rv-pill-radius);
     background: var(--rv-glass);
     box-shadow: inset 0 0 0 0.5px var(--rv-glass-border), 0 1px 12px rgb(0 0 0 / 0.14);
+  }
+
+  /* On a layer of its own, because blur on the group would stop a menu inside it blurring the video. */
+  .rv-root [data-part="control-group"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
     -webkit-backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
     backdrop-filter: blur(var(--rv-blur)) saturate(1.7);
   }
@@ -121,8 +132,8 @@
     display: inline-grid;
     place-items: center;
     flex: none;
-    width: var(--rv-control-size);
-    height: var(--rv-control-size);
+    width: calc(var(--rv-control-size) * var(--rv-scale, 1));
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1));
     margin: 0;
     padding: 0;
     border: 0;
@@ -130,7 +141,7 @@
     background: transparent;
     color: inherit;
     font: inherit;
-    font-size: var(--rv-icon-size);
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1));
     cursor: pointer;
     transition:
       background-color var(--rv-duration-in) var(--rv-ease),
@@ -192,7 +203,7 @@
 
     .rv-root [data-part="control-group"]:first-child > [data-control]:first-child::after,
     .rv-root [data-part="volume"] [data-control]::after {
-      inset-inline-start: 0;
+      inset-inline: 0 auto;
       transform: translate(0, 4px);
     }
 
@@ -272,17 +283,6 @@
   }
 
   /* Sliders share a real input for focus and assistive tech. */
-  .rv-root [data-part="timeline-input"],
-  .rv-root [data-part="volume-input"] {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-
   /* Timeline */
   .rv-root [data-part="timeline"] {
     position: relative;
@@ -430,7 +430,7 @@
     flex: none;
     overflow: hidden;
     width: 0;
-    height: var(--rv-control-size);
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1));
     touch-action: none;
     cursor: pointer;
     opacity: 0;
@@ -620,12 +620,23 @@
     position: absolute;
     top: 50%;
     left: 22%;
+    display: grid;
+    place-items: center;
     width: 120px;
     height: 120px;
     margin: -60px 0 0 -60px;
+    color: #fff;
+    font: 600 15px/1 var(--rv-font);
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+  }
+
+  .rv-root [data-part="seek-feedback"] > span::before {
+    content: "";
+    position: absolute;
+    inset: 0;
     border-radius: 50%;
     background: rgb(255 255 255 / 0.2);
-    opacity: 0;
   }
 
   .rv-root [data-part="seek-feedback"][data-direction="forward"] > span {
@@ -633,7 +644,22 @@
   }
 
   .rv-root [data-part="seek-feedback"][data-active] > span {
-    animation: rv-ripple 480ms var(--rv-ease);
+    animation: rv-seek-label 560ms var(--rv-ease);
+  }
+
+  .rv-root [data-part="seek-feedback"][data-active] > span::before {
+    animation: rv-ripple 560ms var(--rv-ease);
+  }
+
+  @keyframes rv-seek-label {
+    from,
+    60% {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
   }
 
   @keyframes rv-ripple {
@@ -651,12 +677,11 @@
   /* Menu */
   .rv-root [data-part="menu-content"] {
     position: absolute;
-    right: max(var(--rv-inset), env(safe-area-inset-right));
-    bottom: calc(100% - 16px);
+    inset-inline-end: max(var(--rv-inset), env(safe-area-inset-right));
+    bottom: calc(100% + 8px);
     z-index: 4;
     overflow: hidden;
     width: 240px;
-    max-height: min(320px, 76cqh);
     border-radius: var(--rv-menu-radius);
     background: var(--rv-glass-strong);
     box-shadow: inset 0 0 0 0.5px var(--rv-glass-border), 0 12px 40px rgb(0 0 0 / 0.36);
@@ -668,6 +693,14 @@
       opacity 220ms var(--rv-ease),
       transform 220ms var(--rv-ease),
       height 220ms var(--rv-ease);
+  }
+
+  .rv-root[dir="rtl"] [data-part="menu-content"] {
+    transform-origin: bottom left;
+  }
+
+  .rv-root [data-part="control-group"] [data-part="menu-content"] {
+    inset-inline-end: 0;
   }
 
   @starting-style {
@@ -691,7 +724,10 @@
   .rv-root [data-part="menu-panel"] {
     position: absolute;
     inset: 0 0 auto;
-    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    /* The menu measures the room it has, since the player clips whatever passes its edge. */
+    max-height: min(320px, var(--rv-menu-room, 320px));
     visibility: hidden;
     opacity: 0;
     transform: translateX(16px);
@@ -710,6 +746,15 @@
     opacity: 1;
     transform: none;
     transition-delay: 0s;
+  }
+
+  /* Scrolls apart from the back row, which stays in reach above it. */
+  .rv-root [data-part="menu-list"] {
+    min-height: 0;
+    padding: 6px;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
 
   .rv-root [data-part="menu-item"],
@@ -754,7 +799,8 @@
   }
 
   .rv-root [data-part="menu-back"] {
-    margin-bottom: 4px;
+    flex: none;
+    margin: 6px 6px 0;
     font-weight: 600;
   }
 
@@ -805,7 +851,7 @@
     transition: transform var(--rv-duration-out) var(--rv-ease);
   }
 
-  .rv-root[data-controls="shown"] [data-part="captions"] {
+  .rv-root:not([data-controls="hidden"]) [data-part="captions"] {
     transform: translateY(calc(-1 * var(--rv-control-size) - 34px));
   }
 
@@ -815,6 +861,8 @@
     background: var(--rv-caption-background, rgb(0 0 0 / 0.72));
     color: var(--rv-caption-color, #fff);
     font: 500 var(--rv-caption-size, clamp(13px, 2.6cqw, 28px)) / 1.3 var(--rv-font);
+    /* Each line sets its own direction, so RTL punctuation lands on the correct side. */
+    unicode-bidi: plaintext;
     white-space: pre-line;
   }
 
@@ -1080,46 +1128,55 @@
   }
 
   /* Small players drop the slider and shrink. */
+  /* These scale the tokens rather than redeclare them, which would beat a consumer's value. */
   @container rv (max-width: 479px) {
-    [data-part="control-group"] {
-      --rv-control-size: 32px;
-      --rv-icon-size: 18px;
+    .rv-root [data-part="control-group"] {
+      --rv-scale: 0.889;
     }
 
-    [data-part="volume-slider"],
-    [data-part="time-separator"],
-    [data-part="duration"] {
+    .rv-root [data-part="volume-slider"],
+    .rv-root [data-part="time-separator"],
+    .rv-root [data-part="duration"] {
       display: none;
     }
 
-    [data-part="controls"] {
-      --rv-inset: 8px;
+    .rv-root [data-part="controls"] {
+      --rv-inset-scale: 0.667;
     }
 
-    [data-part="play-overlay"] {
+    .rv-root [data-part="play-overlay"],
+    .rv-root [data-part="buffering"] {
       width: 56px;
       height: 56px;
       margin: -28px 0 0 -28px;
       font-size: 24px;
     }
 
-    /* The menu becomes a bottom sheet. */
-    [data-part="menu-content"] {
-      right: 8px;
-      left: 8px;
-      bottom: 8px;
+    /* The menu becomes a bottom sheet, placed against the controls instead of its group. */
+    .rv-root [data-part="control-group"]:has([data-part="menu-content"]) {
+      position: static;
+    }
+
+    .rv-root [data-part="control-group"]:has([data-part="menu-content"])::before {
+      display: none;
+    }
+
+    .rv-root [data-part="menu-content"],
+    .rv-root[dir="rtl"] [data-part="menu-content"],
+    .rv-root [data-part="control-group"] [data-part="menu-content"] {
+      inset-inline: 8px;
+      bottom: max(8px, env(safe-area-inset-bottom));
       width: auto;
       transform-origin: bottom center;
     }
   }
 
   @container rv (min-width: 840px) {
-    [data-part="control-group"] {
-      --rv-control-size: 40px;
-      --rv-icon-size: 22px;
+    .rv-root [data-part="control-group"] {
+      --rv-scale: 1.111;
     }
 
-    [data-part="time"] {
+    .rv-root [data-part="time"] {
       font-size: 14px;
     }
   }
@@ -1150,7 +1207,7 @@
       animation-duration: 2.400s;
     }
 
-    .rv-root [data-part="seek-feedback"][data-active] > span {
+    .rv-root [data-part="seek-feedback"][data-active] > span::before {
       animation-name: rv-fade;
     }
   }
