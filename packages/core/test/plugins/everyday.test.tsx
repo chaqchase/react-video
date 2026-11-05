@@ -1664,6 +1664,6 @@ describe("analytics", () => {
     expect(types()).not.toContain("pause");
     player.commands.setSource("/broken.mp4");
     await settle();
-    expect(events.find(({ type }) => type === "error")?.error?.code).toBe(4);
+    expect(events.find(({ type }) => type === "error")?.error?.code).toBe("media-unsupported");
   });
 });

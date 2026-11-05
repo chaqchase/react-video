@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { VideoKitError } from "../core/kit-error";
 import type {
   AnyPluginFactory,
   CommandsOf,
@@ -81,7 +82,8 @@ export function useVideoState(
   const player = usePlayer();
   const name = "pluginName" in first ? first.pluginName : null;
   if (name && !player.has(name)) {
-    throw new Error(
+    throw new VideoKitError(
+      "plugin-not-installed",
       `react-video-kit: plugin "${name}" isn't installed. Add ${name}() to the plugins prop.`
     );
   }

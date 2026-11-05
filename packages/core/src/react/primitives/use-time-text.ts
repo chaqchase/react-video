@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, type HTMLAttributes } from "react";
+import { useCallback, useEffect, useRef, type HTMLAttributes } from "react";
 import { usePlayer } from "../context";
 import { useClock } from "../hooks";
 
@@ -21,5 +21,15 @@ export function useTimeText(format: (time: number, duration: number) => string) 
     [format, player]
   );
   useClock(write, everySecond);
+  // The clock is stopped until playback, and the duration usually arrives before that.
+  useEffect(() => {
+    let known = player.getState().media.duration;
+    return player.subscribe(() => {
+      const { duration } = player.getState().media;
+      if (duration === known) return;
+      known = duration;
+      player.clock.sync();
+    });
+  }, [player]);
   return element;
 }

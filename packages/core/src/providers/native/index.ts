@@ -1,6 +1,9 @@
+import { VideoKitError } from "../../core/kit-error";
 import type {
   Capabilities,
+  KnownVideoErrorCode,
   LoadRequest,
+  MediaErrorInfo,
   MediaState,
   Provider,
   ProviderEntry,
@@ -12,12 +15,30 @@ import type { Scope } from "../../core/scope";
 const HLS_MIME = "application/vnd.apple.mpegurl";
 const DASH_MIME = "application/dash+xml";
 
-const MEDIA_ERROR_MESSAGES: Record<number, string> = {
-  1: "Playback was aborted.",
-  2: "A network error stopped the download.",
-  3: "The media could not be decoded.",
-  4: "The source isn't supported.",
+const MEDIA_ERRORS: Record<number, [KnownVideoErrorCode, boolean, string]> = {
+  1: ["media-aborted", true, "Playback was aborted."],
+  2: ["media-network", true, "A network error stopped the download."],
+  3: ["media-decode", false, "The media could not be decoded."],
+  4: ["media-unsupported", false, "The source isn't supported."],
+  // Only some browsers and engines still use this one.
+  5: ["drm-session", false, "The media is encrypted and could not be decrypted."],
 };
+
+/** Describes a `MediaError`. Engines hand on the same numbers from the element. */
+export function mediaErrorInfo(
+  nativeCode: number,
+  message: string | undefined,
+  cause: unknown
+): MediaErrorInfo {
+  // A download that fails before any data arrives reads as an unsupported source.
+  const offline = nativeCode === 4 && typeof navigator !== "undefined" && navigator.onLine === false;
+  const [code, retryable, fallback] = MEDIA_ERRORS[offline ? 2 : nativeCode] ?? [
+    "media-unknown",
+    false,
+    "The source could not be played.",
+  ];
+  return { code, message: message || fallback, fatal: true, retryable, nativeCode, cause };
+}
 
 function typeOf(source: SourceObject) {
   if (source.type) return source.type;
@@ -43,7 +64,7 @@ export class NativeProvider implements Provider {
   }
 
   attach(element: HTMLVideoElement | null, sink: Sink, scope: Scope) {
-    if (!element) throw new Error("NativeProvider needs a media element.");
+    if (!element) throw new VideoKitError("provider-no-element", "react-video-kit: NativeProvider needs a media element.");
     this.element = element;
     this.sink = sink;
 
@@ -86,23 +107,15 @@ export class NativeProvider implements Provider {
     });
     on("error", () => {
       if (this.ignoreElementErrors) return;
-      const error = element.error;
-      sink.error({
-        code: error?.code ?? "unknown",
-        message:
-          error?.message ||
-          MEDIA_ERROR_MESSAGES[error?.code ?? 0] ||
-          "The source could not be played.",
-        fatal: true,
-        source: this.source ?? undefined,
-      });
+      const { error } = element;
+      sink.error(mediaErrorInfo(error?.code ?? 0, error?.message, error));
     });
 
     this.baseCapabilities = this.capabilities(element);
     sink.update({ ...this.snapshot(), capabilities: this.baseCapabilities });
   }
 
-  async load(request: LoadRequest, _signal?: AbortSignal) {
+  async load(request: LoadRequest, signal?: AbortSignal) {
     const element = this.element;
     if (!element) return;
     this.source = request.source;
@@ -113,7 +126,8 @@ export class NativeProvider implements Provider {
         () => {
           element.currentTime = startTime;
         },
-        { once: true }
+        // The next source mustn't jump to this one's position.
+        { once: true, signal }
       );
     }
     element.src = request.source.src;

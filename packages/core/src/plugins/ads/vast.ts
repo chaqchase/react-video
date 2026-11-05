@@ -1,3 +1,4 @@
+import { VideoKitError } from "../../core/kit-error";
 import type { AdEngine, AdHost, AdInfo } from "./engine";
 
 export interface VastOptions {
@@ -63,7 +64,11 @@ function pickMedia(linear: Element) {
 
 async function loadAds(url: string, redirects: number, signal: AbortSignal, inherited?: VastAd) {
   const response = await fetch(url, { signal });
-  if (!response.ok) throw new Error(`VAST tag returned ${response.status}.`);
+  if (!response.ok) {
+    throw new VideoKitError("ads-request", `VAST tag returned ${response.status}.`, {
+      nativeCode: response.status,
+    });
+  }
   const document_ = new DOMParser().parseFromString(await response.text(), "text/xml");
   const ads: VastAd[] = [];
 
@@ -155,6 +160,8 @@ export function vast(options: VastOptions) {
         };
         finish = () => {
           ping(ad.tracking.get("skip"));
+          // Silent from this moment, not whenever the next ad or the content loads.
+          video.pause();
           done();
         };
         video.addEventListener(
@@ -238,7 +245,10 @@ export function vast(options: VastOptions) {
             if (controller.signal.aborted) return;
           }
           video.hidden = true;
+          video.pause();
           video.removeAttribute("src");
+          // Without this the element keeps its media, and can be heard after the ad is gone.
+          video.load();
           active.breakEnd();
         };
         void run();
@@ -263,6 +273,7 @@ export function vast(options: VastOptions) {
       destroy() {
         controller.abort();
         finish = () => {};
+        element?.pause();
         element?.remove();
         host?.container.remove();
         element = null;

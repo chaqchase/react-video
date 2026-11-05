@@ -6,6 +6,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
+  useSyncExternalStore,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
@@ -14,12 +15,15 @@ import { sourceKey } from "../core/source";
 import type {
   AnyPlugin,
   LoadStrategy,
+  MediaErrorInfo,
   Player,
+  PlayerState,
   SourceInput,
 } from "../core/types";
 import { PlayerContext } from "./context";
 
-export interface RootProps extends HTMLAttributes<HTMLDivElement> {
+export interface RootProps extends Omit<HTMLAttributes<HTMLDivElement>, "onError"> {
+  /** The video to play, which loads afresh when its value changes. */
   src?: SourceInput | null;
   /** Set once. Define the array outside the component or memoize it. */
   plugins?: readonly AnyPlugin[];
@@ -27,16 +31,27 @@ export interface RootProps extends HTMLAttributes<HTMLDivElement> {
   load?: LoadStrategy;
   /** Bring your own player instead of creating one. */
   player?: Player;
+  /** Called with every error, fatal or not, for logging. It can change between renders. */
+  onError?: (error: MediaErrorInfo) => void;
+  /** Content rendered inside the player's root element. */
   children?: ReactNode;
 }
 
+const nameOf = (state: PlayerState) =>
+  (state.i18n as { strings?: { player?: string } } | undefined)?.strings?.player ?? "Video player";
+
 /** Provides the player to its parts. Never re-renders because of playback. */
 export const Root = forwardRef<Player, RootProps>(function Root(
-  { src, plugins, load, player: externalPlayer, children, ...props },
+  { src, plugins, load, player: externalPlayer, onError, children, "aria-label": label, ...props },
   ref
 ) {
   const [player] = useState(
     () => externalPlayer ?? createPlayer({ plugins, src, load })
+  );
+  const name = useSyncExternalStore(
+    player.subscribe,
+    () => nameOf(player.getState()),
+    () => nameOf(player.getInitialState())
   );
   const element = useRef<HTMLDivElement>(null);
   // Fixed after the first render, so React never overwrites what the
@@ -49,8 +64,15 @@ export const Root = forwardRef<Player, RootProps>(function Root(
 
   useEffect(() => player.mount(element.current), [player]);
 
+  const errorHandler = useRef(onError);
+  useEffect(() => {
+    errorHandler.current = onError;
+  });
+  useEffect(() => player.onError((error) => errorHandler.current?.(error)), [player]);
+
   const key = sourceKey(src);
-  const appliedKey = useRef(key);
+  // A player from outside has its own source, which only a `src` given here replaces.
+  const appliedKey = useRef(externalPlayer ? sourceKey(null) : key);
   useEffect(() => {
     if (appliedKey.current === key) return;
     appliedKey.current = key;
@@ -80,7 +102,14 @@ export const Root = forwardRef<Player, RootProps>(function Root(
 
   return (
     <PlayerContext.Provider value={player}>
-      <div ref={element} data-part="root" {...initialAttributes} {...props}>
+      <div
+        ref={element}
+        data-part="root"
+        role="group"
+        aria-label={label ?? name}
+        {...initialAttributes}
+        {...props}
+      >
         {children}
       </div>
     </PlayerContext.Provider>

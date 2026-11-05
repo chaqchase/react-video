@@ -1,5 +1,6 @@
 import type { HlsConfig } from "hls.js";
 import type Hls from "hls.js";
+import { VideoKitError } from "../../core/kit-error";
 import { definePlugin } from "../../core/plugin";
 import type { SourceObject } from "../../core/types";
 
@@ -38,11 +39,19 @@ export const hls = definePlugin("hls", (options: HlsOptions = {}) => ({
         return hasMediaSource();
       },
       async load() {
-        const [{ createHlsProvider }, library] = await Promise.all([
-          import("./provider"),
-          options.library?.() ?? import("hls.js"),
-        ]);
-        return createHlsProvider(library.default, options.config);
+        try {
+          const [{ createHlsProvider }, library] = await Promise.all([
+            import("./provider"),
+            options.library?.() ?? import("hls.js"),
+          ]);
+          return createHlsProvider(library.default, options.config);
+        } catch (cause) {
+          throw new VideoKitError(
+            "hls-engine-load",
+            `hls.js didn't load. Check that it's installed, or the library option. ${String(cause)}`,
+            { retryable: true, cause }
+          );
+        }
       },
     });
   },

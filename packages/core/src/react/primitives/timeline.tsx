@@ -28,6 +28,7 @@ export interface TimelineProps extends HTMLAttributes<HTMLDivElement> {
   step?: number;
   /** Seconds moved by Page Up and Page Down. */
   largeStep?: number;
+  /** Replaces the default track, thumb, and preview. */
   children?: ReactNode;
 }
 

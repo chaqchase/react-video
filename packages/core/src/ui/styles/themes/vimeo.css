@@ -1,0 +1,149 @@
+/*
+ * After Vimeo's player, measured from it: a black 56 by 32 play button, with one black bar
+ * beside it holding a 4px timeline and 24px buttons, 8px from the edges.
+ */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-vimeo {
+    --rv-accent: #00adef;
+    --rv-focus: #00adef;
+    --rv-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-glass-strong: rgb(0 0 0 / 0.9);
+    --rv-glass-hover: rgb(255 255 255 / 0.16);
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.4);
+    --rv-radius: 0;
+    --rv-pill-radius: 4px;
+    --rv-menu-radius: 4px;
+    --rv-control-size: 24px;
+    --rv-icon-size: 16px;
+    --rv-inset: 8px;
+    --rv-bar-track: 4px;
+    --rv-bar-track-active: 6px;
+  }
+
+  /* The button and the bar are the player's whole interface, so they're up before playback too. */
+  .rv-root.rv-theme-vimeo:not([data-started]) [data-part="controls"] {
+    --rv-shown: 1;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="play-overlay"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="controls"] {
+    --rv-scale: 1;
+    padding-block-end: calc(var(--rv-inset) + 4px);
+    padding-inline: var(--rv-inset) calc(var(--rv-inset) + 6px);
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="controls"]::before {
+    background: none;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.76), transparent 84px);
+  }
+
+  /* The bar itself, behind the buttons. It fades as they do. */
+  .rv-root.rv-theme-vimeo [data-part="controls"]::after {
+    position: absolute;
+    inset-inline: calc(var(--rv-inset) + 64px) var(--rv-inset);
+    inset-block-end: var(--rv-inset);
+    z-index: -1;
+    flex: none;
+    height: 32px;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 0.9);
+    opacity: var(--rv-shown, 1);
+    transition: opacity var(--rv-duration-fade) ease-in-out;
+  }
+
+  .rv-root.rv-theme-vimeo[data-status="error"] [data-part="controls"]::after {
+    display: none;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="timeline"] {
+    flex: 1 1 0;
+    order: 2;
+    min-width: 40px;
+    margin-inline: 20px 10px;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="transport"] [data-part="play-pause"] {
+    width: 56px;
+    height: 32px;
+    margin-block-end: -4px;
+    background: rgb(0 0 0 / 0.9);
+    font-size: 18px;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="current-time"] {
+    order: 3;
+    margin-inline: 0 6px;
+    font-size: 11px;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="remaining-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="volume-track"] {
+    border-radius: 100px;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="volume-fill"] {
+    background: var(--rv-accent);
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="timeline-preview"]:not(:has([data-part="thumbnail"][data-visible])) {
+    border-radius: 2px;
+    background: #fff;
+    color: #000;
+    font-size: 10px;
+  }
+
+  .rv-root.rv-theme-vimeo [data-part="captions-toggle"][aria-pressed="true"] {
+    background: transparent;
+    color: var(--rv-accent);
+  }
+
+  @container rv (max-width: 479px) {
+    .rv-root.rv-theme-vimeo [data-part="transport"] [data-part="play-pause"] {
+      width: 44px;
+    }
+
+    .rv-root.rv-theme-vimeo [data-part="controls"]::after {
+      inset-inline-start: calc(var(--rv-inset) + 52px);
+      background: #000;
+    }
+
+    .rv-root.rv-theme-vimeo [data-part="current-time"] {
+      display: none;
+    }
+
+    /* More buttons than fit go to a row above the bar rather than shrink below a usable size,
+       so each brings the bar's black with it. */
+    .rv-root.rv-theme-vimeo [data-part="controls"] {
+      flex-wrap: wrap-reverse;
+      align-content: flex-start;
+      align-items: flex-end;
+    }
+
+    .rv-root.rv-theme-vimeo [data-part="controls"] [data-control] {
+      background: #000;
+    }
+
+    .rv-root.rv-theme-vimeo [data-part="timeline"] {
+      height: 24px;
+      margin-inline: 14px 6px;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-vimeo [data-part="transport"] > [data-part="play-pause"]:hover {
+      background: var(--rv-accent);
+    }
+  }
+}

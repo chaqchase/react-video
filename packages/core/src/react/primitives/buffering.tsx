@@ -3,12 +3,15 @@
 import { forwardRef, useEffect, useRef, type HTMLAttributes } from "react";
 import type { MediaState } from "../../core/types";
 import { usePlayer } from "../context";
+import { useLabel } from "../hooks";
 import { mergeRefs } from "./as-child";
 
 /** Short stalls resolve on their own, so a spinner would only add flicker. */
 const SHOW_DELAY_MS = 400;
 /** Once shown, it stays long enough to read as deliberate. */
 const MIN_VISIBLE_MS = 300;
+/** Long enough that a screen reader isn't interrupted by every seek. */
+const ANNOUNCE_DELAY_MS = 2500;
 
 const isBuffering = ({ status, paused, waiting, seeking, scrubbing }: MediaState) =>
   status !== "error" &&
@@ -21,6 +24,7 @@ export const BufferingIndicator = forwardRef<HTMLDivElement, BufferingIndicatorP
   function BufferingIndicator(props, ref) {
     const player = usePlayer();
     const element = useRef<HTMLDivElement | null>(null);
+    const message = useLabel("buffering", "Buffering");
 
     useEffect(() => {
       const node = element.current;
@@ -28,6 +32,7 @@ export const BufferingIndicator = forwardRef<HTMLDivElement, BufferingIndicatorP
       let wanted = false;
       let shownAt = 0;
       let timer: ReturnType<typeof setTimeout> | undefined;
+      let announcement: ReturnType<typeof setTimeout> | undefined;
 
       const show = (visible: boolean) => {
         node.toggleAttribute("data-visible", visible);
@@ -38,6 +43,8 @@ export const BufferingIndicator = forwardRef<HTMLDivElement, BufferingIndicatorP
         if (next === wanted) return;
         wanted = next;
         clearTimeout(timer);
+        clearTimeout(announcement);
+        if (next) announcement = setTimeout(() => player.announce(message), ANNOUNCE_DELAY_MS);
         const visible = node.hasAttribute("data-visible");
         if (next && !visible) {
           timer = setTimeout(() => show(true), SHOW_DELAY_MS);
@@ -52,8 +59,9 @@ export const BufferingIndicator = forwardRef<HTMLDivElement, BufferingIndicatorP
       return () => {
         unsubscribe();
         clearTimeout(timer);
+        clearTimeout(announcement);
       };
-    }, [player]);
+    }, [player, message]);
 
     return (
       <div

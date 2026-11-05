@@ -1,0 +1,196 @@
+/*
+ * After Disney+: the title top left, a small transport centred right above a thin
+ * timeline, the two times under its ends, and the volume and fullscreen off to the side.
+ */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-disney {
+    --rv-accent: #4cc4ee;
+    --rv-focus: #fff;
+    --rv-font: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+    --rv-muted: rgb(255 255 255 / 0.72);
+    --rv-glass-strong: rgb(13 16 26 / 0.96);
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.32);
+    --rv-buffered: rgb(255 255 255 / 0.5);
+    --rv-radius: 0;
+    --rv-menu-radius: 4px;
+    --rv-control-size: 34px;
+    --rv-icon-size: 21px;
+    --rv-inset: 14px;
+    --rv-bar-track: 2px;
+    --rv-bar-track-active: 4px;
+    --rv-bar-play-order: 0;
+  }
+
+  .rv-root.rv-theme-disney [data-part="controls"] {
+    padding-block-end: 8px;
+  }
+
+  .rv-root.rv-theme-disney [data-part="controls"]::before,
+  .rv-root.rv-theme-disney [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.76), transparent 26%, transparent 66%, rgb(0 0 0 / 0.82));
+  }
+
+  /* First line: an empty start, then the buttons at the far end. */
+  .rv-root.rv-theme-disney [data-part="controls"]::after {
+    order: 1;
+  }
+
+  .rv-root.rv-theme-disney [data-position="details"] > [data-part="control-group"]:last-child > *,
+  .rv-root.rv-theme-disney [data-position="top"] > [data-part="control-group"]:last-child > :not([data-part="volume"]),
+  .rv-root.rv-theme-disney [data-position="top"] > [data-part="control-group"]:first-child > *,
+  .rv-root.rv-theme-disney [data-part="menu-trigger"] {
+    order: 2;
+  }
+
+  /* The volume and fullscreen sit together at the very end. */
+  .rv-root.rv-theme-disney [data-part="volume"] {
+    order: 3;
+  }
+
+  .rv-root.rv-theme-disney [data-position="top"] > [data-part="control-group"]:first-child > [data-part="fullscreen"] {
+    order: 4;
+  }
+
+  /* Second line: the timeline. Third: the time left, tiny, under its far end. */
+  .rv-root.rv-theme-disney [data-part="timeline"] {
+    order: 4;
+    height: 14px;
+  }
+
+  /* The play button sits just above the timeline, so its hit area stops at its own edge. */
+  .rv-root.rv-theme-disney [data-part="transport"] [data-control]::before {
+    height: 100%;
+  }
+
+  .rv-root.rv-theme-disney [data-part="remaining-time"] {
+    display: block;
+    order: 5;
+    margin: 0 0 0 auto;
+    color: var(--rv-muted);
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  /* There's no minus sign on it, and this hides it without touching the text. */
+  .rv-root.rv-theme-disney [data-part="remaining-time"]::first-letter {
+    font-size: 0;
+  }
+
+  .rv-root.rv-theme-disney [data-part="current-time"] {
+    display: none;
+  }
+
+  /* A box of its own, since the transport never mirrors. */
+  .rv-root.rv-theme-disney [data-part="transport"] {
+    position: static;
+    display: flex;
+    flex: none;
+    gap: 4px;
+    translate: none;
+  }
+
+  /* With room to spare it centres on the whole player, whatever sits beside it. */
+  @container rv (min-width: 720px) {
+    .rv-root.rv-theme-disney [data-part="transport"] {
+      position: absolute;
+      inset-inline: 0;
+      inset-block: auto calc(8px + 12px + 14px);
+      pointer-events: none;
+    }
+  }
+
+  /* More buttons take more room to centre without running into each other. */
+  @container rv (max-width: 1099px) {
+    .rv-root.rv-theme-disney:has([data-position="details"] > [data-part="control-group"]:last-child > :nth-child(3), [data-part="transport"] > :nth-child(4)) [data-part="transport"] {
+      position: static;
+    }
+  }
+
+  .rv-root.rv-theme-disney [data-part="transport"] > [data-part="seek-button"] {
+    display: inline-grid;
+  }
+
+  .rv-root.rv-theme-disney [data-part="transport"] [data-part="play-pause"] {
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1) * 1.2);
+  }
+
+  /* The title sits top left, large, with the episode under it. */
+  .rv-root.rv-theme-disney [data-part="title-text"] {
+    order: 0;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .rv-root.rv-theme-disney [data-part="title-eyebrow"] {
+    order: 1;
+    font-size: 12px;
+  }
+
+  .rv-root.rv-theme-disney [data-part="title-description"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-disney [data-part="title"] {
+    inset-inline: calc(var(--rv-inset-scaled) + 8px) calc(var(--rv-inset-scaled) + 48px);
+    gap: 1px;
+  }
+
+  .rv-root.rv-theme-disney [data-part="captions-toggle"] {
+    position: absolute;
+    inset-block-start: calc(var(--rv-inset-scaled) - 4px);
+    inset-inline-end: var(--rv-inset-scaled);
+  }
+
+  .rv-root.rv-theme-disney [data-part="captions-toggle"][aria-pressed="true"] {
+    background: transparent;
+    color: var(--rv-accent);
+  }
+
+  .rv-root.rv-theme-disney [data-part="timeline-thumb"] {
+    background: #fff;
+    opacity: var(--rv-shown, 1);
+    transform: scale(0.72);
+  }
+
+  /* This player has no large button, so the bar is up before playback and its play button does the job. */
+  .rv-root.rv-theme-disney [data-part="play-overlay"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-disney:not([data-started]) [data-part="controls"] {
+    --rv-shown: 1;
+  }
+
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-disney [data-part="control-group"] [data-part="menu-content"] {
+      bottom: calc(var(--rv-bar) + 44px);
+    }
+  }
+
+  @container rv (max-width: 479px) {
+    /* The controls sit higher at this size, so the shade has to start higher too. */
+    .rv-root.rv-theme-disney [data-part="controls"]::before,
+    .rv-root.rv-theme-disney [data-part="controls"]:has([data-part="title"])::before {
+      background: linear-gradient(rgb(0 0 0 / 0.7), transparent 24%, transparent 34%, rgb(0 0 0 / 0.82));
+    }
+
+    .rv-root.rv-theme-disney [data-part="transport"] > [data-part="seek-button"] {
+      display: none;
+    }
+
+    .rv-root.rv-theme-disney [data-part="remaining-time"] {
+      display: block;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-disney [data-control]:hover,
+    .rv-root.rv-theme-disney [data-part="transport"] > [data-control]:hover {
+      transform: scale(1.12);
+    }
+  }
+}

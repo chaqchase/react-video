@@ -21,7 +21,14 @@ const DVR_MIN_SECONDS = 60;
 export const live = definePlugin("live", (options: LiveOptions = {}) => {
   const { edgeTolerance = 6 } = options;
   return {
-    state: () => ({ active: false, dvr: false, atEdge: true }),
+    state: () => ({
+      /** True while the current source is live. */
+      active: false,
+      /** True when the viewer can seek back through a window of the stream. */
+      dvr: false,
+      /** True within `edgeTolerance` seconds of the live edge, and when the source isn't live. */
+      atEdge: true,
+    }),
     attrs: {
       "data-live": (state) => state.active,
       "data-dvr": (state) => state.active && state.dvr,

@@ -28,6 +28,8 @@ let lastUsed: Player | null = null;
 const isTyping = (target: EventTarget | null) => {
   const element = target as HTMLElement | null;
   if (!element?.closest) return false;
+  // A panel over the picture has its own keys, such as arrows to move through its contents.
+  if (element.closest('[data-part="panel"]')) return true;
   const field = element.closest<HTMLInputElement>(
     'input, textarea, select, [contenteditable=""], [contenteditable="true"]'
   );
@@ -57,6 +59,35 @@ const slides = (target: EventTarget | null, key: string) =>
 
 type FeedbackListener = (message: string) => void;
 
+export interface HotkeyBinding {
+  /** What the keys do, such as `seekBack`, or the name given to `bind`. */
+  id: string;
+  /** The keys, as `KeyboardEvent.key` values. */
+  keys: readonly string[];
+  /** How far the keys seek, in seconds. */
+  seconds?: number;
+}
+
+/** What each key does, with the plugin it needs, if any. */
+const BINDINGS: readonly (readonly [id: string, keys: readonly string[], plugin?: string])[] = [
+  ["playPause", [" ", "k"]],
+  ["seekBack", ["ArrowLeft"]],
+  ["seekForward", ["ArrowRight"]],
+  ["seekBackLarge", ["j"]],
+  ["seekForwardLarge", ["l"]],
+  ["volumeUp", ["ArrowUp"]],
+  ["volumeDown", ["ArrowDown"]],
+  ["mute", ["m"]],
+  ["fullscreen", ["f"], "fullscreen"],
+  ["pip", ["p"], "pip"],
+  ["captions", ["c"], "captions"],
+  ["faster", [">"], "speed"],
+  ["slower", ["<"], "speed"],
+  ["start", ["Home"]],
+  ["end", ["End"]],
+  ["jump", ["0", "9"]],
+];
+
 /**
  * Keyboard shortcuts. They work while focus is inside a player, and afterwards for
  * the player last used, until the viewer clicks somewhere else on the page.
@@ -64,9 +95,32 @@ type FeedbackListener = (message: string) => void;
 export const hotkeys = definePlugin("hotkeys", (options: HotkeysOptions = {}) => {
   const { seekStep = 5, largeSeekStep = 10, volumeStep = 0.05 } = options;
   const listeners = new Set<FeedbackListener>();
+  const added = new Map<string, { id: string; action: () => void }>();
 
   return {
-    commands: () => ({
+    commands: (context) => ({
+      /** The shortcuts this player responds to, given which plugins are installed. */
+      bindings(): readonly HotkeyBinding[] {
+        const seconds: Record<string, number> = {
+          seekBack: seekStep,
+          seekForward: seekStep,
+          seekBackLarge: largeSeekStep,
+          seekForwardLarge: largeSeekStep,
+        };
+        return [
+          ...BINDINGS.filter(([, , plugin]) => !plugin || context.player.has(plugin)).map(
+            ([id, keys]) => ({ id, keys, seconds: seconds[id] })
+          ),
+          ...[...added].map(([key, { id }]) => ({ id, keys: [key] })),
+        ];
+      },
+      /** Adds a shortcut, under the same rules as the built-in ones. Returns a function that removes it. */
+      bind(key: string, id: string, action: () => void) {
+        added.set(key, { id, action });
+        return () => {
+          added.delete(key);
+        };
+      },
       /** Listens for the message each shortcut shows. */
       onFeedback(listener: FeedbackListener) {
         listeners.add(listener);
@@ -167,7 +221,7 @@ export const hotkeys = definePlugin("hotkeys", (options: HotkeysOptions = {}) =>
           context.find<typeof idle>("idle")?.commands.show();
           return;
         }
-        const action = actions[key] ?? actions[key.toLowerCase()];
+        const action = added.get(key)?.action ?? actions[key] ?? actions[key.toLowerCase()];
         if (!action) return;
         event.preventDefault();
         action();
@@ -189,7 +243,8 @@ export function HotkeysFeedback() {
     if (!node) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const stop = player.plugin(hotkeys).commands.onFeedback((message) => {
-      node.textContent = message;
+      // Screen readers stay silent when the text doesn't change, as with two seeks in a row.
+      node.textContent = node.textContent === message ? `${message}\u00a0` : message;
       node.setAttribute("data-visible", "");
       clearTimeout(timer);
       timer = setTimeout(() => node.removeAttribute("data-visible"), FEEDBACK_MS);

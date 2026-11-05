@@ -12,9 +12,13 @@ import { MenuSub } from "../../react/primitives/menu-sub";
 import { CaptionsIcon } from "../../ui/icons";
 
 export interface CaptionTrack {
+  /** URL of the track's WebVTT file. */
   src: string;
+  /** The track's language tag, such as `en`. */
   language: string;
+  /** The track's name in the captions menu. */
   label: string;
+  /** The kind of track to create, `subtitles` unless set. */
   kind?: "captions" | "subtitles";
 }
 
@@ -97,7 +101,9 @@ export const captions = definePlugin("captions", (options: CaptionsOptions = {})
 
   return {
     state: () => ({
+      /** The caption and subtitle tracks on the video, from any source. */
       tracks: [] as readonly MediaTrackInfo[],
+      /** The id of the track showing, or null when captions are off. */
       active: null as string | null,
       /** The language the viewer wants, which may not have a track yet. */
       language: options.language ?? null,
@@ -125,7 +131,9 @@ export const captions = definePlugin("captions", (options: CaptionsOptions = {})
         apply(id);
       };
       return {
+        /** Shows the track with this id, or turns captions off with null. */
         select,
+        /** Turns captions off, or back on with the last track used or else the first. */
         toggle() {
           const { active, tracks } = context.state();
           if (active !== null) select(null);
@@ -140,6 +148,7 @@ export const captions = definePlugin("captions", (options: CaptionsOptions = {})
             if (match) apply(match.id);
           }
         },
+        /** Calls `listener` with the cues as they change, and returns a function that stops it. */
         onCues(listener: CueListener) {
           listeners.add(listener);
           return () => {

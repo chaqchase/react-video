@@ -4,9 +4,11 @@ import { forwardRef, type HTMLAttributes } from "react";
 import { useItemHandlers, useMenu } from "./menu-context";
 
 export interface MenuItemProps extends Omit<HTMLAttributes<HTMLDivElement>, "onSelect"> {
+  /** Stops the item being chosen or reached with the keyboard. */
   disabled?: boolean;
   /** Runs when chosen. The menu closes afterwards unless `keepOpen` is set. */
   onSelect?(): void;
+  /** Leaves the menu open after the item is chosen. */
   keepOpen?: boolean;
 }
 

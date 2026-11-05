@@ -6,7 +6,7 @@ import { mergeRefs } from "./as-child";
 import { useTimeText, type TimeProps } from "./use-time-text";
 
 const formatRemaining = (time: number, duration: number) =>
-  `-${formatTime(Math.max(duration - time, 0), duration)}`;
+  `−${formatTime(Math.max(duration - time, 0), duration)}`;
 
 export type RemainingTimeProps = TimeProps;
 
@@ -16,7 +16,7 @@ export const RemainingTime = forwardRef<HTMLSpanElement, RemainingTimeProps>(
     const element = useTimeText(formatRemaining);
     return (
       <span ref={mergeRefs(element, ref)} data-part="remaining-time" {...props}>
-        -0:00
+        −0:00
       </span>
     );
   }

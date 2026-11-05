@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { VideoKitError } from "../core/kit-error";
 import type { AnyPluginFactory, Player } from "../core/types";
 import { usePlayer } from "../react/context";
 import { useCommands, useCurrentTime, useVideoState } from "../react/hooks";
@@ -41,7 +42,7 @@ export function useVideoContext() {
     (name: string) => {
       const handle = pluginOf(player, name);
       if (!handle) {
-        throw new Error(`react-video-kit: add the ${name} plugin to use this action.`);
+        throw new VideoKitError("plugin-not-installed", `react-video-kit: add the ${name} plugin to use this action.`);
       }
       void (handle.commands as TogglePlugin).toggle();
     },

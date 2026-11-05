@@ -1,3 +1,4 @@
+import { VideoKitError } from "./kit-error";
 import type {
   AnyPlugin,
   PluginFactory,
@@ -37,11 +38,11 @@ export function sortPlugins(instances: readonly AnyPlugin[]): ResolvedPlugin[] {
   const byName = new Map<string, ResolvedPlugin>();
   const plugins = instances.map(({ name, create }) => {
     if (byName.has(name)) {
-      throw new Error(`react-video-kit: plugin "${name}" is installed twice.`);
+      throw new VideoKitError("plugin-duplicate", `react-video-kit: plugin "${name}" is installed twice.`);
     }
     // Props crossing into an island or a client component lose their functions.
     if (typeof create !== "function") {
-      throw new Error(`react-video-kit: plugin "${name}" has no code. Create plugins on the client.`);
+      throw new VideoKitError("plugin-no-code", `react-video-kit: plugin "${name}" has no code. Create plugins on the client.`);
     }
     const plugin = { name, spec: create() };
     byName.set(name, plugin);
@@ -56,14 +57,15 @@ export function sortPlugins(instances: readonly AnyPlugin[]): ResolvedPlugin[] {
     if (visited.has(plugin.name)) return;
     if (visiting.includes(plugin.name)) {
       const cycle = [...visiting, plugin.name].join(" -> ");
-      throw new Error(`react-video-kit: plugin dependency cycle: ${cycle}.`);
+      throw new VideoKitError("plugin-cycle", `react-video-kit: plugin dependency cycle: ${cycle}.`);
     }
     visiting.push(plugin.name);
 
     for (const required of plugin.spec.requires ?? []) {
       const dependency = byName.get(required);
       if (!dependency) {
-        throw new Error(
+        throw new VideoKitError(
+          "plugin-missing",
           `react-video-kit: plugin "${plugin.name}" requires "${required}", which isn't installed.`
         );
       }

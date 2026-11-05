@@ -1,15 +1,18 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useEffect } from "react";
 import { definePlugin } from "../../core/plugin";
 import type { Scope } from "../../core/scope";
 import type {
+  KnownVideoErrorCode,
   LoadRequest,
+  MediaErrorInfo,
   MediaState,
   Provider,
   Sink,
   SourceObject,
 } from "../../core/types";
+import { usePlayer } from "../../react/context";
 import { useCommands, useLabel, useVideoState } from "../../react/hooks";
 import { Button, type ButtonProps } from "../../react/primitives/button";
 import { CastIcon } from "../../ui/icons";
@@ -78,7 +81,7 @@ const castGlobals = () => globalThis as unknown as CastGlobals;
  * Resolves when the SDK has loaded. Browsers without Cast support never resolve it,
  * and only Chromium's are worth the request.
  */
-function loadSdk(url: string, signal: AbortSignal) {
+function loadSdk(url: string, signal: AbortSignal, onFail: () => void) {
   return new Promise<void>((resolve) => {
     const globals = castGlobals();
     if (globals.cast?.framework) {
@@ -95,10 +98,21 @@ function loadSdk(url: string, signal: AbortSignal) {
       const script = document.createElement("script");
       script.src = url;
       script.async = true;
+      script.addEventListener("error", onFail, { signal });
       document.head.append(script);
     }
   });
 }
+
+/** Viewers carry on watching here when casting fails, so none of this is fatal. */
+const castError = (code: KnownVideoErrorCode, message: string, nativeCode?: unknown): MediaErrorInfo => ({
+  code,
+  message: nativeCode ? `${message} ${String(nativeCode)}` : message,
+  fatal: false,
+  retryable: false,
+  nativeCode: typeof nativeCode === "string" ? nativeCode : undefined,
+  cause: nativeCode,
+});
 
 const typeFor = ({ src, type }: SourceObject) => {
   if (type) return type;
@@ -221,18 +235,26 @@ export const chromecast = definePlugin("chromecast", (options: ChromecastOptions
 
   return {
     state: () => ({
+      /** True when the Cast SDK reports a device to cast to. */
       available: false,
+      /** True while playback is on a Cast receiver. */
       active: false,
+      /** The name of the receiver in use, or null if there's none or it has no name. */
       device: null as string | null,
     }),
     attrs: { "data-casting": (state) => state.active },
-    commands: () => ({
-      /** Opens the device picker. Must run from a click or key press. */
+    commands: (context) => ({
+      /** Opens the device picker, or ends the session if one is running. Must run from a click or key press. */
       toggle() {
-        const context = castGlobals().cast?.framework.CastContext.getInstance();
-        const current = context?.getCurrentSession();
+        const cast = castGlobals().cast?.framework.CastContext.getInstance();
+        const current = cast?.getCurrentSession();
         if (current) current.endSession(true);
-        else context?.requestSession().catch(() => {});
+        else {
+          cast?.requestSession().catch((error: unknown) => {
+            // The Cast SDK rejects with this when the viewer closes the picker.
+            if (error !== "cancel") context.error(castError("cast-session", "Casting didn't start.", error));
+          });
+        }
       },
     }),
     setup(context, scope) {
@@ -248,7 +270,8 @@ export const chromecast = definePlugin("chromecast", (options: ChromecastOptions
         release = context.pushProvider(provider);
         context.set({ active: true, device: current.getCastDevice().friendlyName ?? null });
         if (source) {
-          provider.load({ source, startTime }).catch(() => {
+          provider.load({ source, startTime }).catch((error: unknown) => {
+            context.error(castError("cast-load", "The receiver couldn't load the video.", error));
             context.player.plugin(chromecast).commands.toggle();
           });
         }
@@ -266,7 +289,9 @@ export const chromecast = definePlugin("chromecast", (options: ChromecastOptions
       };
       scope.add(stop);
 
-      void loadSdk(options.sdkUrl ?? SDK_URL, scope.signal).then(() => {
+      void loadSdk(options.sdkUrl ?? SDK_URL, scope.signal, () => {
+        context.error(castError("cast-sdk", "The Cast SDK didn't load."));
+      }).then(() => {
         if (scope.signal.aborted) return;
         const { cast, chrome } = castGlobals();
         const { CastContext, CastContextEventType, CastState, SessionState } = cast.framework;
@@ -309,11 +334,13 @@ export const chromecast = definePlugin("chromecast", (options: ChromecastOptions
         const current = session;
         const provider = new CastProvider(current, titleOf(request.source));
         release = context.pushProvider(provider);
-        void provider.load(request).catch(() => {});
+        void provider.load(request).catch((error: unknown) => {
+          context.error(castError("cast-load", "The receiver couldn't load the video.", error));
+        });
         return next(request);
       },
     },
-    slots: { "controls-end": CastButton, overlay: CastingOverlay },
+    slots: { "top-start": CastButton, overlay: CastingOverlay },
   };
 });
 
@@ -352,13 +379,18 @@ export function CastingOverlay() {
   const active = useVideoState(chromecast, (state) => state.active);
   const device = useVideoState(chromecast, (state) => state.device);
   const castingTo = useLabel("castingTo", "Casting to");
+  const player = usePlayer();
+  const message = `${castingTo} ${device ?? "Chromecast"}`;
+
+  useEffect(() => {
+    if (active) player.announce(message);
+  }, [active, message, player]);
+
   if (!active) return null;
   return (
-    <div data-part="casting" role="status">
+    <div data-part="casting">
       <CastIcon />
-      <p>
-        {castingTo} {device ?? "Chromecast"}
-      </p>
+      <p>{message}</p>
     </div>
   );
 }

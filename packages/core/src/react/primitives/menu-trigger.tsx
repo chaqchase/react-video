@@ -13,6 +13,7 @@ export const MenuTrigger = forwardRef<HTMLButtonElement, MenuTriggerProps>(
     return (
       <Button
         ref={mergeRefs(menu.trigger.set, ref)}
+        id={`${menu.id}-trigger`}
         data-part="menu-trigger"
         data-state={menu.open ? "open" : "closed"}
         aria-haspopup="menu"

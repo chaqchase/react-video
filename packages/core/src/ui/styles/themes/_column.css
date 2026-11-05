@@ -1,0 +1,253 @@
+/*
+ * Made for vertical video, as the short-video apps are: a column of bare icons down one
+ * side, the name over a shade in the other corner, and a timeline along the very edge.
+ * The build swaps `rv-theme-bar` for each theme's own class.
+ */
+@layer rv {
+  .rv-root.rv-theme-bar {
+    --rv-glass: transparent;
+    --rv-glass-filter: none;
+    --rv-rim: none;
+    --rv-accent: #fff;
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.3);
+    --rv-inset: 12px;
+  }
+
+  .rv-root.rv-theme-bar [data-part="controls"] {
+    align-items: flex-end;
+    gap: 10px;
+    padding-block-end: calc(var(--rv-inset-scaled) + 10px);
+  }
+
+  .rv-root.rv-theme-bar [data-part="controls"]::before,
+  .rv-root.rv-theme-bar [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(transparent 34%, rgb(0 0 0 / 0.66));
+  }
+
+  /* Both rows stack into a single column of round buttons on one side. */
+  .rv-root.rv-theme-bar :is([data-position="top"], [data-position="details"]) {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-row"][data-position="details"] {
+    align-items: center;
+  }
+
+  .rv-root.rv-theme-bar [data-position="details"] > [data-part="control-group"]:last-child,
+  .rv-root.rv-theme-bar [data-position="top"] > [data-part="control-group"]:last-child {
+    margin: 0;
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-group"] {
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-group"]::before {
+    content: none;
+  }
+
+  .rv-root:not([data-controls="hidden"]).rv-theme-bar [data-part="control-group"] > * {
+    pointer-events: auto;
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-group"] [data-control] {
+    /* Bare icons on the picture, so the tight shadow is what they have on a bright frame. */
+    filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1.5px rgb(0 0 0 / 0.8)) drop-shadow(0 1px 3px rgb(0 0 0 / 0.5));
+  }
+
+  /* The name and description on the other side, over the shade. */
+  .rv-root.rv-theme-bar [data-part="title"] {
+    position: absolute;
+    inset-block-end: calc(var(--rv-inset-scaled) + 14px);
+    inset-inline: var(--rv-inset-scaled) calc(var(--rv-control-size) * var(--rv-scale, 1) + var(--rv-inset-scaled) * 2);
+    margin: 0;
+    pointer-events: none;
+    text-shadow: 0 0 2px rgb(0 0 0 / 0.8), 0 1px 3px rgb(0 0 0 / 0.55);
+  }
+
+  .rv-root.rv-theme-bar [data-part="title-eyebrow"] {
+    color: var(--rv-foreground);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .rv-root.rv-theme-bar [data-part="title-text"] {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    white-space: normal;
+  }
+
+  .rv-root.rv-theme-bar[data-playing] [data-part="title-description"] {
+    max-height: 2.9em;
+    margin: 0;
+    opacity: var(--rv-shown, 1);
+  }
+
+  /* A bare timeline along the very bottom edge, with its hit area above it. */
+  .rv-root.rv-theme-bar [data-part="control-row"][data-position="scrubber"] {
+    position: absolute;
+    inset: auto 0 0;
+    display: block;
+    margin: 0;
+  }
+
+  .rv-root.rv-theme-bar [data-position="scrubber"] > :is([data-part="current-time"], [data-part="remaining-time"]) {
+    display: none;
+  }
+
+  .rv-root.rv-theme-bar [data-part="timeline"] {
+    height: 8px;
+  }
+
+  .rv-root.rv-theme-bar [data-part="timeline"]::before {
+    inset: -22px 0 0;
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-row"] > [data-part="timeline"] [data-part="timeline-track"] {
+    inset: auto 0 0;
+    height: 3px;
+    border-radius: 0;
+    translate: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-row"] > [data-part="timeline"][data-dragging] [data-part="timeline-track"],
+  .rv-root.rv-theme-bar [data-part="control-row"] > [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-track"] {
+    height: 6px;
+  }
+
+  /* At the very edge a focus ring would be cut off, so the track steps in while it has one. */
+  .rv-root.rv-theme-bar [data-part="control-row"] > [data-part="timeline"]:has(input:focus-visible) [data-part="timeline-track"] {
+    inset: auto 6px 6px;
+    height: 6px;
+    border-radius: var(--rv-pill-radius);
+  }
+
+  .rv-root.rv-theme-bar [data-part="timeline-preview"] {
+    bottom: calc(100% + 14px);
+  }
+
+  /* Tapping the video does the seeking and pausing, so the centre holds one plain glyph. */
+  .rv-root.rv-theme-bar [data-part="transport"] > [data-part="seek-button"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-bar [data-part="transport"] > [data-control],
+  .rv-root.rv-theme-bar [data-part="play-overlay"] {
+    background: rgb(0 0 0 / 0.5);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* The volume opens sideways from its button, since the column has no room to grow. */
+  .rv-root.rv-theme-bar [data-part="volume"] {
+    position: relative;
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume"]:hover,
+  .rv-root.rv-theme-bar [data-part="volume"]:focus-within {
+    padding: 0;
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume-slider"] {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: calc(100% + 10px);
+  }
+
+  /* The slider never mirrors, so its own inline end stays on the right, off the frame. */
+  .rv-root.rv-theme-bar[dir="rtl"] [data-part="volume-slider"] {
+    inset-inline: calc(100% + 10px) auto;
+  }
+
+  /* Captions keep clear of the column, whether or not it's showing. */
+  .rv-root.rv-theme-bar [data-part="captions"] {
+    inset-inline: 5% 60px;
+  }
+
+  .rv-root.rv-theme-bar[dir="rtl"] [data-part="captions"] {
+    inset-inline: 60px 5%;
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume-track"] {
+    height: 4px;
+    margin-top: -2px;
+  }
+
+  /* Tooltips sit beside the column, because it fills the space above and below them. */
+  @media (hover: hover) {
+    .rv-root.rv-theme-bar [data-part="control-group"] [data-control][aria-label]::after {
+      inset: 50% calc(100% + 10px) auto auto;
+      transform: translate(4px, -50%);
+    }
+
+    .rv-root.rv-theme-bar [data-part="control-group"] [data-control][aria-label]:hover::after {
+      transform: translate(0, -50%);
+    }
+
+    .rv-root.rv-theme-bar[dir="rtl"] [data-part="control-group"] [data-control][aria-label]::after {
+      inset: 50% auto auto calc(100% + 10px);
+    }
+
+    .rv-root.rv-theme-bar [data-part="transport"] > [data-control]:hover,
+    .rv-root.rv-theme-bar [data-part="play-overlay"]:hover {
+      background: rgb(0 0 0 / 0.62);
+      transform: scale(1.08);
+    }
+  }
+
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-bar [data-part="control-group"] [data-part="menu-content"] {
+      inset-inline-end: calc(100% + 10px);
+      bottom: 0;
+    }
+  }
+
+  /* The menu opens over the name, so the name steps aside. */
+  .rv-root.rv-theme-bar [data-part="controls"]:has([data-part="menu-content"][data-state="open"]) [data-part="title"] {
+    opacity: 0;
+  }
+
+  /* Opens beside the column, on a player that's tall enough to fit it there. */
+  .rv-root.rv-theme-bar[data-orientation="portrait"] [data-part="control-group"] [data-part="menu-content"] {
+    inset-inline-end: calc(100% + 10px);
+    bottom: 0;
+    width: min(240px, 100cqw - var(--rv-control-size) * var(--rv-scale, 1) - var(--rv-inset-scaled) * 2 - 10px);
+  }
+
+  /* The title normally drops out at this width, but here it's a feature of the layout. */
+  @container rv (max-width: 479px) {
+    .rv-root.rv-theme-bar [data-part="title"] {
+      display: flex;
+    }
+  }
+
+  /* Tucked away until it's wanted, even if the player happens to be wide. */
+  .rv-root.rv-theme-bar [data-part="volume"] {
+    padding-inline-end: 0;
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume-slider"] {
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+  }
+
+  .rv-root.rv-theme-bar[data-status="error"] :is([data-part="transport"], [data-position="details"], [data-position="scrubber"]) {
+    display: none;
+  }
+}

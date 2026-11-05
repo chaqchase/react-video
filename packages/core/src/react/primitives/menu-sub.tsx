@@ -22,6 +22,7 @@ export const MenuSub = forwardRef<HTMLDivElement, MenuSubProps>(function MenuSub
   ref
 ) {
   const defaultBack = useLabel("back", "Back");
+  const backName = backLabel ?? defaultBack;
   const menu = useMenu();
   const id = useId();
   const active = menu.view === id;
@@ -58,7 +59,8 @@ export const MenuSub = forwardRef<HTMLDivElement, MenuSubProps>(function MenuSub
                 role="menuitem"
                 data-part="menu-back"
                 tabIndex={-1}
-                aria-label={backLabel ?? defaultBack}
+                // The row shows the submenu's title, so its name has to contain that too.
+                aria-label={typeof title === "string" ? `${backName}: ${title}` : backName}
                 {...back}
               >
                 <span data-part="menu-item-label">{title}</span>

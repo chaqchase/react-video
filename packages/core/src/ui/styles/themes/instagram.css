@@ -1,0 +1,33 @@
+/* After Instagram Reels: finer icons, a smaller name and caption, and a hairline timeline. */
+@import "./_column.css";
+
+@layer rv {
+  .rv-root.rv-theme-instagram {
+    --rv-focus: #fff;
+    --rv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --rv-glass-strong: rgb(38 38 38 / 0.97);
+    --rv-radius: 8px;
+    --rv-menu-radius: 14px;
+    --rv-control-size: 40px;
+    --rv-icon-size: 24px;
+  }
+
+  .rv-root.rv-theme-instagram [data-part="title-eyebrow"] {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .rv-root.rv-theme-instagram [data-part="title-text"],
+  .rv-root.rv-theme-instagram [data-part="title-description"] {
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-instagram [data-part="control-row"] > [data-part="timeline"] [data-part="timeline-track"] {
+    height: 2px;
+  }
+
+  .rv-root.rv-theme-instagram [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-thumb"] {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+}

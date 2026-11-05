@@ -96,7 +96,7 @@ export class RenditionProvider extends NativeProvider {
         } else {
           this.ignoreElementErrors = false;
         }
-        this.sink?.error({ code: "quality-switch", message, fatal: false });
+        this.sink?.error({ code: "quality-switch", message, fatal: false, retryable: false });
       },
       options
     );

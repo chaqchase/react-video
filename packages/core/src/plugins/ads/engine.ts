@@ -19,6 +19,7 @@ export interface AdHost {
   readonly container: HTMLElement;
   /** Pauses the content and locks seeking and rate, until `breakEnd`. */
   breakStart(): void;
+  /** Tells the player an ad has begun, so the timeline and overlay follow it. */
   adStart(ad: AdInfo): void;
   /** Reports a failure partway through a break. Ending the break is still the engine's job. */
   error(error: unknown): void;
@@ -42,13 +43,18 @@ export interface AdEngine {
   prepare(host: AdHost): void;
   /** Resolves once a pre-roll has started, or it's known there isn't one. */
   request(): Promise<void>;
+  /** Resumes the current ad. */
   play(): Promise<void> | void;
+  /** Pauses the current ad. */
   pause(): void;
+  /** Skips the current ad. */
   skip(): void;
   /** The viewer followed the ad's link. */
   clicked?(): void;
+  /** Applies the viewer's volume, from 0 to 1, and muted setting to the ad. */
   setVolume(volume: number, muted: boolean): void;
   /** The content ended, so any post-roll can play. */
   contentEnded?(): void;
+  /** Stops the engine and removes what it added to the page. */
   destroy(): void;
 }

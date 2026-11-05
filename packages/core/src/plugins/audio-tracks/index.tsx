@@ -34,6 +34,7 @@ const toInfo = ({ id, label, language, kind }: NativeAudioTrack, index: number):
 export const audioTracks = definePlugin("audio-tracks", () => ({
   commands(context) {
     return {
+      /** Switches to the audio track with this id. */
       select(id: string) {
         const list = (context.video() as WithAudioTracks | null)?.audioTracks;
         if (list && context.media().provider === "native") {

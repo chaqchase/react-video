@@ -1,3 +1,5 @@
+import { VideoKitError } from "../../core/kit-error";
+import type { KnownVideoErrorCode } from "../../core/types";
 import type { AdEngine, AdHost } from "./engine";
 
 const SDK_URL = "https://imasdk.googleapis.com/js/sdkloader/ima3.js";
@@ -9,7 +11,7 @@ interface ImaAd {
 }
 interface ImaEvent {
   getAd(): ImaAd | null;
-  getError?(): unknown;
+  getError?(): { getErrorCode?(): number; getMessage?(): string } | undefined;
 }
 interface ImaManager {
   addEventListener(type: string, listener: (event: ImaEvent) => void): void;
@@ -52,6 +54,14 @@ interface Ima {
   };
   ViewMode: { NORMAL: unknown };
 }
+
+const adError = (code: KnownVideoErrorCode, event: ImaEvent) => {
+  const error = event.getError?.();
+  return new VideoKitError(code, error?.getMessage?.() ?? "IMA reported an error.", {
+    nativeCode: error?.getErrorCode?.(),
+    cause: error,
+  });
+};
 
 const imaOf = () => (globalThis as unknown as { google?: { ima?: Ima } }).google?.ima;
 
@@ -109,7 +119,7 @@ export function ima(options: ImaOptions) {
           loader = next;
           next.addEventListener(sdk.AdErrorEvent.Type.AD_ERROR, (event: ImaEvent) => {
             active.breakEnd();
-            reject(event.getError?.() ?? new Error("IMA reported an error."));
+            reject(adError("ads-request", event));
           });
           next.addEventListener(
             sdk.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
@@ -139,7 +149,7 @@ export function ima(options: ImaOptions) {
                 });
               });
               loaded.addEventListener(AdErrorEvent.Type.AD_ERROR, (failed) => {
-                active.error(failed.getError?.() ?? new Error("IMA reported an error."));
+                active.error(adError("ads-playback", failed));
                 active.breakEnd();
                 resolve();
               });

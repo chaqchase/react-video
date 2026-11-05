@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect, type ReactElement } from "react";
 import { definePlugin } from "../../core/plugin";
+import { usePlayer } from "../../react/context";
 import { useCommands, useLabel, useVideoState } from "../../react/hooks";
 import { Button } from "../../react/primitives/button";
+import { useFocusFallback } from "../../react/primitives/focus-fallback";
 
 export interface AutoplayOptions {
   /** Try again muted when the browser refuses sound. Defaults to true. */
@@ -17,9 +20,13 @@ export interface AutoplayOptions {
  * prefer reduced motion aren't started automatically, unless told otherwise.
  */
 export const autoplay = definePlugin("autoplay", (options: AutoplayOptions = {}) => ({
-  state: () => ({ mutedFallback: false }),
+  state: () => ({
+    /** True while playback is muted only because the browser refused sound. */
+    mutedFallback: false,
+  }),
   attrs: { "data-autoplay-muted": (state) => state.mutedFallback },
   commands: (context) => ({
+    /** Turns the sound back on and dismisses the unmute chip. */
     unmute() {
       context.commands.setMuted(false);
       context.set({ mutedFallback: false });
@@ -60,18 +67,26 @@ export const autoplay = definePlugin("autoplay", (options: AutoplayOptions = {})
 }));
 
 /** Offers sound after a muted autoplay, until the viewer unmutes in any way. */
-export function UnmuteChip() {
+export function UnmuteChip(): ReactElement | null {
   const visible = useVideoState(
     autoplay,
     (state, media) => state.mutedFallback && media.muted && !media.paused
   );
+  return visible ? <ActiveUnmuteChip /> : null;
+}
+UnmuteChip.displayName = "Video.UnmuteChip";
+
+function ActiveUnmuteChip() {
   const { unmute } = useCommands(autoplay);
   const label = useLabel("tapToUnmute", "Tap to unmute");
-  if (!visible) return null;
+  const player = usePlayer();
+  const chip = useFocusFallback<HTMLButtonElement>();
+
+  useEffect(() => player.announce(label), [label, player]);
+
   return (
-    <Button data-part="unmute-chip" onClick={() => unmute()}>
+    <Button ref={chip} data-part="unmute-chip" onClick={() => unmute()}>
       {label}
     </Button>
   );
 }
-UnmuteChip.displayName = "Video.UnmuteChip";

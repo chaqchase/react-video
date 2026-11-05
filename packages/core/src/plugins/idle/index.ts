@@ -11,10 +11,13 @@ export interface IdleOptions {
 
 /** Elements that keep the controls up while the viewer is using them. */
 const IN_USE = [
-  '[data-part="controls"]:hover',
-  '[data-part="controls"] :focus-visible',
+  // Not the play button: pressing play leaves focus there, and the viewer then wants to watch.
+  '[data-part="controls"] :focus-visible:not([data-part="play-pause"])',
   '[data-part="menu-content"][data-state="open"]',
+  '[data-part="panel"][data-state="open"]',
 ].join(",");
+const HOVERED = '[data-part="controls"]:hover';
+const ON_TRANSPORT = '[data-part="transport"]:hover';
 
 /**
  * Hides the controls when the viewer isn't using them. They stay mounted while
@@ -24,14 +27,21 @@ export const idle = definePlugin("idle", (options: IdleOptions = {}) => {
   const { mouseTimeout = 3000, touchTimeout = 4000, leaveTimeout = 800 } = options;
   let show: (() => void) | null = null;
   return {
-    state: () => ({ visible: true }),
+    state: () => ({
+      /** True while the controls are showing. */
+      visible: true,
+    }),
     attrs: { "data-controls": (state) => (state.visible ? "shown" : "hidden") },
     commands(context) {
+      const reveal = () => (show ? show() : context.set({ visible: true }));
+      const hide = () => context.set({ visible: false });
       return {
         /** Reveals the controls, which then hide again as usual. */
-        show: () => (show ? show() : context.set({ visible: true })),
-        hide: () => context.set({ visible: false }),
-        toggle: () => context.set({ visible: !context.state().visible }),
+        show: reveal,
+        /** Hides the controls until the viewer's next activity. */
+        hide,
+        /** Shows the controls if hidden, and hides them if showing. */
+        toggle: () => (context.state().visible ? hide() : reveal()),
       };
     },
     setup(context, scope) {
@@ -47,7 +57,9 @@ export const idle = definePlugin("idle", (options: IdleOptions = {}) => {
       const pinned = () =>
         mediaPinned() ||
         root.hasAttribute("data-casting") ||
-        root.querySelector(IN_USE) !== null;
+        root.querySelector(IN_USE) !== null ||
+        // The pointer stays on the button it pressed to start playing, so that can't pin them.
+        (root.querySelector(HOVERED) !== null && root.querySelector(ON_TRANSPORT) === null);
 
       const check = () => {
         timer = undefined;

@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { definePlugin } from "../../core/plugin";
 import { useCommands, useLabel, useVideoState } from "../../react/hooks";
 import { Button, type ButtonProps } from "../../react/primitives/button";
-import { PipIcon } from "../../ui/icons";
+import { PipEnterIcon, PipExitIcon } from "../../ui/icons";
 
 type WebkitVideo = HTMLVideoElement & {
   webkitSupportsPresentationMode?: (mode: string) => boolean;
@@ -14,7 +14,12 @@ type WebkitVideo = HTMLVideoElement & {
 
 /** Picture-in-picture, through the standard API or Safari's presentation modes. */
 export const pip = definePlugin("pip", () => ({
-  state: () => ({ active: false, supported: false }),
+  state: () => ({
+    /** True while the video is in picture-in-picture. */
+    active: false,
+    /** True when the browser allows picture-in-picture and the video doesn't turn it off. */
+    supported: false,
+  }),
   attrs: { "data-pip": (state) => state.active },
   commands(context) {
     const enter = async () => {
@@ -32,8 +37,11 @@ export const pip = definePlugin("pip", () => ({
       else video?.webkitSetPresentationMode?.("inline");
     };
     return {
+      /** Moves the video into picture-in-picture. */
       enter,
+      /** Brings the video back from picture-in-picture. */
       exit,
+      /** Enters picture-in-picture, or exits it if already active. */
       toggle: () => (context.state().active ? exit() : enter()),
     };
   },
@@ -56,7 +64,7 @@ export const pip = definePlugin("pip", () => ({
       }
     });
   },
-  slots: { "controls-end": Pip },
+  slots: { "top-start": Pip },
 }));
 
 export type PipProps = ButtonProps;
@@ -85,7 +93,12 @@ export const Pip = forwardRef<HTMLButtonElement, PipProps>(function Pip(
       }}
       {...props}
     >
-      {children ?? <PipIcon />}
+      {children ?? (
+        <>
+          <PipEnterIcon data-show="inactive" />
+          <PipExitIcon data-show="active" />
+        </>
+      )}
     </Button>
   );
 });

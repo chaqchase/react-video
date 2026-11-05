@@ -2,13 +2,18 @@ import { definePlugin } from "../../core/plugin";
 import type { SourceObject } from "../../core/types";
 
 export interface MediaSessionMetadata {
+  /** The name the system shows for the video. */
   title?: string;
+  /** The artist the system shows beside the title. */
   artist?: string;
+  /** The album the system shows beside the title. */
   album?: string;
+  /** The images the system can show for the video. */
   artwork?: MediaImage[];
 }
 
 export interface MediaSessionOptions {
+  /** What the system shows for the video, set directly or worked out for each source. */
   metadata?: MediaSessionMetadata | ((source: SourceObject) => MediaSessionMetadata);
   /** Seconds moved by the system's skip buttons. */
   seekStep?: number;

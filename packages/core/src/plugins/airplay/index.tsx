@@ -17,7 +17,12 @@ type AvailabilityEvent = Event & { availability?: string };
  * HLS that the hls plugin uses on Apple devices but not with `preferEngine`.
  */
 export const airplay = definePlugin("airplay", () => ({
-  state: () => ({ available: false, active: false }),
+  state: () => ({
+    /** True when Safari has found a device to send to. */
+    available: false,
+    /** True while the video is playing on an AirPlay device. */
+    active: false,
+  }),
   attrs: { "data-airplay": (state) => state.active },
   commands: (context) => ({
     /** Opens the picker. Must run from a click or key press. */
@@ -35,7 +40,7 @@ export const airplay = definePlugin("airplay", () => ({
       context.set({ active: video.webkitCurrentPlaybackTargetIsWireless === true });
     });
   },
-  slots: { "controls-end": AirPlayButton },
+  slots: { "top-start": AirPlayButton },
 }));
 
 export type AirPlayButtonProps = ButtonProps;
