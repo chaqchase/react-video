@@ -1,0 +1,107 @@
+---
+title: React Router
+description: Use the player in framework mode, with its source from a route loader.
+---
+
+<Install />
+
+## Add the player
+
+Framework mode renders on the server by default, and the player renders there too. You don't need a client-only wrapper or a `.client.tsx` file.
+
+```tsx title="app/components/player.tsx"
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+
+const plugins = defaultPlugins();
+
+export function Player({ src, poster }: { src: string; poster?: string }) {
+  return <VideoPlayer src={src} poster={poster} plugins={plugins} />;
+}
+```
+
+```tsx title="app/routes/home.tsx"
+import { Player } from "../components/player";
+
+export default function Home() {
+  return <Player src="/video.mp4" poster="/poster.jpg" />;
+}
+```
+
+React Router adds the skin's stylesheet to the route's `<Links />`, so it's in the server's HTML and the player doesn't flash unstyled.
+
+The first `npm run dev` after installing makes Vite pre-bundle the package and reload the page, so the console can show a 504 (Outdated Optimize Dep) that one time. If the player doesn't respond after that, restart the dev server.
+
+## Load the source in a route
+
+Return the source from a `loader`:
+
+```tsx title="app/routes/watch.tsx"
+import { Player } from "../components/player";
+import type { Route } from "./+types/watch";
+
+export function loader({ params }: Route.LoaderArgs) {
+  return { src: `/videos/${params.id}.mp4`, poster: `/videos/${params.id}.jpg` };
+}
+
+export default function Watch({ loaderData }: Route.ComponentProps) {
+  return <Player src={loaderData.src} poster={loaderData.poster} />;
+}
+```
+
+Going from `/watch/a` to `/watch/b` keeps the route mounted, so the player changes source on the same video element.
+
+If the source only exists in the browser, such as a URL signed with a token the viewer holds, use a `clientLoader`. The server's HTML then has your `HydrateFallback`, and the player mounts when the loader finishes:
+
+```tsx title="app/routes/signed.tsx"
+import { Player } from "../components/player";
+import type { Route } from "./+types/signed";
+
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+  const response = await fetch(`/videos/${params.id}.json`);
+  return (await response.json()) as { src: string; poster: string };
+}
+
+export function HydrateFallback() {
+  return <div style={{ aspectRatio: "16 / 9", background: "black" }} />;
+}
+
+export default function Watch({ loaderData }: Route.ComponentProps) {
+  return <Player src={loaderData.src} poster={loaderData.poster} />;
+}
+```
+
+## Load the player lazily
+
+To keep the player out of a route's own chunk, use `lazy`. React streams the result, so the server's HTML still contains the player.
+
+```tsx title="app/routes/lazy.tsx"
+import { lazy, Suspense } from "react";
+
+const Player = lazy(() =>
+  import("../components/player").then((module) => ({ default: module.Player }))
+);
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div style={{ aspectRatio: "16 / 9", background: "black" }} />}>
+      <Player src="/video.mp4" poster="/poster.jpg" />
+    </Suspense>
+  );
+}
+```
+
+## Use it with Tailwind 4
+
+Put the skin in `app/app.css`, after a line that declares the layer order. The skin lives in the `rv` layer, so placing `rv` before `utilities` lets a class like `rounded-none` override it. Without that line, the skin wins.
+
+```css title="app/app.css"
+@layer theme, base, rv, components, utilities;
+
+@import "tailwindcss";
+@import "react-video-kit/styles.css";
+```
+
+Remove the skin's import from `app/components/player.tsx`. [Theming](/docs/v4/theming) has the details.
+
+Last built against React Router 8.5.1, Vite 8.3.5, React 19.3.1, and Tailwind CSS 4.3.4.

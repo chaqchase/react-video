@@ -1,0 +1,104 @@
+---
+title: State and time
+description: How the player stays fast while a video plays.
+---
+
+Most players re-render on each `timeupdate`. This one doesn't render at all during playback. The [home page](/#performance) has a live meter counting React commits, so you can watch it stay at zero.
+
+Two rules make this work:
+
+1. **Time never enters the store.** Current time isn't React state, so nothing subscribes to it by accident.
+2. **Anything that follows time writes straight to the DOM.** The timeline fill and the clock text update through a shared clock, with no render.
+
+## Reading state
+
+`useVideoState` subscribes to one value, and your component re-renders only when that value changes.
+
+```tsx
+const paused = useVideoState((media) => media.paused);
+const waiting = useVideoState((media) => media.waiting);
+```
+
+To select several values at once, pass `shallow`, so that a new object with the same contents doesn't cause a render:
+
+```tsx
+import { shallow, useVideoState } from "react-video-kit";
+
+const { volume, muted } = useVideoState((media) => ({ volume: media.volume, muted: media.muted }), shallow);
+```
+
+The whole state is listed under [MediaState](/docs/v4/reference/core). It has separate fields for `status`, `waiting`, and `seeking`, so a spinner doesn't have to guess what a stall means.
+
+## Following time
+
+Choose by what you're updating.
+
+**For anything that moves smoothly, use `useClock`.** It calls your function without rendering. You say how many seconds of change are worth an update, so a long video on a short track wakes up rarely.
+
+```tsx
+"use client";
+
+import { useCallback, useRef } from "react";
+import { useClock } from "react-video-kit";
+
+function SecondsWatched() {
+  const element = useRef<HTMLSpanElement>(null);
+  const write = useCallback((time: number) => {
+    if (element.current) element.current.textContent = `${Math.floor(time)}s`;
+  }, []);
+  const resolution = useCallback(() => 1, []);
+
+  useClock(write, resolution);
+  return <span ref={element} />;
+}
+```
+
+**For text that renders with React, use `useCurrentTime`.** Say how often it should render. This is simpler, and once a second is rarely a problem.
+
+```tsx
+const time = useCurrentTime(1);
+return time > 30 ? <SkipButton /> : null;
+```
+
+## The clock
+
+There's one clock per player, and it only runs while playback advances. While a video is paused, nothing runs per frame. It writes on every seek and source change, however far time moved.
+
+Each write says how far time must move before it's visible. On a two-hour video and a 900px track, one pixel is 8 seconds, so the fill only updates that often.
+
+## Styling from state
+
+The root element carries `data-*` attributes that update with no render. Use them from CSS:
+
+| Attribute | Present when |
+|---|---|
+| `data-status` | Always: `idle`, `loading`, `ready`, or `error` |
+| `data-playing`, `data-paused` | Playback is running, or paused |
+| `data-started` | Playback has begun for this source |
+| `data-ended` | Playback reached the end |
+| `data-waiting` | The player has stalled, waiting for data |
+| `data-seeking` | A seek is in progress |
+| `data-scrubbing` | The viewer is dragging the timeline |
+| `data-muted` | Audio is muted |
+| `data-live` | The source is live |
+| `data-error` | A fatal error happened |
+
+Plugins add their own, such as `data-controls` from [idle](/docs/v4/plugins/idle).
+
+```css
+.my-player[data-waiting] .my-spinner {
+  opacity: 1;
+}
+```
+
+## Commands
+
+`useCommands` returns functions that don't change, so calling it never causes a render.
+
+```tsx
+const { play, pause, seek, setVolume, setMuted, setRate } = useCommands();
+```
+
+`play` resolves to whether playback started, and never rejects. When the browser refuses, as it may with autoplay, the reason is in `media.playRejected`.
+
+Commands can be locked. During an [ad](/docs/v4/plugins/ads), the seek and rate commands do nothing, whichever control or key calls them. That's why no control needs special handling for ads.

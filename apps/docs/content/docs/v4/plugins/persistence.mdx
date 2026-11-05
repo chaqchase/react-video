@@ -1,0 +1,77 @@
+---
+title: Persistence
+description: Remembers where the viewer stopped, and their volume, speed, and caption language.
+---
+
+<PluginSummary id="persistence" />
+
+Brings the viewer back to where they stopped, with the settings they chose. Play the demo past the 5-second mark, then reload this page.
+
+<Demo slug="persistence" />
+
+## Usage
+
+```tsx
+import { persistence } from "react-video-kit/persistence";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [persistence()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Turn either half off with `resume` or `preferences`. Set `key` to keep players apart, since players with the same key share their preferences and any positions for the same source:
+
+```tsx
+persistence({ key: "course-player", preferences: false });
+```
+
+## What's saved
+
+Everything goes in `localStorage` by default, under the `key` prefix, which defaults to `rv`.
+
+| Stored under | What it holds | When it's saved |
+| --- | --- | --- |
+| `rv:position:<src>` | Seconds into that video | Every 5 seconds of playback, on seeks, on pause, at the end, and on `pagehide` |
+| `rv:preferences` | Volume, mute, speed, and caption language | When any of them changes |
+
+A saved position is removed, so the video starts from the beginning next time, when:
+
+- The viewer is less than 5 seconds in.
+- The viewer is at least 95% of the way through, or the video has ended.
+
+Only on-demand video gets a position. Live streams, DVR windows, and ads never save one.
+
+## When it's restored
+
+Preferences come back when the player mounts, after hydration, so the server and the first client render still match. A position comes back when that source loads. The video stays paused there unless something else starts it, such as the [autoplay](/docs/v4/plugins/autoplay) plugin.
+
+A `startTime` from something else wins over a saved position, such as `reload(30)`.
+
+## Use your own storage
+
+`storage` takes anything with `getItem`, `setItem`, and `removeItem`, which all have to be synchronous:
+
+```tsx
+const memory = new Map<string, string>();
+
+persistence({
+  storage: {
+    getItem: (name) => memory.get(name) ?? null,
+    setItem: (name, value) => void memory.set(name, value),
+    removeItem: (name) => void memory.delete(name),
+  },
+});
+```
+
+## Behaviour
+
+- Storage can throw when it's blocked, full, or in a private window. A failed read counts as nothing saved, a failed write is dropped, and playback carries on with no error. Unreadable JSON counts as nothing saved too.
+- Changing source doesn't save first, so the old video keeps its last save, up to 5 seconds of playback behind.
+- A saved caption language wins over the `language` option on [captions](/docs/v4/plugins/captions), including a saved choice of no captions. It takes effect as soon as a matching track appears, and a video with no such track doesn't lose it.
+- It always runs after the captions plugin, whatever order you list them in.
+- A muted fallback from [autoplay](/docs/v4/plugins/autoplay) isn't saved, because the browser chose it rather than the viewer. The next visit tries sound again.
+
+## API
+
+<PluginApi id="persistence" />

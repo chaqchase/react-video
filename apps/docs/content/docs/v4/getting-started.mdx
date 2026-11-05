@@ -1,0 +1,177 @@
+---
+title: Getting started
+description: Install the package and play your first video.
+---
+
+## Set it up
+
+<Steps>
+<Step>
+
+### Install it
+
+<Install />
+
+React 18.2 or newer is the only requirement. Streaming engines are optional, and you only add them [if you need them](#play-a-stream).
+
+</Step>
+<Step>
+
+### Make a player
+
+```tsx title="components/player.tsx"
+"use client";
+
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+
+const plugins = defaultPlugins();
+
+export function Player() {
+  return <VideoPlayer src="/video.mp4" poster="/poster.jpg" plugins={plugins} />;
+}
+```
+
+`defaultPlugins()` adds auto-hiding controls, gestures, keyboard shortcuts, error recovery, the captions, speed, and quality menus, picture in picture, and fullscreen.
+
+</Step>
+<Step>
+
+### Use it
+
+```tsx title="app/page.tsx"
+import { Player } from "@/components/player";
+
+export default function Page() {
+  return <Player />;
+}
+```
+
+That's a complete player:
+
+<Demo slug="compose-ready" />
+
+</Step>
+</Steps>
+
+<Callout title="Keep plugins out of render">
+  Plugins are read once, when the player is created. Define the array outside your component, or in `useMemo`. To change them later, remount the player by changing its `key`.
+</Callout>
+
+<Callout title="Why &quot;use client&quot;?">
+  In the Next.js App Router, plugins contain functions, and functions can't pass from a Server Component to a Client Component. Create them in a file marked `"use client"`, as above. The player still renders on the server.
+</Callout>
+
+## Choose your plugins
+
+`defaultPlugins()` is a convenience, not a requirement. List only the ones you want, and the rest stay out of your bundle:
+
+```tsx
+"use client";
+
+import { fullscreen } from "react-video-kit/fullscreen";
+import { hotkeys } from "react-video-kit/hotkeys";
+import { idle } from "react-video-kit/idle";
+import { VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+
+const plugins = [idle(), hotkeys(), fullscreen()];
+
+export function Player() {
+  return <VideoPlayer src="/video.mp4" plugins={plugins} />;
+}
+```
+
+A control appears when its plugin is installed, so there's no other configuration to do. Browse them all in the [plugin gallery](/plugins), which adds up the size as you select.
+
+## Play a stream
+
+MP4 and WebM play with no plugin at all. HLS and DASH each need a plugin and its engine, which is loaded only when a source needs it.
+
+<Tabs items={["HLS", "DASH"]}>
+<Tab value="HLS">
+
+```bash
+npm install hls.js
+```
+
+```tsx
+import { hls } from "react-video-kit/hls";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [hls(), ...defaultPlugins()];
+
+<VideoPlayer src="/stream.m3u8" plugins={plugins} />;
+```
+
+</Tab>
+<Tab value="DASH">
+
+```bash
+npm install dashjs
+```
+
+```tsx
+import { dash } from "react-video-kit/dash";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [dash(), ...defaultPlugins()];
+
+<VideoPlayer src="/stream.mpd" plugins={plugins} />;
+```
+
+</Tab>
+</Tabs>
+
+## Add captions
+
+Pass your tracks to the captions plugin. Its menu appears on its own.
+
+```tsx
+import { captions } from "react-video-kit/captions";
+
+const plugins = [
+  captions({
+    tracks: [{ src: "/captions.en.vtt", language: "en", label: "English" }],
+  }),
+];
+```
+
+## Control it from code
+
+A `ref` gives you the player, and anything inside the player can use hooks:
+
+```tsx
+"use client";
+
+import { useRef } from "react";
+import type { Player } from "react-video-kit/core";
+import { VideoPlayer } from "react-video-kit/player";
+
+export function Intro() {
+  const player = useRef<Player>(null);
+  return (
+    <>
+      <VideoPlayer ref={player} src="/video.mp4" />
+      <button onClick={() => player.current?.commands.seek(30)}>Skip the intro</button>
+    </>
+  );
+}
+```
+
+## Next steps
+
+<Cards>
+  <Card title="Sources" href="/docs/v4/concepts/sources">
+    Fallbacks, renditions, and when engines load.
+  </Card>
+  <Card title="Composition" href="/docs/v4/composition">
+    Arrange the controls your own way.
+  </Card>
+  <Card title="Theming" href="/docs/v4/theming">
+    Change the look with CSS variables.
+  </Card>
+  <Card title="Your framework" href="/docs/v4/recipes">
+    Notes for Next.js, Vite, Astro, and others.
+  </Card>
+</Cards>

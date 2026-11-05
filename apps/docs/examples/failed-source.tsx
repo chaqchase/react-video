@@ -9,7 +9,7 @@ function ErrorMessage() {
 
 export default function FailedSource() {
   return (
-    <Video.Root src="/media/broken.mp4">
+    <Video.Root src="/media/broken.mp4" load="visible">
       <Video.Media width={640} height={360} />
       <ErrorMessage />
     </Video.Root>

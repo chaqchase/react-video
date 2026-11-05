@@ -1,0 +1,102 @@
+---
+title: Recovery
+description: Reloads the source after a failure that can pass, from the same position.
+---
+
+<PluginSummary id="recovery" />
+
+Reloads the source when a connection drops, waiting longer between each try. Meanwhile the viewer sees a spinner, not an error. The file below never loads, so you can watch every retry fail and the error appear once they run out. Its timestamps show the waits growing.
+
+<Demo slug="recovery" />
+
+A file that can't be decoded isn't normally retried, so this demo sets `retryOn` to retry everything.
+
+## Usage
+
+`recovery()` is part of `defaultPlugins()`, so `VideoPlayer` with those already has it. On its own:
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { recovery } from "react-video-kit/recovery";
+
+const plugins = [recovery({ retries: 5, delay: 500 })];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+`retries` is how many times it reloads before giving up, 3 by default. `delay` is the first wait in milliseconds, 1000 by default, and it doubles for each retry. The defaults wait 1, 2, then 4 seconds.
+
+A plugin can't be installed twice, so remove the default one to change its options:
+
+```tsx
+import { defaultPlugins } from "react-video-kit/player";
+import { recovery } from "react-video-kit/recovery";
+
+const plugins = [
+  recovery({ retries: 5 }),
+  ...defaultPlugins().filter(({ name }) => name !== "recovery"),
+];
+```
+
+## What's retried
+
+Fatal errors with one of these codes:
+
+- `2`, the browser's own network error.
+- `"network"`, which the [hls](/docs/v4/plugins/hls) and [dash](/docs/v4/plugins/dash) plugins report for failed downloads.
+
+Everything else is reported straight away:
+
+- The browser's other codes: `1` (aborted), `3` (can't decode), and `4` (unsupported source).
+- `"drm"`, from the [DRM](/docs/v4/plugins/drm) plugin.
+- `"no-provider"`, when nothing can play the source.
+- `"load-failed"`, when a provider or its engine fails to load.
+- Any other code from hls.js or dash.js.
+
+`retryOn` replaces that rule. It's only asked about fatal errors:
+
+```tsx
+recovery({
+  retryOn: ({ code }) => code === 2 || code === "network" || code === 3,
+});
+```
+
+## When retries run out
+
+`retrying` goes back to `false`, and the error stays. `VideoPlayer` shows its error overlay, with the error's message and a **Try again** button. That button picks up where the failure happened, and plays again if the viewer was watching. It also starts a fresh set of retries.
+
+While retries are running, the default skin hides the overlay and shows the spinner, using `data-retrying` on the root.
+
+To show your own message, read `media.error`:
+
+<Demo slug="failed-source" />
+
+To tell the viewer it's retrying, read the plugin's state:
+
+```tsx
+"use client";
+
+import { useVideoState } from "react-video-kit";
+import { recovery } from "react-video-kit/recovery";
+
+function Reconnecting() {
+  const retrying = useVideoState(recovery, (state) => state.retrying);
+  const attempt = useVideoState(recovery, (state) => state.attempt);
+  return retrying ? <p role="status">Reconnecting, try {attempt}</p> : null;
+}
+```
+
+## Behaviour
+
+- A retry loads the source at the last position, and plays again if the viewer was watching or had pressed play. A video that was paused stays paused, unless the [autoplay](/docs/v4/plugins/autoplay) plugin starts it, because that runs for each load.
+- While `navigator.onLine` is `false`, the plugin waits for the browser's `online` event in place of a timer. That wait spends no attempt, even when there are none left.
+- `attempt` returns to 0 once playback gets more than 5 seconds past the failure. Reaching `ready` isn't enough, so a source that fails again right after reloading can't loop forever.
+- Changing to a different source clears the count, the position, and any retry that's waiting.
+- If `src` is a list and playback hasn't started, the player moves to the next source and this plugin isn't involved. Once the whole list has failed, a retry starts it again from the top and the count carries on, so a list whose sources all fail still runs out of retries.
+- Reloading from your own code when no retry is running starts a fresh set of retries.
+- An [ad](/docs/v4/plugins/ads) pre-roll doesn't play again after a retry.
+- hls.js [recovers from media errors](/docs/v4/plugins/hls#behaviour) before this plugin hears about them.
+
+## API
+
+<PluginApi id="recovery" />

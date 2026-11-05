@@ -33,6 +33,21 @@ test("Apple's browsers get native HLS unless told otherwise", async ({ page, bro
     .toBeGreaterThan(start + 1);
 });
 
+test("subtitles from a DASH manifest can be turned on and switched", async ({ page }) => {
+  await play(page, "dash-captions");
+  await page.locator(root).hover();
+  await page.getByRole("button", { name: "Captions" }).click();
+  const line = page.locator('[data-part="caption-line"]').first();
+  await expect(line).toContainText("English caption", { timeout: 15_000 });
+
+  await page.locator(root).hover();
+  await page.getByRole("button", { name: "Settings" }).click();
+  await page.locator('[data-menu="captions"]').click();
+  await page.getByRole("menuitemradio", { name: "العربية" }).click();
+  await expect(line).not.toContainText("English caption", { timeout: 15_000 });
+  await expect(line).toContainText(/\p{Script=Arabic}/u);
+});
+
 for (const slug of ["hls-engine", "dash"]) {
   test.describe(slug, () => {
     test("plays through the engine and advances", async ({ page }) => {

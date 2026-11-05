@@ -1,0 +1,129 @@
+---
+title: Styled parts
+description: Arrange the styled controls in your own layout.
+---
+
+Each part of the ready-made player is an export of `react-video-kit`. Import them all as a namespace, and tree-shaking still removes the ones you don't use.
+
+<Demo slug="compose-parts" />
+
+Plugin controls, such as `Fullscreen` and `SpeedMenu`, come from the plugin's own import.
+
+## The basics
+
+A player needs a `Root` and a `Media`. Everything else is optional, and it can go in any order inside `Root`:
+
+```tsx
+"use client";
+
+import * as Video from "react-video-kit";
+import "react-video-kit/styles.css";
+
+export function Player() {
+  return (
+    <Video.Root src="/video.mp4">
+      <Video.Media poster="/poster.jpg" />
+      <Video.PlayOverlay />
+      <Video.BufferingIndicator />
+      <Video.ErrorOverlay />
+      <Video.Controls>
+        <Video.Timeline />
+        <Video.ControlRow>
+          <Video.ControlGroup>
+            <Video.PlayPause />
+            <Video.Volume />
+            <Video.Time />
+          </Video.ControlGroup>
+        </Video.ControlRow>
+      </Video.Controls>
+    </Video.Root>
+  );
+}
+```
+
+`Controls` is what hides and shows with the [idle](/docs/v4/plugins/idle) plugin. `ControlRow` lays out its groups, and `ControlGroup` is one glass pill.
+
+## Timeline
+
+`Timeline` works with no children. To change what's in it, list its subparts:
+
+```tsx
+<Video.Timeline>
+  <Video.TimelineTrack>
+    <Video.TimelineBuffered />
+    <Video.TimelineFill />
+    <Video.Slot name="timeline-track" />
+  </Video.TimelineTrack>
+  <Video.TimelineThumb />
+  <Video.TimelinePreview>
+    <Video.Slot name="timeline-preview" />
+  </Video.TimelinePreview>
+</Video.Timeline>
+```
+
+Those two slots are where [chapters](/docs/v4/plugins/chapters) and [thumbnails](/docs/v4/plugins/thumbnails) draw, so keep them if you use those plugins.
+
+## Menus
+
+`SettingsMenu` holds whatever plugins add to the `menu` slot, and hides itself when that's empty. To build your own, use `Menu`, and put a plugin's menu in it:
+
+```tsx
+import * as Video from "react-video-kit";
+import { SpeedMenu } from "react-video-kit/speed";
+
+<Video.Menu>
+  <Video.MenuTrigger aria-label="Speed">1×</Video.MenuTrigger>
+  <Video.MenuContent>
+    <SpeedMenu />
+  </Video.MenuContent>
+</Video.Menu>;
+```
+
+`MenuSub` drills down in place, rather than opening a second menu beside the first. For your own options, use `MenuRadioGroup`:
+
+```tsx
+<Video.MenuSub title="Ambience" value={ambience}>
+  <Video.MenuRadioGroup value={ambience} onValueChange={setAmbience}>
+    <Video.MenuRadioItem value="off">Off</Video.MenuRadioItem>
+    <Video.MenuRadioItem value="on">On</Video.MenuRadioItem>
+  </Video.MenuRadioGroup>
+</Video.MenuSub>
+```
+
+Menus render inside the player, so they keep working in fullscreen. They have keyboard support, and focus returns to the trigger when one closes.
+
+## Your own controls
+
+`Video.Button` is a control that matches the others. Add behaviour with [hooks](/docs/v4/hooks):
+
+```tsx
+"use client";
+
+import * as Video from "react-video-kit";
+
+function SkipBack({ seconds = 10 }: { seconds?: number }) {
+  const player = Video.usePlayer();
+  const { seek } = Video.useCommands();
+  return (
+    <Video.Button aria-label={`Back ${seconds} seconds`} onClick={() => seek(player.clock.time() - seconds)}>
+      ↺
+    </Video.Button>
+  );
+}
+```
+
+## Use your own element
+
+Controls built on `Button`, such as `PlayPause`, `Mute`, and `Fullscreen`, accept `asChild`. It merges their behaviour onto your element instead of rendering a button. This is useful for a design system's button component:
+
+```tsx
+<Video.PlayPause asChild>
+  <MyButton variant="ghost">Play</MyButton>
+</Video.PlayPause>
+```
+
+Your element must pass its props and `ref` through to the DOM.
+
+## All parts
+
+See [Components](/docs/v4/components) for every part and its props.

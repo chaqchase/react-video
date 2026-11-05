@@ -1,6 +1,232 @@
 ---
-title: v3 documentation
-description: The current stable release.
+title: Version 3
+description: The docs for react-video-kit 3.x, the current stable release.
 ---
 
-Version 3 is the stable release on npm. Its reference lives in the [package README](https://github.com/chaqchase/react-video/tree/main/packages/core#readme).
+<Callout title="These docs are frozen">
+  Version 3 only gets fixes. It's what `npm install react-video-kit` installs until version 4 is stable. For anything new, look at [version 4](/docs/v4), and [the migration guide](/docs/v4/migration) when you're ready to move.
+</Callout>
+
+## Install
+
+`motion` is a required peer dependency.
+
+```bash
+npm install react-video-kit motion
+```
+
+The package's CSS is imported for you, with an `rv-` prefix and no global reset, so it works with or without Tailwind in your app.
+
+## Quick start
+
+```tsx
+import { Video } from "react-video-kit";
+
+export default function App() {
+  return (
+    <Video.Root src="https://example.com/video.mp4">
+      <Video.Media />
+      <Video.Center>
+        <Video.PlayPause />
+      </Video.Center>
+    </Video.Root>
+  );
+}
+```
+
+## Components
+
+### Layout
+
+- **`Video.Root`** manages state and context
+- **`Video.Media`** renders the video element, with its sources and tracks
+- **`Video.Backdrop`** is a gradient overlay
+- **`Video.Header`**, **`Video.Center`**, **`Video.Footer`** are control areas
+
+### Typography
+
+- **`Video.Title`**, **`Video.Subtitle`**
+
+### Controls
+
+- **`Video.PlayPause`**
+- **`Video.SeekBack`**, **`Video.SeekForward`**, with a `seconds` prop
+- **`Video.FullscreenToggle`**, **`Video.PipToggle`**
+- **`Video.CaptionsMenu`**, **`Video.QualityMenu`**
+- **`Video.Volume.Button`**, **`Video.Volume.Slider`**
+- **`Video.Timeline`**
+- **`Video.Time.Current`**, **`Video.Time.Remaining`**
+- **`Video.Loading`**
+
+Menus portal into the fullscreen element when the player is fullscreen, and to `document.body` otherwise.
+
+## A full player
+
+```tsx
+import { Video } from "react-video-kit";
+
+export default function Player() {
+  return (
+    <Video.Root src="https://example.com/video.mp4" title="My video" subtitle="A description">
+      <Video.Media />
+      <Video.Backdrop />
+
+      <Video.Header>
+        <Video.FullscreenToggle />
+        <Video.PipToggle />
+        <Video.Volume.Button />
+        <Video.Volume.Slider />
+      </Video.Header>
+
+      <Video.Center>
+        <Video.SeekBack seconds={10} />
+        <Video.PlayPause />
+        <Video.SeekForward seconds={10} />
+        <Video.Loading />
+      </Video.Center>
+
+      <Video.Footer>
+        <Video.Subtitle />
+        <Video.Title />
+        <Video.Timeline />
+        <Video.Time.Current />
+        <Video.Time.Remaining negative />
+      </Video.Footer>
+    </Video.Root>
+  );
+}
+```
+
+## Quality levels
+
+An array of sources is a list of quality levels. `QualityMenu` switches between them, and keeps the time and play state.
+
+```tsx
+<Video.Root
+  src={[
+    { src: "/video-1080p.mp4", type: "video/mp4", label: "HD" },
+    { src: "/video-720p.mp4", type: "video/mp4", label: "SD" },
+  ]}
+  defaultQualityIndex={0}
+  onQualityChange={(index, source) => console.log(source.label)}
+>
+  <Video.Media />
+  <Video.Footer>
+    <Video.QualityMenu />
+  </Video.Footer>
+</Video.Root>
+```
+
+## Captions
+
+`CaptionsMenu` lists every track, plus an Off option.
+
+```tsx
+<Video.Root
+  src="https://example.com/video.mp4"
+  tracks={[
+    { src: "/captions-en.vtt", kind: "captions", srclang: "en", label: "English", default: true },
+    { src: "/captions-es.vtt", kind: "captions", srclang: "es", label: "Spanish" },
+  ]}
+  defaultTrackIndex={0}
+  onTrackChange={(index, track) => console.log(index, track)}
+>
+  <Video.Media />
+  <Video.Footer>
+    <Video.CaptionsMenu />
+  </Video.Footer>
+</Video.Root>
+```
+
+## Styling
+
+Every component takes a `className`. The timeline also takes `trackClassName`, `rangeClassName`, and `thumbClassName`.
+
+```tsx
+<Video.Root className="mx-auto max-w-4xl">
+  <Video.Media className="rounded-2xl" />
+  <Video.Timeline className="my-timeline" trackClassName="bg-gray-700" rangeClassName="bg-blue-500" />
+</Video.Root>
+```
+
+## asChild
+
+`PlayPause`, `SeekBack`, `SeekForward`, `FullscreenToggle`, `PipToggle`, and `Volume.Button` accept `asChild`, which puts their behaviour on your own element.
+
+```tsx
+<Video.PlayPause asChild>
+  <button className="my-button">Play</button>
+</Video.PlayPause>
+```
+
+## Ref
+
+```tsx
+import { useRef } from "react";
+import { Video, type VideoHandle } from "react-video-kit";
+
+export default function Controlled() {
+  const video = useRef<VideoHandle>(null);
+  return (
+    <>
+      <Video.Root ref={video} src="https://example.com/video.mp4">
+        <Video.Media />
+      </Video.Root>
+      <button onClick={() => video.current?.seek(30)}>Skip to 30s</button>
+    </>
+  );
+}
+```
+
+The handle has `play()`, `pause()`, `seek(seconds)`, `setVolume(value)`, `mute()`, `unmute()`, `enterFullscreen()`, `exitFullscreen()`, `enterPip()`, and `exitPip()`.
+
+## Root props
+
+| Prop | Type | Description |
+|---|---|---|
+| `src` | `VideoSource` | A URL, or an array of quality levels |
+| `tracks` | `VideoTrack[]` | Text tracks |
+| `poster` | `string` | Poster image |
+| `title`, `subtitle` | `string` | Shown by `Video.Title` and `Video.Subtitle` |
+| `autoPlay` | `boolean` | Defaults to `true` |
+| `loop` | `boolean` | Loops playback |
+| `showControls` | `boolean` | Defaults to `true` |
+| `hotkeys` | `boolean \| { enabled, scope }` | `scope` is `focused` (the default), `hovered`, or `global` |
+| `className` | `string` | Extra classes |
+| `defaultTrackIndex` | `number \| null` | The first active track. `null` is off |
+| `defaultQualityIndex` | `number` | The first quality level |
+| `onProgress` | `(time: number) => void` | As time updates |
+| `onDuration` | `(duration: number) => void` | When the duration is known |
+| `onEnded`, `onPlay`, `onPause`, `onLoad` | `() => void` | Playback events |
+| `onVolumeChange` | `(volume: number) => void` | When the volume changes |
+| `onTrackChange` | `(index: number \| null, track?: VideoTrack) => void` | When the caption track changes |
+| `onQualityChange` | `(index: number, source) => void` | When the quality level changes |
+
+## Keyboard
+
+With `hotkeys` enabled:
+
+| Key | Action |
+|---|---|
+| Space | Play or pause |
+| Left, Right | Seek 5 seconds |
+| Up, Down | Volume |
+| F | Fullscreen |
+| M | Mute |
+| P | Picture in picture |
+| Escape | Exit fullscreen or picture in picture |
+
+## Known limitations
+
+These are fixed in version 4, and they won't change in version 3:
+
+- Sliders don't have a thumb by default, so a keyboard can't focus them and a screen reader doesn't announce them. Pass `hideThumb={false}` to change that.
+- Controls can hide while the video is paused.
+- A source that fails to load keeps showing a spinner.
+- Changing `src` after the first render doesn't load the new source.
+- Every part re-renders each time the current time updates.
+- HLS and DASH only work where the browser plays them natively.
+
+## License
+
+Apache-2.0

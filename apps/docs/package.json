@@ -10,7 +10,9 @@
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "media": "node scripts/gen-media.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "data": "node scripts/gen-data.mjs",
+    "check": "node scripts/gen-data.mjs --check && node scripts/check-docs.mjs"
   },
   "dependencies": {
     "dashjs": "5.2.1",

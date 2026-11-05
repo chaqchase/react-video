@@ -1,0 +1,163 @@
+---
+title: Captions
+description: Captions and subtitles drawn by the player, with a toggle and a menu.
+---
+
+<PluginSummary id="captions" />
+
+Adds a captions button to the controls and a **Captions** row to the settings menu, and draws the cues itself so you can style them. Press play in the demo. English is on from the start, in the colours set on the player. Switch to Arabic in the settings menu, or turn captions off with the button.
+
+<Demo slug="captions" />
+
+## Usage
+
+```tsx
+import { captions } from "react-video-kit/captions";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [
+  captions({
+    tracks: [
+      { src: "/captions.en.vtt", language: "en", label: "English" },
+      { src: "/captions.ar.vtt", language: "ar", label: "العربية" },
+    ],
+    language: "en",
+  }),
+];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+- `tracks` adds `<track>` elements to the video. `kind` is `"subtitles"` unless you set it to `"captions"`.
+- `language` turns a track on as soon as one with exactly that language appears. `"en"` doesn't match a track marked `"en-US"`.
+
+Cues sit at the bottom of the video, and lift clear of the controls while those are showing. With the [idle](/docs/v4/plugins/idle) plugin, they drop back down when the controls hide.
+
+`defaultPlugins()` already includes `captions()`, and installing a plugin twice throws. To add tracks to the defaults, leave out the plain one:
+
+```tsx
+import { captions, type CaptionTrack } from "react-video-kit/captions";
+import { defaultPlugins } from "react-video-kit/player";
+
+const tracks: CaptionTrack[] = [{ src: "/captions.en.vtt", language: "en", label: "English" }];
+
+const plugins = [
+  captions({ tracks }),
+  ...defaultPlugins().filter(({ name }) => name !== "captions"),
+];
+```
+
+The menu also picks up `<track>` elements you pass yourself. Use these when you need an `id` or `default`:
+
+```tsx
+import { captions } from "react-video-kit/captions";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [captions()];
+
+<VideoPlayer
+  src="/video.mp4"
+  plugins={plugins}
+  tracks={<track id="en-sdh" src="/captions.en-sdh.vtt" srcLang="en" label="English (SDH)" kind="captions" />}
+/>;
+```
+
+## Load tracks per source
+
+The `tracks` option has no per-source form. Its `<track>` elements go on the video once, when the element attaches, and they stay when the source changes. To change them with the source, build the plugins for each source and put a `key` on the player, so it remounts:
+
+```tsx
+"use client";
+
+import { useMemo } from "react";
+import { captions, type CaptionTrack } from "react-video-kit/captions";
+import { VideoPlayer } from "react-video-kit/player";
+
+function Film({ src, tracks }: { src: string; tracks: readonly CaptionTrack[] }) {
+  const plugins = useMemo(() => [captions({ tracks })], [tracks]);
+  return <VideoPlayer key={src} src={src} plugins={plugins} />;
+}
+```
+
+You can also swap `<track>` elements in place. Removing the active track turns captions off, and a new track in the language the viewer chose turns them back on.
+
+## Style the captions
+
+Three CSS variables cover the usual changes:
+
+```css
+.my-player {
+  --rv-caption-color: #fde68a;
+  --rv-caption-background: rgb(0 0 0 / 0.85);
+  --rv-caption-size: 20px;
+}
+```
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+
+<VideoPlayer className="my-player" src="/video.mp4" />;
+```
+
+By default, cues are white on `rgb(0 0 0 / 0.72)`, and their size follows the player's width, from 13px to 28px.
+
+For anything else, target `[data-part="caption-line"]`, one for each active cue, and `[data-part="captions"]`, the box around them. The player root has a `data-captions` attribute while a track is on. See [theming](/docs/v4/theming).
+
+## Draw the cues yourself
+
+`CaptionsDisplay` draws the cues, writing to the DOM directly with no React renders. It inserts what the browser's `getCueAsHTML()` returns, so WebVTT tags such as `<i>` and `<b>` work, and each active cue gets its own line. It only reads a cue's content, so settings such as `line:0` have no effect: cues always sit at the bottom centre.
+
+To show cues somewhere else as well, subscribe with `onCues`. It's called with the active cues each time they change:
+
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { useCommands } from "react-video-kit";
+import { captions } from "react-video-kit/captions";
+
+function LiveTranscript() {
+  const { onCues } = useCommands(captions);
+  const [text, setText] = useState("");
+  useEffect(
+    () => onCues((cues) => setText(cues.map((cue) => (cue as VTTCue).text).join(" "))),
+    [onCues]
+  );
+  return <p>{text}</p>;
+}
+```
+
+`VideoPlayer` always renders `CaptionsDisplay`, through the `overlay` slot. To replace it, hide `[data-part="captions"]` with CSS. In [your own layout](/docs/v4/composition/parts), cues only appear if you render `<Video.Slot name="overlay" />` or `<CaptionsDisplay />`.
+
+## Right-to-left cues
+
+Add the track like any other. In the default skin, each line works out its own direction with `unicode-bidi: plaintext`, so punctuation in an Arabic or Hebrew cue lands on the correct side, even in a left-to-right player. In a [headless layout](/docs/v4/composition/headless), put that on `[data-part="caption-line"]` yourself.
+
+## Subtitles from an engine
+
+Subtitle tracks in an HLS manifest join the same menu with no setup, and the plugin draws them like any other track. hls.js adds them to the video's text tracks, which the plugin watches, and its own display is turned off. Try it in the [audio tracks](/docs/v4/plugins/audio-tracks) demo, where **English** under **Captions** comes from this line in the manifest:
+
+```text
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=YES,URI="subtitles-en.m3u8"
+```
+
+Subtitle tracks in a DASH manifest join it too, and the plugin passes the viewer's choice to dash.js. They start off, as dash.js's own default would turn on the first track, and the menu uses the labels from the manifest. The [DASH](/docs/v4/plugins/dash#subtitles) page has a demo.
+
+<Callout type="warn" title="Not tested on real devices yet">
+  On iPhone and iPad, only the browser can draw captions in native fullscreen. When `webkitbeginfullscreen` fires, the plugin hands the active track to the browser, and it takes the track back on `webkitendfullscreen`. That has only run in unit tests with simulated events. In that mode the `--rv-caption-*` variables don't apply, because the browser draws through `::cue`, in white on `rgb(0 0 0 / 0.72)`. Subtitles from native HLS on those devices haven't been run either.
+</Callout>
+
+## Behaviour
+
+- `CaptionsToggle` and `CaptionsMenu` render nothing until there's a track.
+- `toggle` turns on the last track used, or the first if that one's gone or none has been. The `c` key does the same if the [hotkeys](/docs/v4/plugins/hotkeys) plugin is installed.
+- Only tracks of kind `captions` and `subtitles` appear. Other kinds are ignored.
+- A track the browser turns on by itself, such as one marked `default`, becomes the active track and the plugin draws it, so it isn't drawn twice. A `default` track stayed off in Playwright's WebKit while `language` worked there, so prefer `language`.
+- A track's ID is its `id`, then its language, then its label. When two tracks would share an ID, the later one gets its position added, so two English tracks are `en` and `en-1`. Removing a track can change the IDs after it, and the active track carries on under its new one.
+- `language` in the plugin's state is the language the viewer wants, and it carries over to tracks that appear later, such as the next video's. Choosing a track sets it to that track's language, and `prefer` sets it directly. Choosing Off clears it, so new tracks don't turn captions back on.
+- The cue box is `aria-hidden`, so screen readers don't announce cues.
+- The [persistence](/docs/v4/plugins/persistence) plugin saves the viewer's choice as soon as it's made, and restores it on the next visit.
+
+## API
+
+<PluginApi id="captions" />

@@ -1,0 +1,128 @@
+---
+title: Theming
+description: Change the skin with CSS variables, and style anything further with plain CSS.
+---
+
+The default skin is plain CSS with no dependencies. Every value worth changing is a CSS variable.
+
+## Try the tokens
+
+Each row is a real token, read from the skin's source. Change one and the player updates, with the CSS to copy above the list.
+
+<TokenEditor />
+
+## Set them
+
+Set tokens on the player, or on any element above it. They inherit, so a single rule can theme every player in a section.
+
+```css
+.my-player {
+  --rv-accent: #ffb27a;
+  --rv-radius: 8px;
+  --rv-control-size: 44px;
+}
+```
+
+```tsx
+<VideoPlayer className="my-player" src="/video.mp4" />
+```
+
+You can also set them inline, through `style`.
+
+## Import order and layers
+
+The skin is in a CSS layer named `rv`, so your own styles win however they're ordered, as long as they aren't in a lower layer.
+
+```tsx
+import "react-video-kit/styles.css";
+```
+
+### With Tailwind
+
+Layered CSS loses to unlayered CSS, and Tailwind 4 uses layers of its own, so declare where the skin goes. Put this first in your stylesheet:
+
+```css title="app/globals.css"
+@layer theme, base, rv, components, utilities;
+
+@import "tailwindcss";
+@import "react-video-kit/styles.css";
+```
+
+This puts the skin above Tailwind's reset, so the reset doesn't flatten it, and below its utilities, so a class such as `rounded-none` wins.
+
+```tsx
+<VideoPlayer className="rounded-none" src="/video.mp4" />
+```
+
+## Style a part
+
+Each part has a `data-part` attribute, and that's what the skin itself targets:
+
+```css
+.my-player [data-part="timeline-fill"] {
+  background: linear-gradient(90deg, #a698f5, #ffb27a);
+}
+
+.my-player [data-part="control-group"] {
+  backdrop-filter: none;
+  background: #17132b;
+}
+```
+
+Every control button also has `data-control`.
+
+## Style by state
+
+The player's root has [attributes for its state](/docs/v4/concepts/state-and-time#styling-from-state), and they update with no render:
+
+```css
+.my-player[data-paused] [data-part="control-group"] {
+  background: #17132b;
+}
+
+.my-player[data-controls="hidden"] {
+  cursor: none;
+}
+```
+
+## Size
+
+The skin responds to the player's own width rather than the window's, through a container query. A narrow player in a wide page gets the compact layout.
+
+| Player width | What changes |
+|---|---|
+| Under 480px | Compact controls, and menus become a bottom sheet |
+| 480px to 839px | The default |
+| 840px and over | Larger controls |
+
+The player is `16 / 9` and fills its container by default. To change the shape, set `aspect-ratio` on it. The video letterboxes to fit by default, and you can change that on the media part:
+
+```css
+.my-player {
+  aspect-ratio: 1 / 1;
+}
+
+.my-player [data-part="media"] {
+  object-fit: cover;
+}
+```
+
+## Right to left
+
+Install the [i18n](/docs/v4/plugins/i18n) plugin with a right-to-left locale and the controls mirror. The timeline and the play controls keep their direction, as they do in most video players, since time runs the same way.
+
+## Motion
+
+Controls animate with CSS only. With `prefers-reduced-motion: reduce`, transforms go away, and short opacity fades replace them. The easing and durations are tokens too:
+
+```css
+.my-player {
+  --rv-ease: ease-out;
+  --rv-duration-in: 100ms;
+  --rv-duration-out: 100ms;
+}
+```
+
+## Replace the skin
+
+To start from nothing, use the [headless primitives](/docs/v4/composition/headless) and don't import `styles.css`.

@@ -12,5 +12,5 @@ const items = [
 const plugins = [playlist({ items, countdown: 3 }), ...defaultPlugins()];
 
 export default function Playlist() {
-  return <VideoPlayer plugins={plugins} />;
+  return <VideoPlayer plugins={plugins} load="visible" />;
 }

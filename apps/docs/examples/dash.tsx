@@ -9,6 +9,7 @@ export default function Dash() {
       src="/media/dash/manifest.mpd"
       poster="/media/poster.jpg"
       plugins={[dash(), ...defaultPlugins()]}
+      load="visible"
     />
   );
 }

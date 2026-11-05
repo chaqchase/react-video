@@ -111,7 +111,7 @@ test.describe("ads", () => {
     await expect(page.locator('[data-part="timeline-input"]')).toBeDisabled();
     await expect(page.getByRole("link", { name: "Learn more" })).toHaveAttribute(
       "href",
-      "https://github.com/chaqchase/react-video-kit"
+      "https://github.com/chaqchase/react-video"
     );
 
     await page.getByRole("button", { name: "Skip ad" }).click({ timeout: 10_000 });

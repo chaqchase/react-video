@@ -1,0 +1,41 @@
+---
+title: Composition
+description: Three layers to build from. Start at the top, and go lower only when you need to.
+---
+
+All three use the same plugins and the same state, so you can move between them without rewriting anything else.
+
+<Tabs items={["Ready-made", "Styled parts", "Headless"]}>
+<Tab value="Ready-made">
+
+Every control, already arranged. Turn features on with plugins, and change the look with [tokens](/docs/v4/theming).
+
+<Demo slug="compose-ready" />
+
+</Tab>
+<Tab value="Styled parts">
+
+The same styled controls, in your own arrangement. Here, the timeline moves in line with the buttons.
+
+<Demo slug="compose-parts" />
+
+</Tab>
+<Tab value="Headless">
+
+Behaviour and accessibility with no CSS at all. The whole design here comes from Tailwind classes in the example.
+
+<Demo slug="compose-headless" />
+
+</Tab>
+</Tabs>
+
+## Which one to use
+
+| Choice | [Ready-made](/docs/v4/composition/player) | [Styled parts](/docs/v4/composition/parts) | [Headless](/docs/v4/composition/headless) |
+|---|---|---|---|
+| Import | `react-video-kit/player` | `react-video-kit` | `react-video-kit/primitives` |
+| You write | One component | The layout | The layout and all CSS |
+| Skin | Included | Included | None |
+| Good for | Most players | A different layout | A design system of your own |
+
+You can mix them too. Any part works inside `VideoPlayer` as a child, and your own components can read state with [hooks](/docs/v4/hooks) at any layer.

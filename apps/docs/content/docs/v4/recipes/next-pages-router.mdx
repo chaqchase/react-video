@@ -1,0 +1,77 @@
+---
+title: Next.js Pages Router
+description: Server-render the player from a page, on React 18 or 19.
+---
+
+<Install />
+
+## Add the player
+
+The Pages Router has no Server Components, so this file needs no directive:
+
+```tsx title="components/player.tsx"
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = defaultPlugins();
+
+export function Player({ src, poster }: { src: string; poster?: string }) {
+  return <VideoPlayer src={src} poster={poster} plugins={plugins} />;
+}
+```
+
+Import the skin in `_app`:
+
+```tsx title="pages/_app.tsx"
+import type { AppProps } from "next/app";
+import "react-video-kit/styles.css";
+
+export default function App({ Component, pageProps }: AppProps) {
+  return <Component {...pageProps} />;
+}
+```
+
+Then use it from any page:
+
+```tsx title="pages/index.tsx"
+import { Player } from "@/components/player";
+
+export default function Home() {
+  return <Player src="/video.mp4" poster="/poster.jpg" />;
+}
+```
+
+## Server rendering
+
+The player is in the page's HTML, whether the page is prerendered as above or rendered per request with `getServerSideProps`. You don't need `next/dynamic`.
+
+```tsx title="pages/watch.tsx"
+import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { Player } from "@/components/player";
+
+export const getServerSideProps = (async () => {
+  return { props: { src: "/video.mp4", poster: "/poster.jpg" } };
+}) satisfies GetServerSideProps;
+
+export default function Watch({ src, poster }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  return <Player src={src} poster={poster} />;
+}
+```
+
+## React 18
+
+The Pages Router still runs on React 18, and so does the player. It needs React 18.2 or newer.
+
+## Use it with Tailwind 4
+
+Put the skin in your global stylesheet, after a line that declares the layer order. The skin lives in the `rv` layer, so placing `rv` before `utilities` lets a class like `rounded-none` override it. Without that line, the skin wins.
+
+```css title="styles/globals.css"
+@layer theme, base, rv, components, utilities;
+
+@import "tailwindcss";
+@import "react-video-kit/styles.css";
+```
+
+Import `@/styles/globals.css` from `_app` in place of `react-video-kit/styles.css`. [Theming](/docs/v4/theming) has the details.
+
+Last built against Next.js 16.4.5 with Turbopack and Tailwind CSS 4.3.4, on React 19.3.0 and on React 18.3.1.

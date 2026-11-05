@@ -9,6 +9,7 @@ export default function Hls() {
       src="/media/hls/master.m3u8"
       poster="/media/poster.jpg"
       plugins={[hls(), ...defaultPlugins()]}
+      load="visible"
     />
   );
 }

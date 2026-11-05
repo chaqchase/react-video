@@ -1,0 +1,113 @@
+---
+title: Auto-hide
+description: Hides the controls when the viewer isn't using them.
+---
+
+<PluginSummary id="idle" />
+
+The `idle` plugin hides the controls during playback, and brings them back when the viewer moves the mouse, taps, or uses the keyboard. Press the play button in the middle of the video below and leave the mouse still: the label in the corner changes to `hidden` after 3 seconds. Move the mouse off the player and it takes 0.8 seconds. Pause, or open the settings menu, and the controls stay up.
+
+<Demo slug="idle" />
+
+## Usage
+
+```tsx
+import { idle } from "react-video-kit/idle";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [idle()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Without this plugin, the controls never hide. To change how long they wait, pass any of the three timeouts, in milliseconds:
+
+```tsx
+idle({ mouseTimeout: 5000, touchTimeout: 6000, leaveTimeout: 300 });
+```
+
+## When the controls hide
+
+During playback, the controls hide:
+
+- **3 seconds** (`mouseTimeout`) after the last mouse movement over the player, the last key press inside it, or keyboard focus moving inside it. The same wait starts when playback starts or resumes, and when a timeline drag ends.
+- **0.8 seconds** (`leaveTimeout`) after the mouse leaves the player.
+- **4 seconds** (`touchTimeout`) after a touch brings them back.
+- **At once** when the viewer taps outside the controls while they're showing.
+
+## What keeps them up
+
+The plugin won't hide the controls while any of these is true:
+
+- The video is paused or has ended.
+- Playback has failed with an error.
+- The viewer is dragging the timeline.
+- The mouse is over the controls.
+- A control has keyboard focus.
+- A menu is open.
+- The video is casting to a [Chromecast](/docs/v4/plugins/chromecast).
+
+The first three bring hidden controls back at once. The others only stop a hide: when one comes due and something's still in use, the plugin looks again every `mouseTimeout`. So after a menu closes, the controls can take up to 3 seconds to hide.
+
+## On touch
+
+Touch has no hover, so a tap toggles the controls:
+
+- A tap anywhere outside the controls hides them if they're showing and nothing above keeps them up. Otherwise it shows them for 4 seconds.
+- A tap on the controls, or a touch that moves more than 10px, never hides them. It shows them for 4 seconds.
+
+<Callout type="warn" title="Not tested on real devices yet">
+  Taps and the 4 second wait have only run in unit tests with simulated touch events, not on a real phone or tablet.
+</Callout>
+
+## Fade your own UI with the controls
+
+The plugin writes `data-controls="shown"` or `data-controls="hidden"` on the player's root, so CSS can follow it with no render:
+
+```css
+[data-controls="hidden"] .video-title {
+  opacity: 0;
+}
+```
+
+When you need the value in a component, read the plugin's state. Render the component inside the player:
+
+```tsx
+"use client";
+
+import { useVideoState } from "react-video-kit";
+import { idle } from "react-video-kit/idle";
+
+function VideoTitle() {
+  const visible = useVideoState(idle, (state) => state.visible);
+  return visible ? <h2>Trailer</h2> : null;
+}
+```
+
+## Hide the controls in your own layout
+
+The default skin does the hiding, so a [headless layout](/docs/v4/composition/headless) needs its own rule. Keep the controls in the page while they're hidden, because Tab has to be able to reach them. Use `display: none` and it can't.
+
+```css
+[data-controls="hidden"] [data-part="controls"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-controls="hidden"] [data-part="controls"]:has(:focus-visible) {
+  opacity: 1;
+}
+```
+
+Build the bar with `Controls`, and menus with `Menu` and `MenuContent`. The hover, focus, and open menu checks look for their `data-part` and `data-state` attributes.
+
+## Behaviour
+
+- The default skin also hides the cursor while the controls are hidden.
+- A key press inside the player counts as activity. So does a [hotkey](/docs/v4/plugins/hotkeys) that reaches the player while focus is elsewhere, which calls `show`.
+- `show` brings the controls back and starts the usual `mouseTimeout` wait, so they hide again afterwards.
+- `hide` and `toggle` set the state directly and skip the checks above. `hide` works while the video is paused, and the controls stay hidden until the next activity.
+
+## API
+
+<PluginApi id="idle" />

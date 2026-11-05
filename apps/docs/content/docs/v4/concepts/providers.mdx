@@ -1,0 +1,54 @@
+---
+title: Providers
+description: The layer that hides each media engine behind one interface.
+---
+
+A provider plays media. Every provider reports the same state and takes the same commands, so the controls and plugins never need to know which engine is running.
+
+The native provider ships in the kernel and handles anything the browser plays itself. [`hls()`](/docs/v4/plugins/hls) and [`dash()`](/docs/v4/plugins/dash) register providers for adaptive streams.
+
+## How a source finds a provider
+
+When a source loads, each registered provider is asked whether it can play it. That check is synchronous and imports nothing, based only on the source and the browser. The engine downloads only when its provider is chosen, and only when [`load`](/docs/v4/concepts/sources#when-it-loads) allows.
+
+```tsx
+const plugins = [hls(), dash()];
+
+<VideoPlayer src="/stream.mpd" plugins={plugins} />;
+```
+
+Here, a page that only ever plays MP4 downloads neither engine.
+
+## Providers stack
+
+A plugin can hand playback to another provider for a while. Only the top provider writes state and feeds the clock. The ones below it are suspended, and they resume with their own state when it's removed. A pushed provider can bring its own timeline and capabilities, and the ones from before it come back afterwards.
+
+This is how casting works. [Chromecast](/docs/v4/plugins/chromecast) pushes a provider that mirrors the remote device, so the timeline and play button keep working with nothing Cast-specific in them.
+
+## Write your own
+
+A provider implements this interface:
+
+<Api entry="react-video-kit/core" name="Provider" />
+
+Register it from a plugin, with a check that imports nothing, and a `load` that imports your engine only when needed:
+
+```tsx
+import { definePlugin } from "react-video-kit/core";
+
+export const myEngine = definePlugin("my-engine", () => ({
+  setup(context) {
+    context.registerProvider({
+      name: "my-engine",
+      canPlay: ({ src, type }) => type === "application/x-mine" || src.endsWith(".mine"),
+      load: () => import("./my-provider").then(({ MyProvider }) => MyProvider),
+    });
+  },
+}));
+```
+
+Providers report through a `Sink`, and only that way, which is what lets the stack suspend them:
+
+<Api entry="react-video-kit/core" name="Sink" />
+
+`time` is read by the clock on every tick, so it must not allocate.

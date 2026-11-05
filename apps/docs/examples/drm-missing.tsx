@@ -7,5 +7,5 @@ import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
 const plugins = [dash(), ...defaultPlugins()];
 
 export default function DrmMissing() {
-  return <VideoPlayer src="/media/drm/manifest.mpd" poster="/media/poster.jpg" plugins={plugins} />;
+  return <VideoPlayer src="/media/drm/manifest.mpd" poster="/media/poster.jpg" plugins={plugins} load="visible" />;
 }

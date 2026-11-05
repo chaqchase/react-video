@@ -1,0 +1,86 @@
+---
+title: Astro
+description: Run the player as a React island, and pick the client directive that suits the page.
+---
+
+Add Astro's React integration, then the package:
+
+```bash
+npx astro add react
+```
+
+<Install />
+
+## Add the player
+
+The island is a React component, and it creates its own plugins:
+
+```tsx title="src/components/Player.tsx"
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+
+const plugins = defaultPlugins();
+
+export function Player({ src, poster }: { src: string; poster?: string }) {
+  return <VideoPlayer src={src} poster={poster} plugins={plugins} />;
+}
+```
+
+Importing the skin in the island is enough. Astro bundles it and links it in the page.
+
+```astro title="src/pages/index.astro"
+---
+import { Player } from "../components/Player";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Watch</title>
+  </head>
+  <body>
+    <Player client:load src="/video.mp4" poster="/poster.jpg" />
+  </body>
+</html>
+```
+
+## Keep plugins inside the island
+
+Astro writes an island's props into the HTML as JSON, and functions don't survive that. Plugins are made of functions, so create them in the React file, as above. Pass only plain data, like `src` and `poster`, from the `.astro` file.
+
+<Callout type="warn" title="The build won't catch this">
+  Passing `plugins={defaultPlugins()}` from an `.astro` file builds without an error. Each plugin's functions become `null`, and the island fails in the browser, leaving no player on the page. The console says the plugin "arrived without its code".
+</Callout>
+
+## Choose a client directive
+
+| Directive | Server's HTML | Becomes interactive |
+|---|---|---|
+| `client:load` | Has the player | As soon as the page loads |
+| `client:visible` | Has the player | When it scrolls into view. Until then, the page requests neither the island's code nor the video. |
+| `client:only="react"` | No player | As soon as the page loads |
+| None | Has the player | Never. The controls don't work and the video doesn't load. |
+
+Use `client:visible` for a player below the fold, and `client:load` for one the viewer sees straight away. A `client:load` player can still put off fetching the video until it's on screen with `load="visible"`.
+
+## Use it with Tailwind 4
+
+Add Astro's Tailwind integration:
+
+```bash
+npx astro add tailwind
+```
+
+Then put the skin in the stylesheet it created, after a line that declares the layer order. The skin lives in the `rv` layer, so placing `rv` before `utilities` lets a class like `rounded-none` override it. Without that line, the skin wins.
+
+```css title="src/styles/global.css"
+@layer theme, base, rv, components, utilities;
+
+@import "tailwindcss";
+@import "react-video-kit/styles.css";
+```
+
+Import `../styles/global.css` in the page's frontmatter, and remove the skin's import from `src/components/Player.tsx`. [Theming](/docs/v4/theming) has the details.
+
+Last built against Astro 7.4.5, `@astrojs/react` 7.1.2, React 19.3.1, and Tailwind CSS 4.3.4.

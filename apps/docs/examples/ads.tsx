@@ -7,5 +7,5 @@ import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
 const plugins = [ads({ engine: vast({ tag: "/ads/preroll.xml" }) }), ...defaultPlugins()];
 
 export default function Ads() {
-  return <VideoPlayer src="/media/sample-360.mp4" poster="/media/poster.jpg" plugins={plugins} />;
+  return <VideoPlayer src="/media/sample-360.mp4" poster="/media/poster.jpg" plugins={plugins} load="visible" />;
 }

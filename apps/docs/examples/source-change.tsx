@@ -17,7 +17,7 @@ const clips = {
 export default function SourceChange() {
   const [clip, setClip] = useState<keyof typeof clips>("Low");
   return (
-    <Video.Root src={clips[clip]}>
+    <Video.Root src={clips[clip]} load="visible">
       <Video.Media width={640} height={360} />
       <button type="button" onClick={() => setClip("Low")}>
         Low
