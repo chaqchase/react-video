@@ -232,6 +232,35 @@ test.describe("docs", () => {
     });
   }
 
+  test("every internal link goes to a page, and to a section that exists", async ({ request, browserName }) => {
+    test.skip(browserName !== "chromium", "This only reads the server's HTML, so one browser is enough.");
+    test.setTimeout(180_000);
+    const sections = new Map<string, Set<string> | null>();
+    const links = new Map<string, string>();
+    const queue = ["/"];
+    // Reads each page it finds, so a link built from data is checked as well as a written one.
+    for (const path of queue) {
+      if (sections.has(path)) continue;
+      const response = await request.get(path);
+      const isPage = response.ok() && response.headers()["content-type"]?.includes("text/html");
+      const html = isPage ? await response.text() : "";
+      sections.set(path, response.ok() ? new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(([, id]) => id as string)) : null);
+      for (const [, href] of html.matchAll(/<a\b[^>]*?\bhref="([^"]+)"/g)) {
+        if (!href?.startsWith("/") || href.startsWith("//")) continue;
+        const { pathname, hash } = new URL(href.replaceAll("&amp;", "&"), "http://site");
+        links.set(pathname + hash, path);
+        queue.push(pathname);
+      }
+    }
+    expect(sections.size).toBeGreaterThan(50);
+    const broken = [...links].filter(([link]) => {
+      const [path, hash] = link.split("#") as [string, string | undefined];
+      const found = sections.get(path);
+      return !found || (hash !== undefined && !found.has(decodeURIComponent(hash)));
+    });
+    expect(broken.map(([link, from]) => `${from} links to ${link}`)).toEqual([]);
+  });
+
   test("every page in the sitemap renders, without errors or accessibility violations", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "One browser is enough to find a page that doesn't render.");
     test.setTimeout(400_000);

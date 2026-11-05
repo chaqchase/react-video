@@ -27,6 +27,7 @@ export default function Analytics() {
         heartbeat for every 10 seconds played.
       </p>
       <ol aria-label="Analytics events" className="flex min-h-44 flex-col gap-1 font-mono text-xs break-all text-current">
+        {log.length === 0 && <li className="opacity-80">No events yet. Press play.</li>}
         {log.map((line, index) => (
           <li key={index}>{line}</li>
         ))}
