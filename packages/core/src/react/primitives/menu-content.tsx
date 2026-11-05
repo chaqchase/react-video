@@ -5,7 +5,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
@@ -13,31 +12,19 @@ import {
 import { usePlayer } from "../context";
 import { mergeRefs, useNodeRef } from "./as-child";
 import { useMenu } from "./menu-context";
+import { usePresence } from "./use-presence";
 
-/** Keep in step with the exit transition, plus some margin for timer drift. */
-const EXIT_MS = 200;
 const TYPEAHEAD_RESET_MS = 500;
 /** The gap kept above a menu, plus the distance its entrance starts below where it ends. */
 const ROOM_MARGIN = 14;
 const ITEM_SELECTOR = '[role^="menuitem"]:not([aria-disabled="true"])';
-
-/** Keeps a closing element mounted long enough for its exit transition to play. */
-function usePresence(open: boolean) {
-  const [mounted, setMounted] = useState(open);
-  if (open && !mounted) setMounted(true);
-  useEffect(() => {
-    if (open || !mounted) return;
-    const timer = setTimeout(() => setMounted(false), EXIT_MS);
-    return () => clearTimeout(timer);
-  }, [mounted, open]);
-  return mounted;
-}
 
 function itemsIn(panel: Element | null | undefined) {
   return panel ? [...panel.querySelectorAll<HTMLElement>(ITEM_SELECTOR)] : [];
 }
 
 export interface MenuContentProps extends HTMLAttributes<HTMLDivElement> {
+  /** The rows at the top level of the menu. */
   children?: ReactNode;
 }
 
@@ -175,6 +162,7 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(
         >
           <div
             role="menu"
+            aria-labelledby={`${menu.id}-trigger`}
             data-part="menu-panel"
             data-active={view === null ? "" : undefined}
             data-root=""

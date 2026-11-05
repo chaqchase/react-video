@@ -1,0 +1,78 @@
+/* Only what's needed, in white: a slim timeline and plain icons on one line. */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-minimal {
+    --rv-accent: #fff;
+    --rv-focus: #fff;
+    --rv-glass-strong: rgb(20 20 22 / 0.94);
+    --rv-glass-hover: rgb(255 255 255 / 0.1);
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.3);
+    --rv-radius: 10px;
+    --rv-menu-radius: 12px;
+    --rv-control-size: 32px;
+    --rv-icon-size: 18px;
+    --rv-bar-track: 2px;
+    --rv-bar-track-active: 4px;
+  }
+
+  .rv-root.rv-theme-minimal [data-part="controls"]::before {
+    background: linear-gradient(transparent 62%, rgb(0 0 0 / 0.66));
+  }
+
+  /* A name in the corner needs a shade of its own, or it would vanish against a bright sky. */
+  .rv-root.rv-theme-minimal [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.68), transparent 26%, transparent 62%, rgb(0 0 0 / 0.66));
+  }
+
+  .rv-root.rv-theme-minimal [data-part="controls"]::after {
+    content: none;
+  }
+
+  .rv-root.rv-theme-minimal [data-part="timeline"] {
+    flex: 1 1 0;
+    order: 6;
+    min-width: 40px;
+    margin-inline: 8px;
+  }
+
+  .rv-root.rv-theme-minimal [data-part="current-time"] {
+    order: 5;
+    margin-inline: 4px 0;
+  }
+
+  .rv-root.rv-theme-minimal [data-part="remaining-time"] {
+    order: 7;
+    margin-inline: 0 4px;
+  }
+
+  /* The timeline never mirrors, so each time stays at its own end of it. */
+  .rv-root.rv-theme-minimal[dir="rtl"] [data-part="current-time"] {
+    order: 7;
+    margin-inline: 0 4px;
+  }
+
+  .rv-root.rv-theme-minimal[dir="rtl"] [data-part="remaining-time"] {
+    order: 5;
+    margin-inline: 4px 0;
+  }
+
+  .rv-root.rv-theme-minimal [data-part="title-description"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-minimal [data-part="play-overlay"] {
+    background: rgb(0 0 0 / 0.4);
+  }
+
+  .rv-root.rv-theme-minimal [data-part="captions-toggle"][aria-pressed="true"] {
+    background: var(--rv-glass-hover);
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-minimal [data-part="play-overlay"]:hover {
+      background: rgb(0 0 0 / 0.55);
+    }
+  }
+}

@@ -19,7 +19,8 @@ export type MediaProps = Omit<
  * `src` or `<source>` children. Pass `<track>` elements as children.
  */
 export const Media = forwardRef<HTMLVideoElement, MediaProps>(function Media(
-  { playsInline = true, preload = "metadata", children, ...props },
+  // Firefox would otherwise stop on the video, which does nothing with focus.
+  { playsInline = true, preload = "metadata", tabIndex = -1, children, ...props },
   forwarded
 ) {
   const player = usePlayer();
@@ -38,6 +39,7 @@ export const Media = forwardRef<HTMLVideoElement, MediaProps>(function Media(
       data-part="media"
       playsInline={playsInline}
       preload={preload}
+      tabIndex={tabIndex}
       {...props}
     >
       {children}

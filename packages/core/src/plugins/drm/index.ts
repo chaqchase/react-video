@@ -1,3 +1,4 @@
+import { toErrorInfo, VideoKitError } from "../../core/kit-error";
 import { definePlugin } from "../../core/plugin";
 import type { SourceObject } from "../../core/types";
 import { clearKeyLicense, KEY_SYSTEMS, type DrmConfig, type KeySystemConfig } from "./config";
@@ -37,8 +38,43 @@ async function requestLicense(system: KeySystemConfig, message: ArrayBuffer) {
     headers: system.headers,
     credentials: system.withCredentials ? "include" : "same-origin",
   });
-  if (!response.ok) throw new Error(`The licence server returned ${response.status}.`);
+  if (!response.ok) {
+    const { status } = response;
+    throw new VideoKitError(
+      status === 401 || status === 403 ? "drm-denied" : "drm-license",
+      `The licence server returned ${status}.`,
+      { retryable: status !== 401 && status !== 403, nativeCode: status }
+    );
+  }
   return response.arrayBuffer();
+}
+
+async function setCertificate(keys: MediaKeys, url: string) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`The certificate server returned ${response.status}.`);
+    await keys.setServerCertificate(await response.arrayBuffer());
+  } catch (cause) {
+    throw new VideoKitError("drm-certificate", cause instanceof Error ? cause.message : String(cause), {
+      retryable: true,
+      cause,
+    });
+  }
+}
+
+const usable = new Set<MediaKeyStatus>(["usable", "output-downscaled", "status-pending"]);
+
+/** Says why none of a session's keys can play anything, or returns null if some can. */
+function keyFailure(session: MediaKeySession) {
+  const statuses: MediaKeyStatus[] = [];
+  session.keyStatuses.forEach((status) => statuses.push(status));
+  const [status] = statuses;
+  if (!status || statuses.some((each) => usable.has(each))) return null;
+  return new VideoKitError(
+    status === "expired" ? "drm-expired" : status === "output-restricted" ? "drm-output-restricted" : "drm-session",
+    `The key's status is ${status}.`,
+    { retryable: false, nativeCode: status }
+  );
 }
 
 /**
@@ -48,7 +84,13 @@ async function requestLicense(system: KeySystemConfig, message: ArrayBuffer) {
  * then Clear Key, whatever order the config lists them in.
  */
 export const drm = definePlugin("drm", (options: DrmOptions) => ({
-  state: () => ({ system: null as string | null }),
+  state: () => ({
+    /** The key system the current source plays through natively, or null until it needs one. */
+    system: null as string | null,
+  }),
+  source(context) {
+    context.set({ system: null });
+  },
   gates: {
     load(request, next) {
       const config = typeof options === "function" ? options(request.source) : options;
@@ -58,10 +100,13 @@ export const drm = definePlugin("drm", (options: DrmOptions) => ({
   attach(context, element, scope) {
     let config: DrmConfig | null = null;
     let ready: Promise<SystemName> | null = null;
+    let chosen: SystemName | null = null;
+    let currentSrc: string | null = null;
     const seen = new Set<string>();
 
     const prepare = async (): Promise<SystemName> => {
       const available = (Object.keys(KEY_SYSTEMS) as SystemName[]).filter((name) => config?.[name]);
+      let failure: unknown;
       for (const name of available) {
         try {
           const access = await navigator.requestMediaKeySystemAccess(
@@ -70,30 +115,27 @@ export const drm = definePlugin("drm", (options: DrmOptions) => ({
           );
           const keys = await access.createMediaKeys();
           if (name === "fairplay" && config?.fairplay) {
-            const response = await fetch(config.fairplay.certificateUrl);
-            await keys.setServerCertificate(await response.arrayBuffer());
+            await setCertificate(keys, config.fairplay.certificateUrl);
           }
           await element.setMediaKeys(keys);
-          context.set({ system: KEY_SYSTEMS[name] });
+          chosen = name;
           return name;
-        } catch {
+        } catch (error) {
           // On to the next system.
+          failure = error;
         }
       }
-      throw new Error("This browser supports none of the configured key systems.");
+      throw failure instanceof VideoKitError
+        ? failure
+        : new VideoKitError("drm-unsupported", "This browser supports none of the configured key systems.", {
+            retryable: false,
+            cause: failure,
+          });
     };
 
     const fail = (error: unknown) => {
       if (scope.signal.aborted) return;
-      context.report({
-        status: "error",
-        waiting: false,
-        error: {
-          code: "drm",
-          message: error instanceof Error ? error.message : String(error),
-          fatal: true,
-        },
-      });
+      context.error(toErrorInfo(error, { code: "drm-session", fatal: true, retryable: false }));
     };
 
     const onEncrypted = (event: MediaEncryptedEvent) => {
@@ -104,6 +146,13 @@ export const drm = definePlugin("drm", (options: DrmOptions) => ({
       if (!resolved) return;
       config = resolved;
 
+      if (source.src !== currentSrc) {
+        currentSrc = source.src;
+        seen.clear();
+        // Keys stay while the new source can use them, since replacing them can fail in some browsers.
+        if (chosen && !resolved[chosen]) ready = null;
+      }
+
       const id = decoder.decode(event.initData);
       if (seen.has(id)) return;
       seen.add(id);
@@ -113,8 +162,13 @@ export const drm = definePlugin("drm", (options: DrmOptions) => ({
         .then(async (name) => {
           const keys = element.mediaKeys;
           if (!keys || !event.initData) return;
+          context.set({ system: KEY_SYSTEMS[name] });
           const session = keys.createSession();
           scope.add(() => void session.close().catch(() => {}));
+          session.addEventListener("keystatuseschange", () => {
+            const failure = keyFailure(session);
+            if (failure) fail(failure);
+          });
           session.addEventListener("message", (message) => {
             const handle = async () => {
               if (name === "clearkey" && config?.clearkey) {
@@ -131,7 +185,13 @@ export const drm = definePlugin("drm", (options: DrmOptions) => ({
           });
           await session.generateRequest(event.initDataType, event.initData);
         })
-        .catch(fail);
+        .catch((error: unknown) => {
+          // Reloading goes through all this again, rather than staying stuck on this failure.
+          ready = null;
+          chosen = null;
+          seen.clear();
+          fail(error);
+        });
     };
 
     scope.on(element, "encrypted", onEncrypted as EventListener);

@@ -15,6 +15,7 @@ export const quality = definePlugin("quality", () => {
   let hasRenditions = false;
   return {
     commands: (context) => ({
+      /** Switches to this level, or to automatic choice with `auto` if the provider offers it. */
       select: (id: string | "auto") => context.commands.setQuality(id),
     }),
     setup(context) {

@@ -1,6 +1,6 @@
 import type { ErrorData, HlsConfig, LevelDetails } from "hls.js";
 import type Hls from "hls.js";
-import type { LoadRequest, Provider } from "../../core/types";
+import type { KnownVideoErrorCode, LoadRequest, Provider } from "../../core/types";
 import { NativeProvider } from "../../providers/native/index";
 import { toHlsDrm, type DrmConfig } from "../drm/config";
 
@@ -8,6 +8,45 @@ import { toHlsDrm, type DrmConfig } from "../drm/config";
 const DVR_MIN_SECONDS = 60;
 const MEDIA_RECOVERIES = 2;
 const RECOVERY_WINDOW_MS = 30_000;
+
+// hls.js's `details`, for the failures that say more than their `type` does.
+const CODES: Record<string, KnownVideoErrorCode> = {
+  manifestLoadError: "hls-manifest",
+  manifestLoadTimeOut: "hls-manifest",
+  manifestParsingError: "hls-manifest-invalid",
+  levelParsingError: "hls-manifest-invalid",
+  manifestIncompatibleCodecsError: "hls-codecs",
+  bufferIncompatibleCodecsError: "hls-codecs",
+  bufferAddCodecError: "hls-codecs",
+  levelLoadError: "hls-playlist",
+  levelLoadTimeOut: "hls-playlist",
+  levelEmptyError: "hls-playlist",
+  playlistUnchangedError: "hls-playlist",
+  audioTrackLoadError: "hls-playlist",
+  audioTrackLoadTimeOut: "hls-playlist",
+  subtitleTrackLoadError: "hls-playlist",
+  subtitleTrackLoadTimeOut: "hls-playlist",
+  fragLoadError: "hls-segment",
+  fragLoadTimeOut: "hls-segment",
+  keyLoadError: "hls-key",
+  keyLoadTimeOut: "hls-key",
+  keySystemNoAccess: "drm-unsupported",
+  keySystemNoConfiguredLicense: "drm-config",
+  keySystemLicenseRequestFailed: "drm-license",
+  keySystemServerCertificateRequestFailed: "drm-certificate",
+  keySystemServerCertificateUpdateFailed: "drm-certificate",
+  keySystemStatusOutputRestricted: "drm-output-restricted",
+};
+
+const RETRYABLE = new Set<string>([
+  "hls-manifest",
+  "hls-playlist",
+  "hls-segment",
+  "hls-key",
+  "hls-network",
+  "drm-certificate",
+  "drm-license",
+]);
 
 export function createHlsProvider(
   Engine: typeof Hls,
@@ -129,16 +168,25 @@ export function createHlsProvider(
         }
       }
 
+      const status = data.response?.code;
+      const code =
+        CODES[data.details] === "drm-license" && (status === 401 || status === 403)
+          ? "drm-denied"
+          : (CODES[data.details] ??
+            (data.type === ErrorTypes.NETWORK_ERROR
+              ? "hls-network"
+              : data.type === ErrorTypes.KEY_SYSTEM_ERROR
+                ? "drm-session"
+                : data.type === ErrorTypes.MEDIA_ERROR || data.type === ErrorTypes.MUX_ERROR
+                  ? "hls-media"
+                  : "hls-unknown"));
       this.sink?.error({
-        code:
-          data.type === ErrorTypes.NETWORK_ERROR
-            ? "network"
-            : data.type === ErrorTypes.MEDIA_ERROR
-              ? 3
-              : data.details,
+        code,
         message: data.error?.message || data.details,
         fatal: true,
-        source: this.source ?? undefined,
+        retryable: RETRYABLE.has(code),
+        nativeCode: data.details,
+        cause: data,
       });
     }
   };

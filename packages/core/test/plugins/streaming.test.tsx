@@ -255,11 +255,11 @@ describe("hls", () => {
       expect(media().error).toBeNull();
     });
 
-    it("reports fatal network errors in the form the recovery plugin retries", async () => {
+    it("marks fatal network errors as ones the recovery plugin retries", async () => {
       const { engine, player, media } = await load(fakeHls(), { plugins: [recovery()] });
       engine.current().emit(engine.Events.ERROR, failure(engine.ErrorTypes.NETWORK_ERROR));
       await settle();
-      expect(media().error).toMatchObject({ code: "network", fatal: true });
+      expect(media().error).toMatchObject({ code: "hls-network", fatal: true, retryable: true });
       expect(player.plugin(recovery).state().retrying).toBe(true);
     });
 
@@ -280,7 +280,7 @@ describe("hls", () => {
       fail();
       await settle();
       expect(instance.recoverMediaError).toHaveBeenCalledTimes(2);
-      expect(media().error).toMatchObject({ code: 3, fatal: true });
+      expect(media().error).toMatchObject({ code: "hls-media", fatal: true, retryable: false });
     });
 
     it("leaves element errors to the engine, which may recover from them", async () => {
@@ -297,7 +297,8 @@ describe("hls", () => {
         src: hlsSource,
         plugins: [hls({ library: () => Promise.reject(new Error("CDN down")) })],
       });
-      expect(media().error).toMatchObject({ code: "load-failed", message: "CDN down", fatal: true });
+      expect(media().error).toMatchObject({ code: "hls-engine-load", fatal: true, retryable: true });
+      expect(media().error?.message).toContain("CDN down");
     });
   });
 });
@@ -456,15 +457,15 @@ describe("dash", () => {
     expect(instance.getDvrWindow).not.toHaveBeenCalled();
   });
 
-  it("marks failed downloads as network errors, and others by their code", async () => {
+  it("marks failed downloads as retryable, and keeps dash.js's own number", async () => {
     const network = await load();
     network.engine.current().emit("error", { error: { code: 27, message: "Download failed" } });
     await settle();
-    expect(network.media().error).toMatchObject({ code: "network", fatal: true });
+    expect(network.media().error).toMatchObject({ code: "dash-segment", fatal: true, retryable: true, nativeCode: 27 });
     const decode = await load();
     decode.engine.current().emit("error", { error: { code: 54, message: "Bad" } });
     await settle();
-    expect(decode.media().error).toMatchObject({ code: 54, message: "Bad" });
+    expect(decode.media().error).toMatchObject({ code: "dash-unknown", nativeCode: 54, message: "Bad", retryable: false });
   });
 
   it("keeps captions off at first, and names tracks for the captions plugin", async () => {

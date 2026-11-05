@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, type HTMLAttributes } from "react";
+import { VideoKitError } from "../../core/kit-error";
 import type { PreviewListener, TimelineController } from "./timeline-controller";
 
 export const TimelineContext = createContext<TimelineController | null>(null);
@@ -8,7 +9,7 @@ export const TimelineContext = createContext<TimelineController | null>(null);
 export function useTimeline() {
   const controller = useContext(TimelineContext);
   if (!controller) {
-    throw new Error("react-video-kit: this part must be inside <Video.Timeline>.");
+    throw new VideoKitError("part-outside-timeline", "react-video-kit: this part must be inside <Video.Timeline>.");
   }
   return controller;
 }

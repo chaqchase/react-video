@@ -1,0 +1,206 @@
+/*
+ * After Prime Video: the title centred at the top with its buttons in the top corner,
+ * a large bare transport in the middle, and a white timeline with its times at the bottom.
+ */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-prime {
+    --rv-accent: #fff;
+    --rv-focus: #fff;
+    --rv-font: "Amazon Ember", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-muted: rgb(255 255 255 / 0.65);
+    --rv-glass-strong: rgb(25 30 37 / 0.97);
+    --rv-glass-hover: rgb(255 255 255 / 0.14);
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.45);
+    --rv-radius: 0;
+    --rv-menu-radius: 4px;
+    --rv-pill-radius: 4px;
+    --rv-control-size: 32px;
+    --rv-icon-size: 19px;
+    --rv-inset: 24px;
+    --rv-bar-track: 2px;
+    --rv-bar-track-active: 4px;
+    --rv-bar-play-order: 0;
+  }
+
+  /* Everything but the time lives along the top, so the row starts there and runs from the far end. */
+  .rv-root.rv-theme-prime [data-part="controls"] {
+    align-content: flex-start;
+    justify-content: flex-end;
+    padding-block-end: var(--rv-inset-scaled);
+  }
+
+  .rv-root.rv-theme-prime [data-part="controls"]::before,
+  .rv-root.rv-theme-prime [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.72), rgb(0 0 0 / 0.42) 34%, rgb(0 0 0 / 0.42) 66%, rgb(0 0 0 / 0.78));
+  }
+
+  .rv-root.rv-theme-prime [data-part="controls"]::after {
+    content: none;
+  }
+
+  .rv-root.rv-theme-prime [data-position="details"] > [data-part="control-group"]:last-child > *,
+  .rv-root.rv-theme-prime [data-position="top"] > [data-part="control-group"]:last-child > :not([data-part="volume"]) {
+    order: 1;
+  }
+
+  .rv-root.rv-theme-prime [data-part="menu-trigger"] {
+    order: 2;
+  }
+
+  .rv-root.rv-theme-prime [data-part="volume"] {
+    order: 3;
+  }
+
+  .rv-root.rv-theme-prime [data-position="top"] > [data-part="control-group"]:first-child > * {
+    order: 4;
+  }
+
+  /* The transport keeps its box, in the middle of the picture. */
+  .rv-root.rv-theme-prime [data-part="transport"] {
+    display: flex;
+    gap: calc(var(--rv-control-size) * var(--rv-scale, 1) * 1.8);
+  }
+
+  .rv-root.rv-theme-prime [data-part="transport"] > [data-part="seek-button"] {
+    display: inline-grid;
+  }
+
+  .rv-root.rv-theme-prime [data-part="transport"] > [data-control] {
+    width: calc(var(--rv-bar) * 1.7);
+    height: calc(var(--rv-bar) * 1.7);
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1) * 2.3);
+  }
+
+  .rv-root.rv-theme-prime [data-part="play-overlay"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-prime:not([data-started]) [data-part="controls"] {
+    --rv-shown: 1;
+  }
+
+  /* The title sits in the middle of the top, with the episode under it. */
+  .rv-root.rv-theme-prime [data-part="title"] {
+    inset-inline: 0;
+    align-items: flex-start;
+    gap: 3px;
+    padding-inline: var(--rv-inset-scaled) 190px;
+    text-shadow: none;
+  }
+
+  @container rv (min-width: 720px) {
+    .rv-root.rv-theme-prime [data-part="title"] {
+      align-items: center;
+      padding-inline: 190px;
+      text-align: center;
+    }
+  }
+
+  .rv-root.rv-theme-prime [data-part="title-text"] {
+    max-width: 100%;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .rv-root.rv-theme-prime [data-part="title-eyebrow"] {
+    order: 1;
+    color: var(--rv-foreground);
+    font-size: 14px;
+  }
+
+  .rv-root.rv-theme-prime [data-part="title-description"] {
+    display: none;
+  }
+
+  /* The timeline and times keep a box of their own along the bottom. */
+  .rv-root.rv-theme-prime [data-position="scrubber"] {
+    position: absolute;
+    inset: auto var(--rv-inset-scaled) calc(var(--rv-inset-scaled) * 0.6);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: baseline;
+    justify-content: flex-start;
+  }
+
+  .rv-root.rv-theme-prime [data-part="current-time"] {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-prime [data-part="remaining-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-prime [data-position="scrubber"] > [data-part="duration"] {
+    display: inline;
+    margin-inline-start: 4px;
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-prime [data-position="scrubber"] > [data-part="duration"]::before {
+    content: "/ ";
+  }
+
+  /* The corner is for buttons, so the pill sits just above the start of the timeline. */
+  .rv-root.rv-theme-prime [data-part="live"] {
+    position: absolute;
+    inset-block-end: calc(var(--rv-inset-scaled) * 0.6 + 20px);
+    inset-inline-start: var(--rv-inset-scaled);
+    margin: 0;
+  }
+
+  /* Up at the top, things open downwards. */
+  .rv-root.rv-theme-prime [data-part="control-group"] [data-control][aria-label]::after,
+  .rv-root.rv-theme-prime [data-position="top"] [data-control][aria-label]::after {
+    inset-block: calc(100% + 10px) auto;
+  }
+
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-prime [data-part="control-group"] [data-part="menu-content"] {
+      top: calc(var(--rv-inset-scaled) + var(--rv-bar) + 8px);
+      bottom: auto;
+      transform-origin: top right;
+    }
+
+    .rv-root.rv-theme-prime [data-part="menu-panel"] {
+      max-height: 320px;
+    }
+  }
+
+  @container rv (max-width: 479px) {
+    /* The transport fills the middle, which leaves room only between it and the timeline. */
+    .rv-root.rv-theme-prime:not([data-controls="hidden"]) [data-part="captions"] {
+      transform: translateY(-24px);
+    }
+
+    .rv-root.rv-theme-prime [data-part="title"] {
+      display: none;
+    }
+
+    .rv-root.rv-theme-prime [data-part="transport"] > [data-control] {
+      width: calc(var(--rv-bar) * 1.4);
+      height: calc(var(--rv-bar) * 1.4);
+      font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1) * 1.8);
+    }
+
+    .rv-root.rv-theme-prime [data-part="transport"] {
+      gap: var(--rv-bar);
+    }
+
+    .rv-root.rv-theme-prime [data-position="scrubber"] > [data-part="duration"] {
+      display: inline;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-prime [data-part="transport"] > [data-control]:hover {
+      background: transparent;
+      transform: scale(1.08);
+    }
+  }
+}

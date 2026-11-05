@@ -50,6 +50,20 @@ for (const file of files) {
   }
 }
 
+// Each theme stands alone, so the shared partial's placeholder must not survive the build.
+const themes = resolve(dist, "themes");
+const sources = readdirSync(resolve(root, "src/ui/styles/themes")).filter((file) => !file.startsWith("_"));
+for (const file of sources) {
+  const path = resolve(themes, file);
+  if (!existsSync(path)) {
+    failures.push(`themes/${file}: missing from the build`);
+    continue;
+  }
+  const css = readFileSync(path, "utf8");
+  if (css.includes("rv-theme-bar")) failures.push(`themes/${file}: placeholder class left in`);
+  if (!css.includes(`rv-theme-${file.replace(".css", "")}`)) failures.push(`themes/${file}: missing its own class`);
+}
+
 if (failures.length > 0) {
   console.error(`dist check failed:\n  ${failures.join("\n  ")}`);
   process.exit(1);

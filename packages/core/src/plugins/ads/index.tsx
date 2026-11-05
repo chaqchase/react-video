@@ -1,12 +1,15 @@
 "use client";
 
+import { useEffect, type ReactElement } from "react";
+import { toErrorInfo } from "../../core/kit-error";
 import { definePlugin } from "../../core/plugin";
 import type { Scope } from "../../core/scope";
-import type { ReactElement } from "react";
-import type { MediaState, Provider, Sink, SourceObject } from "../../core/types";
+import type { KnownVideoErrorCode, MediaErrorInfo, MediaState, Provider, Sink, SourceObject } from "../../core/types";
 import { formatTime } from "../../lib/format-time";
+import { usePlayer } from "../../react/context";
 import { useCommands, useCurrentTime, useLabel, useVideoState } from "../../react/hooks";
 import { Button } from "../../react/primitives/button";
+import { useFocusFallback } from "../../react/primitives/focus-fallback";
 import type { AdEngine, AdHost, AdInfo } from "./engine";
 
 export type { AdEngine, AdHost, AdInfo } from "./engine";
@@ -16,8 +19,8 @@ export interface AdsOptions {
   engine: (source: SourceObject) => AdEngine | null;
   /** Milliseconds to wait for a pre-roll before playing the content instead. */
   timeout?: number;
-  /** Told about every failure, since the viewer never sees them. */
-  onError?: (error: unknown) => void;
+  /** Told about every failure, since the viewer never sees them. `Root`'s `onError` hears these too. */
+  onError?: (error: MediaErrorInfo) => void;
 }
 
 /** Puts an ad on the timeline, so `Timeline` and `Time` need no special cases. */
@@ -90,10 +93,28 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
   let endBreak: () => void = () => {};
   let adProvider: AdProvider | null = null;
 
+  const report = (
+    context: { error(error: MediaErrorInfo): void },
+    code: KnownVideoErrorCode,
+    cause: unknown
+  ) => {
+    const error = toErrorInfo(cause, { code, fatal: false, retryable: false });
+    onError?.(error);
+    context.error(error);
+  };
+
   return {
-    state: () => ({ active: false, ad: null as AdInfo | null, ownsUi: false }),
+    state: () => ({
+      /** True during an ad break. */
+      active: false,
+      /** The current ad, or null until one starts and after the break. */
+      ad: null as AdInfo | null,
+      /** True when the engine draws its own ad controls, which hides the built-in overlay. */
+      ownsUi: false,
+    }),
     attrs: { "data-ad": (state) => state.active },
     commands: () => ({
+      /** Asks the engine to skip the current ad. */
       skip() {
         engine?.skip();
       },
@@ -109,7 +130,7 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
       try {
         engine = options.engine(source);
       } catch (error) {
-        onError?.(error);
+        report(context, "ads-setup", error);
         engine = null;
       }
       const current = engine;
@@ -173,7 +194,7 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
             context.set({ ad });
           },
           error(error) {
-            onError?.(error);
+            report(context, "ads-playback", error);
           },
           breakEnd() {
             if (!inBreak) return;
@@ -183,14 +204,14 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
         };
 
         const failOpen = (error: unknown) => {
-          onError?.(error);
+          report(context, "ads-request", error);
           if (inBreak) host.breakEnd();
         };
 
         try {
           current.prepare(host);
         } catch (error) {
-          onError?.(error);
+          report(context, "ads-setup", error);
           container.remove();
           return next(request);
         }
@@ -205,7 +226,7 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
             clearTimeout(timer);
             // The content starts now, so a pre-roll arriving late mustn't interrupt it.
             if (outcome === "expired" && !inBreak) {
-              onError?.(new Error("Timed out waiting for a pre-roll."));
+              report(context, "ads-timeout", new Error("Timed out waiting for a pre-roll."));
               current.destroy();
               engine = null;
               container.remove();
@@ -223,12 +244,25 @@ export const ads = definePlugin("ads", (options: AdsOptions) => {
 export function AdOverlay(): ReactElement | null {
   const ad = useVideoState(ads, (state) => state.ad);
   const ownsUi = useVideoState(ads, (state) => state.ownsUi);
+  const player = usePlayer();
+  const label = useLabel("ad", "Ad");
+  const spoken = ad ? `${label}${countOf(ad)}` : null;
+
+  // Also for an ad SDK that draws its own overlay, since this is only about what's playing.
+  useEffect(() => {
+    if (spoken) player.announce(spoken);
+  }, [player, spoken]);
+
   // Mounted only during ads, since following time renders once a second.
   return ad && !ownsUi ? <ActiveAd ad={ad} /> : null;
 }
 AdOverlay.displayName = "Video.AdOverlay";
 
+const countOf = (ad: AdInfo) => ((ad.total ?? 1) > 1 ? ` ${ad.position} / ${ad.total}` : "");
+
 function ActiveAd({ ad }: { ad: AdInfo }) {
+  const player = usePlayer();
+  const overlay = useFocusFallback<HTMLDivElement>();
   const time = useCurrentTime();
   const { skip, clicked } = useCommands(ads);
   const label = useLabel("ad", "Ad");
@@ -238,13 +272,17 @@ function ActiveAd({ ad }: { ad: AdInfo }) {
 
   const wait = ad.skipAfter === null ? null : Math.max(Math.ceil(ad.skipAfter - time), 0);
   const remaining = formatTime(Math.max(ad.duration - time, 0));
-  const count = (ad.total ?? 1) > 1 ? ` ${ad.position} / ${ad.total}` : "";
+  const skippable = wait === 0;
+
+  useEffect(() => {
+    if (skippable) player.announce(skipAd);
+  }, [player, skipAd, skippable]);
 
   return (
-    <div data-part="ad-overlay">
+    <div ref={overlay} data-part="ad-overlay">
       <span data-part="ad-label">
         {label}
-        {count} · {remaining}
+        {countOf(ad)} · {remaining}
       </span>
       {ad.clickThrough ? (
         <a

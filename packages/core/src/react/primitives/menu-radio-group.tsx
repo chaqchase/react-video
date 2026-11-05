@@ -4,7 +4,9 @@ import { forwardRef, type HTMLAttributes } from "react";
 import { RadioContext, useMenu } from "./menu-context";
 
 export interface MenuRadioGroupProps extends HTMLAttributes<HTMLDivElement> {
+  /** The value of the checked item, or null when none is checked. */
   value: string | null;
+  /** Called with an item's value when the viewer chooses it. */
   onValueChange(value: string): void;
 }
 

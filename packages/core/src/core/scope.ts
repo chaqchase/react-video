@@ -1,4 +1,5 @@
 export interface Scope {
+  /** Aborts when the scope ends, for `fetch` calls and the like. */
   readonly signal: AbortSignal;
   /** Adds an event listener that is removed when the scope ends. */
   on<Listener extends EventListenerOrEventListenerObject>(
@@ -12,6 +13,7 @@ export interface Scope {
 }
 
 export interface OwnedScope extends Scope {
+  /** Ends the scope, aborting `signal` and running its cleanups. */
   dispose(): void;
 }
 

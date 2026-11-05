@@ -1,7 +1,9 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useRef } from "react";
+import { usePlayer } from "../context";
 import { useCommands, useLabel, useVideoState } from "../hooks";
+import { mergeRefs } from "./as-child";
 import { Button, type ButtonProps } from "./button";
 
 export type PlayOverlayProps = ButtonProps;
@@ -15,10 +17,25 @@ export const PlayOverlay = forwardRef<HTMLButtonElement, PlayOverlayProps>(
     const commands = useCommands();
     const play = useLabel("play", "Play");
     const replay = useLabel("replay", "Replay");
+    const player = usePlayer();
+    const button = useRef<HTMLButtonElement | null>(null);
+
+    // This button and the transport's take turns being hidden, so focus goes between them
+    // rather than falling to the top of the page.
+    useEffect(() => {
+      const focused = document.activeElement;
+      if (state === "started") {
+        if (focused && focused === button.current) {
+          player.root()?.querySelector<HTMLElement>('[data-part="play-pause"]')?.focus({ preventScroll: true });
+        }
+      } else if (focused?.matches('[data-part="play-pause"]') && player.root()?.contains(focused)) {
+        button.current?.focus({ preventScroll: true });
+      }
+    }, [player, state]);
 
     return (
       <Button
-        ref={ref}
+        ref={mergeRefs(button, ref)}
         data-part="play-overlay"
         data-state={state}
         aria-label={state === "ended" ? replay : play}

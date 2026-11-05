@@ -1,19 +1,36 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useEffect, type ReactElement } from "react";
 import { definePlugin } from "../../core/plugin";
 import type { SourceInput } from "../../core/types";
+import { usePlayer } from "../../react/context";
 import { useCommands, useLabel, useVideoState } from "../../react/hooks";
 import { Button, type ButtonProps } from "../../react/primitives/button";
+import { useFocusFallback } from "../../react/primitives/focus-fallback";
 import { NextIcon, PreviousIcon } from "../../ui/icons";
+import { Title } from "../../ui/parts/title";
 
 export interface PlaylistItem {
+  /** The video, in any form the player's `src` accepts. */
   src: SourceInput;
+  /** The name shown with the controls and on the up-next card. */
   title?: string;
+  /** A short line above the title, such as `Season 1, Episode 2`. */
+  eyebrow?: string;
+  /** A sentence or two about this item, under the title while it's paused. */
+  description?: string;
+  /** An image set as the video's poster while this item is current. */
   poster?: string;
+  /** A small image of this item, for browsing the queue. */
+  thumbnail?: string;
+  /** How long this item runs, in seconds, for browsing the queue. */
+  duration?: number;
+  /** The season this item belongs to, which groups it when browsing the queue. */
+  season?: string;
 }
 
 export interface PlaylistOptions {
+  /** The videos in the queue, in play order. */
   items: readonly PlaylistItem[];
   /** The item to start on. */
   start?: number;
@@ -33,8 +50,11 @@ export const playlist = definePlugin("playlist", (options: PlaylistOptions) => {
 
   return {
     state: () => ({
+      /** The videos in the queue. */
       items: options.items,
+      /** Position of the current item in `items`. */
       index: start,
+      /** True when the queue wraps around at both ends. */
       loop,
       /** Seconds until the next item, while counting down. */
       remaining: null as number | null,
@@ -58,15 +78,20 @@ export const playlist = definePlugin("playlist", (options: PlaylistOptions) => {
         stopCountdown();
         context.set({ index });
         context.commands.setSource(item.src);
-        if (play) void context.commands.play();
+        if (!play) return;
+        void context.commands.play();
+        if (item.title) context.player.announce(item.title);
       };
       const move = (delta: number) => {
         const index = target(context.state().index + delta);
         if (index !== null) select(index);
       };
       return {
+        /** Moves to the item at this index and plays it, unless `play` is false. */
         select,
+        /** Moves to the next item and plays it, wrapping around if `loop` is on. */
         next: () => move(1),
+        /** Moves to the previous item and plays it, wrapping around if `loop` is on. */
         previous: () => move(-1),
         /** Stays on the finished video. */
         cancel: stopCountdown,
@@ -119,7 +144,12 @@ export const playlist = definePlugin("playlist", (options: PlaylistOptions) => {
       if (poster) video.setAttribute("poster", poster);
       else video.removeAttribute("poster");
     },
-    slots: { "transport-start": PlaylistPrevious, "transport-end": PlaylistNext, overlay: UpNext },
+    slots: {
+      "transport-start": PlaylistPrevious,
+      "transport-end": PlaylistNext,
+      title: PlaylistTitle,
+      overlay: UpNext,
+    },
   };
 });
 
@@ -185,9 +215,23 @@ export const PlaylistNext = forwardRef<HTMLButtonElement, PlaylistButtonProps>(
 );
 PlaylistNext.displayName = "Video.PlaylistNext";
 
+/** The current item's title, eyebrow, and description. Hidden when it has none of them. */
+export function PlaylistTitle() {
+  const item = useVideoState(playlist, ({ items, index }) => items[index]);
+  if (!item?.title && !item?.eyebrow && !item?.description) return null;
+  return <Title title={item.title} eyebrow={item.eyebrow} description={item.description} />;
+}
+PlaylistTitle.displayName = "Video.PlaylistTitle";
+
 /** Offers the next item when one finishes, counting down if configured to. */
-export function UpNext() {
+export function UpNext(): ReactElement | null {
   const visible = useVideoState(playlist, (state) => state.upNext);
+  return visible ? <UpNextCard /> : null;
+}
+UpNext.displayName = "Video.UpNext";
+
+function UpNextCard() {
+  const player = usePlayer();
   const remaining = useVideoState(playlist, (state) => state.remaining);
   const title = useVideoState(playlist, ({ items, index }) => {
     const next = items[(index + 1) % items.length];
@@ -197,10 +241,14 @@ export function UpNext() {
   const upNext = useLabel("upNext", "Up next");
   const playNow = useLabel("playNow", "Play now");
   const dismiss = useLabel("cancel", "Cancel");
-  if (!visible) return null;
+  const card = useFocusFallback<HTMLDivElement>();
+  const spoken = title ? `${upNext}: ${title}` : upNext;
+
+  // Once, rather than a live region on the card, which would speak every second it counts.
+  useEffect(() => player.announce(spoken), [player, spoken]);
 
   return (
-    <div data-part="up-next" role="status">
+    <div ref={card} data-part="up-next" role="group" aria-label={upNext}>
       <p data-part="up-next-label">
         {upNext}
         {remaining !== null ? <span data-part="up-next-count"> · {remaining}</span> : null}
@@ -217,4 +265,3 @@ export function UpNext() {
     </div>
   );
 }
-UpNext.displayName = "Video.UpNext";

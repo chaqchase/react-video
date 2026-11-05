@@ -16,6 +16,7 @@ import { playlist, PlaylistNext, PlaylistPrevious, UpNext } from "../../src/plug
 import { speed } from "../../src/plugins/speed/index";
 import { NativeProvider } from "../../src/providers/native/index";
 import { Media } from "../../src/react/media";
+import { PlayPause } from "../../src/react/primitives/play-pause";
 import { Root } from "../../src/react/root";
 import { advance } from "../helpers/fake-media";
 
@@ -173,12 +174,12 @@ describe("playlist", () => {
     fireEvent.click(next);
     await settle();
     expect(player.plugin(playlist).state().index).toBe(1);
-    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.queryByRole("group", { name: "Up next" })).toBeNull();
 
     await player.commands.play();
     advance(player.video() as HTMLVideoElement, 60);
     await settle();
-    expect(screen.getByRole("status").textContent).toContain("Three");
+    expect(screen.getByRole("group", { name: "Up next" }).textContent).toContain("Three");
     fireEvent.click(screen.getByRole("button", { name: "Play now" }));
     await settle();
     expect(player.plugin(playlist).state().index).toBe(2);
@@ -418,7 +419,7 @@ describe("chromecast", () => {
     expect(cast.castContext.requestSession).toHaveBeenCalled();
     act(() => cast.startSession());
     await settle();
-    expect(screen.getByRole("status").textContent).toContain("Living room");
+    expect(document.querySelector('[data-part="casting"]')?.textContent).toContain("Living room");
   });
 
   it("shows the button when devices were found before this player mounted", async () => {
@@ -660,6 +661,39 @@ describe("ads", () => {
     expect(fake.engine.skip).toHaveBeenCalled();
   });
 
+  it("says what's playing and when it can be skipped, and hands focus on after", async () => {
+    const fake = fakeEngine();
+    const player = createPlayer({ src: "/a.mp4", plugins: [ads({ engine: () => fake.engine })] });
+    const announce = vi.spyOn(player, "announce");
+    render(
+      <Root player={player}>
+        <Media />
+        <PlayPause data-testid="transport" />
+        <AdOverlay />
+      </Root>
+    );
+    await settle();
+    await act(async () => {
+      await player.commands.play();
+    });
+    await settle();
+    expect(announce.mock.calls.map(([message]) => message).filter((message) => /Ad|Skip/.test(message))).toEqual([
+      "Ad 1 / 2",
+    ]);
+
+    await act(async () => {
+      fake.engine.time = 6;
+      player.clock.sync();
+    });
+    await settle();
+    expect(announce).toHaveBeenLastCalledWith("Skip ad");
+
+    screen.getByRole("button", { name: "Skip ad" }).focus();
+    act(() => fake.host().breakEnd());
+    await settle();
+    expect(document.activeElement).toBe(screen.getByTestId("transport"));
+  });
+
   it("leaves the interface to engines that draw their own", async () => {
     const fake = fakeEngine();
     Object.assign(fake.engine, { ownsUi: true });
@@ -748,7 +782,9 @@ describe("ads", () => {
     });
     const failure = new Error("Broken file");
     fake.host().error(failure);
-    expect(onError).toHaveBeenCalledWith(failure);
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ code: "ads-playback", fatal: false, cause: failure })
+    );
   });
 });
 
@@ -878,11 +914,18 @@ describe("vast", () => {
 
   it("skips on request, tracking that", async () => {
     stubFetch({ "/tag.xml": xml(inline) });
-    const { player, media } = await start();
+    const { player, media, root } = await start();
+    const adVideo = root.querySelector('[data-part="ad-media"]') as HTMLVideoElement;
+    const load = vi.spyOn(adVideo, "load");
+    expect(adVideo.paused).toBe(false);
     player.plugin(ads).commands.skip();
     await settle();
     expect(pings).not.toContain("https://track.test/complete");
     expect(media().provider).toBe("native");
+    // Taking away the src alone doesn't stop a video, and the ad would go on being heard.
+    expect(adVideo.paused).toBe(true);
+    expect(adVideo.hasAttribute("src")).toBe(false);
+    expect(load).toHaveBeenCalled();
   });
 
   it("reports a broken ad file, then moves on", async () => {
@@ -1219,7 +1262,7 @@ describe("drm", () => {
     );
     encrypted(video);
     await settle();
-    expect(media().error).toMatchObject({ code: "drm", fatal: true });
+    expect(media().error).toMatchObject({ code: "drm-unsupported", fatal: true });
     expect(media().status).toBe("error");
   });
 
@@ -1263,6 +1306,69 @@ describe("drm", () => {
     expect(eme.request).not.toHaveBeenCalled();
   });
 
+  it("chooses again when the next source can't use the first system", async () => {
+    fakeEme();
+    const { video, player } = await mounted(
+      {
+        src: "/a.mp4",
+        plugins: [
+          drm((source) =>
+            source.src === "/a.mp4" ? { clearkey: { keys } } : { widevine: { licenseUrl: "https://license.test/" } }
+          ),
+        ],
+      },
+      prepareVideo
+    );
+    encrypted(video);
+    await settle();
+    expect(player.plugin(drm).state().system).toBe("org.w3.clearkey");
+
+    player.commands.setSource("/b.mp4");
+    await settle();
+    expect(player.plugin(drm).state().system).toBeNull();
+
+    encrypted(video);
+    await settle();
+    expect(player.plugin(drm).state().system).toBe("com.widevine.alpha");
+  });
+
+  it("keeps the keys for a source that can use them, with a new session", async () => {
+    const eme = fakeEme();
+    const { video, player } = await mounted(
+      { src: "/a.mp4", plugins: [drm({ clearkey: { keys } })] },
+      prepareVideo
+    );
+    encrypted(video);
+    await settle();
+    player.commands.setSource("/b.mp4");
+    await settle();
+    encrypted(video);
+    await settle();
+    expect(eme.request).toHaveBeenCalledTimes(1);
+    expect(eme.sessions).toHaveLength(2);
+    expect(player.plugin(drm).state().system).toBe("org.w3.clearkey");
+  });
+
+  it("tries again after a failure once the source reloads", async () => {
+    const support = { supported: [] as string[] };
+    const eme = fakeEme(support);
+    const { video, player, media } = await mounted(
+      { src: "/a.mp4", plugins: [drm({ clearkey: { keys } })] },
+      prepareVideo
+    );
+    encrypted(video);
+    await settle();
+    expect(media().error?.code).toBe("drm-unsupported");
+
+    support.supported = ["org.w3.clearkey"];
+    player.commands.reload();
+    await settle();
+    encrypted(video);
+    await settle();
+    expect(media().error).toBeNull();
+    expect(eme.sessions).toHaveLength(1);
+  });
+
   it("looks config up per source, skipping sources that have none", async () => {
     const eme = fakeEme();
     const { video } = await mounted(
@@ -1287,7 +1393,7 @@ describe("a failed source", () => {
       override attach(element: HTMLVideoElement | null, sink: Sink, scope: Scope) {
         super.attach(element, sink, scope);
         report = (state) => sink.update(state);
-        fail = () => sink.error({ code: "drm", message: "No key", fatal: true });
+        fail = () => sink.error({ code: "drm-license", message: "No key", fatal: true });
       }
     }
     const failing = definePlugin("failing", () => ({
@@ -1303,7 +1409,7 @@ describe("a failed source", () => {
     fail?.();
     report?.({ status: "ready" });
     expect(media().status).toBe("error");
-    expect(media().error?.code).toBe("drm");
+    expect(media().error?.code).toBe("drm-license");
 
     player.commands.setSource("/good.mp4");
     await settle();

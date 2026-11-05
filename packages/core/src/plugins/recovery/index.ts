@@ -6,12 +6,11 @@ export interface RecoveryOptions {
   retries?: number;
   /** The first wait in milliseconds, doubling for each retry. */
   delay?: number;
-  /** Decides which errors are worth retrying. */
+  /** Decides which errors are worth retrying. By default, those marked `retryable`. */
   retryOn?: (error: MediaErrorInfo) => boolean;
 }
 
-// MEDIA_ERR_NETWORK, or the code engine providers use for a lost connection.
-const isTransient = ({ code }: MediaErrorInfo) => code === 2 || code === "network";
+const isRetryable = ({ retryable }: MediaErrorInfo) => retryable === true;
 
 /** Playing this far past a failure earns a fresh set of retries. */
 const RECOVERED_AFTER_SECONDS = 5;
@@ -21,7 +20,7 @@ const RECOVERED_AFTER_SECONDS = 5;
  * same position. While offline it waits to reconnect instead of using up retries.
  */
 export const recovery = definePlugin("recovery", (options: RecoveryOptions = {}) => {
-  const { retries = 3, delay = 1000, retryOn = isTransient } = options;
+  const { retries = 3, delay = 1000, retryOn = isRetryable } = options;
   let position = 0;
   let failedAt = 0;
   let lastSource: string | null = null;
@@ -30,7 +29,12 @@ export const recovery = definePlugin("recovery", (options: RecoveryOptions = {})
   let cancelRetry = () => {};
 
   return {
-    state: () => ({ attempt: 0, retrying: false }),
+    state: () => ({
+      /** Retries used so far, back to 0 once playback recovers or the source changes. */
+      attempt: 0,
+      /** True from a retryable failure until the video is ready again or the plugin gives up. */
+      retrying: false,
+    }),
     attrs: { "data-retrying": (state) => state.retrying },
     setup(context, scope) {
       scope.add(() => cancelRetry());
@@ -77,7 +81,7 @@ export const recovery = definePlugin("recovery", (options: RecoveryOptions = {})
       );
       context.watch(
         scope,
-        (media) => media.status === "ready" && !media.error,
+        (media) => media.status === "ready" && !media.error?.fatal,
         (ready) => {
           if (!ready) return;
           reloading = false;

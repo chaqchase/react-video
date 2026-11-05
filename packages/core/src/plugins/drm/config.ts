@@ -1,6 +1,7 @@
 import type { HlsConfig } from "hls.js";
 
 export interface KeySystemConfig {
+  /** Where licence requests are sent. */
   licenseUrl: string;
   /** Sent with each licence request. */
   headers?: Record<string, string>;
@@ -9,6 +10,7 @@ export interface KeySystemConfig {
 }
 
 export interface FairPlayConfig extends KeySystemConfig {
+  /** Where to fetch the FairPlay server certificate. */
   certificateUrl: string;
 }
 
@@ -19,9 +21,13 @@ export interface ClearKeyConfig {
 
 /** One description of protected playback, translated for whichever engine plays. */
 export interface DrmConfig {
+  /** Licence settings for Widevine. */
   widevine?: KeySystemConfig;
+  /** Licence settings for PlayReady. */
   playready?: KeySystemConfig;
+  /** Licence and certificate settings for FairPlay. */
   fairplay?: FairPlayConfig;
+  /** The keys for Clear Key, which needs no licence server. */
   clearkey?: ClearKeyConfig;
 }
 

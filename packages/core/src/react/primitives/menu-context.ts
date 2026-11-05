@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, type KeyboardEvent } from "react";
+import { VideoKitError } from "../../core/kit-error";
 
 interface MenuContextValue {
   open: boolean;
@@ -31,7 +32,7 @@ export function createTriggerHandle() {
 
 export function useMenu() {
   const menu = useContext(MenuContext);
-  if (!menu) throw new Error("react-video-kit: this part must be inside <Video.Menu>.");
+  if (!menu) throw new VideoKitError("part-outside-menu", "react-video-kit: this part must be inside <Video.Menu>.");
   return menu;
 }
 

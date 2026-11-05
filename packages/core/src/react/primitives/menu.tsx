@@ -4,6 +4,7 @@ import { useCallback, useId, useState, type ReactNode } from "react";
 import { createTriggerHandle, MenuContext } from "./menu-context";
 
 export interface MenuProps {
+  /** The menu's trigger and content. */
   children?: ReactNode;
   /** Called as the menu opens and closes. */
   onOpenChange?(open: boolean): void;

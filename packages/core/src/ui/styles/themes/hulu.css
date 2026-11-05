@@ -1,0 +1,171 @@
+/*
+ * After Hulu: the title above a thin white timeline with the time left beside it, the
+ * buttons running from the left under it, and fullscreen up in the top corner.
+ */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-hulu {
+    --rv-accent: #fff;
+    --rv-focus: #1ce783;
+    --rv-font: Graphik, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-muted: rgb(255 255 255 / 0.8);
+    --rv-glass-strong: rgb(30 32 37 / 0.97);
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.45);
+    --rv-radius: 0;
+    --rv-menu-radius: 6px;
+    --rv-control-size: 34px;
+    --rv-icon-size: 20px;
+    --rv-inset: 22px;
+    --rv-bar-track: 3px;
+    --rv-bar-track-active: 5px;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="controls"]::before,
+  .rv-root.rv-theme-hulu [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.5), transparent 20%, transparent 56%, rgb(0 0 0 / 0.85));
+  }
+
+  /* First line: the title. */
+  .rv-root.rv-theme-hulu [data-part="title"] {
+    position: static;
+    flex: 0 0 100%;
+    order: -4;
+    gap: 4px;
+    margin-block-end: 6px;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="title-text"] {
+    order: 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="title-eyebrow"] {
+    order: 1;
+    color: var(--rv-foreground);
+    font-size: 12px;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="title-description"] {
+    display: none;
+  }
+
+  /* Second line: the timeline and the time left fill it exactly. */
+  .rv-root.rv-theme-hulu [data-part="timeline"] {
+    flex: 0 0 calc(100% - 56px);
+    order: -2;
+  }
+
+  .rv-root.rv-theme-hulu[data-live] [data-part="timeline"] {
+    flex-basis: 100%;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="remaining-time"] {
+    display: block;
+    flex: 0 0 56px;
+    order: -1;
+    margin: 0;
+    color: var(--rv-foreground);
+    text-align: end;
+  }
+
+  /* The timeline never mirrors, so the time left stays at its far end. */
+  .rv-root.rv-theme-hulu[dir="rtl"] [data-part="remaining-time"] {
+    order: -3;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="current-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="timeline-thumb"] {
+    opacity: var(--rv-shown, 1);
+    transform: scale(0.7);
+  }
+
+  /* Third line: from the left, play, the seeks, and the volume. */
+  .rv-root.rv-theme-hulu [data-part="transport"] > [data-part="seek-button"] {
+    display: inline-grid;
+    order: 2;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="play-pause"] + [data-part="seek-button"] {
+    order: 3;
+  }
+
+  /* The row mirrors, but time still runs the same way, so back stays on the left of forward. */
+  .rv-root.rv-theme-hulu[dir="rtl"] [data-part="transport"] > [data-part="seek-button"] {
+    order: 3;
+  }
+
+  .rv-root.rv-theme-hulu[dir="rtl"] [data-part="play-pause"] + [data-part="seek-button"] {
+    order: 2;
+  }
+
+  /* Fullscreen and picture in picture go up to the top corner, in a box of their own. */
+  .rv-root.rv-theme-hulu [data-position="top"] > [data-part="control-group"]:first-child {
+    position: absolute;
+    inset-block-start: var(--rv-inset-scaled);
+    inset-inline-end: var(--rv-inset-scaled);
+    display: flex;
+    gap: 6px;
+    height: auto;
+    padding: 0;
+  }
+
+  .rv-root.rv-theme-hulu [data-position="top"] [data-control][aria-label]::after {
+    inset-block: calc(100% + 10px) auto;
+  }
+
+  /* This player has no large button, so the bar is up before playback and its play button does the job. */
+  .rv-root.rv-theme-hulu [data-part="play-overlay"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-hulu:not([data-started]) [data-part="controls"] {
+    --rv-shown: 1;
+  }
+
+  .rv-root.rv-theme-hulu [data-part="captions-toggle"][aria-pressed="true"] {
+    background: transparent;
+    color: var(--rv-focus);
+  }
+
+  /* Lifted clear of the timeline and the time beside it. */
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-hulu [data-part="control-group"] [data-part="menu-content"] {
+      bottom: calc(var(--rv-bar) + 38px);
+    }
+  }
+
+  @container rv (max-width: 479px) {
+    /* The controls sit higher at this size, so the shade has to start higher too. */
+    .rv-root.rv-theme-hulu [data-part="controls"]::before,
+    .rv-root.rv-theme-hulu [data-part="controls"]:has([data-part="title"])::before {
+      background: linear-gradient(rgb(0 0 0 / 0.72), rgb(0 0 0 / 0.42) 22%, transparent 38%, transparent 48%, rgb(0 0 0 / 0.85));
+    }
+
+    .rv-root.rv-theme-hulu [data-part="title"] {
+      display: none;
+    }
+
+    .rv-root.rv-theme-hulu [data-part="remaining-time"] {
+      display: block;
+    }
+
+    .rv-root.rv-theme-hulu [data-part="transport"] > [data-part="seek-button"] {
+      display: none;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-hulu [data-control]:hover,
+    .rv-root.rv-theme-hulu [data-part="transport"] > [data-control]:hover {
+      color: var(--rv-focus);
+    }
+  }
+}

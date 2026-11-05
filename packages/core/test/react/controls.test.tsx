@@ -20,7 +20,9 @@ import { MenuTrigger } from "../../src/react/primitives/menu-trigger";
 import { Timeline } from "../../src/react/primitives/timeline";
 import { Mute } from "../../src/react/primitives/mute";
 import { VolumeSlider } from "../../src/react/primitives/volume-slider";
+import { SeekButton } from "../../src/react/primitives/seek-button";
 import { Root } from "../../src/react/root";
+import { Transport } from "../../src/ui/parts/transport";
 import { advance } from "../helpers/fake-media";
 
 const flush = async () => {
@@ -292,7 +294,85 @@ describe("Timeline", () => {
   });
 });
 
+describe("SeekButton", () => {
+  it("moves by its seconds, and stops at the start", async () => {
+    const { video } = await setup(
+      <>
+        <SeekButton seconds={-10} />
+        <SeekButton seconds={10} />
+      </>
+    );
+    const back = screen.getByRole("button", { name: "Back 10 seconds" });
+    fireEvent.click(screen.getByRole("button", { name: "Forward 10 seconds" }));
+    await flush();
+    expect(video.currentTime).toBe(10);
+    fireEvent.click(back);
+    await flush();
+    expect(video.currentTime).toBe(0);
+    fireEvent.click(back);
+    await flush();
+    expect(video.currentTime).toBe(0);
+  });
+
+  it("reports its direction, and lets a label be replaced", async () => {
+    await setup(<SeekButton seconds={-30} aria-label="Rewind" />);
+    const button = screen.getByRole("button", { name: "Rewind" });
+    expect(button.getAttribute("data-direction")).toBe("back");
+    expect(button.getAttribute("data-part")).toBe("seek-button");
+  });
+
+  it("leaves the position alone when a handler prevents it", async () => {
+    const { video } = await setup(<SeekButton seconds={10} onClick={(event) => event.preventDefault()} />);
+    fireEvent.click(screen.getByRole("button"));
+    await flush();
+    expect(video.currentTime).toBe(0);
+  });
+
+  it("does nothing while seeking is locked", async () => {
+    const locker = definePlugin("locker", () => ({
+      setup(context) {
+        context.lock("ad", ["seek"]);
+      },
+    }));
+    const { container } = render(
+      <Root src="/video.mp4" plugins={[locker()]}>
+        <Media />
+        <SeekButton seconds={10} />
+      </Root>
+    );
+    await flush();
+    const button = screen.getByRole("button");
+    expect(button.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(button);
+    await flush();
+    expect(getVideo(container).currentTime).toBe(0);
+  });
+});
+
+describe("Transport", () => {
+  it("puts play between back and forward, and takes the distance as a prop", async () => {
+    const { container } = await setup(<Transport seekSeconds={15} />);
+    const parts = [...container.querySelectorAll('[data-part="transport"] > button')].map((button) =>
+      button.getAttribute("aria-label")
+    );
+    expect(parts).toEqual(["Back 15 seconds", "Play", "Forward 15 seconds"]);
+  });
+});
+
 describe("volume", () => {
+  it("tells the skin the level, which reads as zero while muted", async () => {
+    const { container, player } = await setup(<Mute />);
+    const button = container.querySelector('[data-part="mute"]') as HTMLElement;
+    expect(button.style.getPropertyValue("--rv-volume")).toBe("1");
+    act(() => player().commands.setVolume(0.25));
+    await flush();
+    expect(button.style.getPropertyValue("--rv-volume")).toBe("0.25");
+    act(() => player().commands.setMuted(true));
+    await flush();
+    expect(button.style.getPropertyValue("--rv-volume")).toBe("0");
+    expect(button.dataset.level).toBe("muted");
+  });
+
   it("names the mute button by what it will do, and reports a level", async () => {
     const { container, player } = await setup(<Mute />);
     const button = container.querySelector('[data-part="mute"]') as HTMLElement;
@@ -423,10 +503,15 @@ describe("overlays", () => {
     expect(button.tabIndex).toBe(-1);
   });
 
-  it("explains a failure and retries", async () => {
-    const { container, video } = await setup(<ErrorOverlay />, "/broken.mp4");
+  it("explains a failure and retries, if that could work", async () => {
+    const { container, video, player } = await setup(<ErrorOverlay />);
+    Object.defineProperty(video, "error", { configurable: true, value: { code: 2, message: "Dropped" } });
+    video.dispatchEvent(new Event("error"));
+    Reflect.deleteProperty(video, "error");
+    await flush();
     const alert = screen.getByRole("alert");
-    expect(alert.textContent).toContain("This video can't be played.");
+    expect(alert.textContent).toContain("This video didn't load.");
+    expect(player().getState().media.error?.code).toBe("media-network");
     const load = vi.spyOn(video, "load");
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     await flush();
@@ -561,16 +646,42 @@ describe("Menu", () => {
 });
 
 describe("VideoPlayer", () => {
+  it("shows the time left as soon as the duration is known, before playback", async () => {
+    const { container } = render(<VideoPlayer src="/video.mp4" plugins={[]} />);
+    await flush();
+    expect(getVideo(container).paused).toBe(true);
+    expect(container.querySelector('[data-part="remaining-time"]')?.textContent).toBe("−1:00");
+  });
+
+  it("puts the track on a row of its own, with no pill around it", async () => {
+    const { container } = render(<VideoPlayer src="/video.mp4" plugins={[]} />);
+    await flush();
+    const row = container.querySelector('[data-position="scrubber"]') as HTMLElement;
+    expect(row.querySelector(':scope > [data-part="timeline"]')).not.toBeNull();
+    expect(container.querySelector('[data-part="control-group"] [data-part="timeline"]')).toBeNull();
+  });
+
   it("renders a complete, working player", async () => {
     const { container } = render(<VideoPlayer src="/video.mp4" poster="/poster.jpg" plugins={defaultPlugins()} />);
     await flush();
     expect(getRoot(container).className).toContain("rv-root");
     expect(getRoot(container).dataset.controls).toBe("shown");
     expect(getVideo(container).getAttribute("poster")).toBe("/poster.jpg");
-    for (const part of ["timeline", "play-pause", "mute", "time", "play-overlay", "buffering"]) {
+    for (const part of ["timeline", "play-pause", "seek-button", "mute", "current-time", "remaining-time", "play-overlay", "buffering"]) {
       expect(container.querySelector(`[data-part="${part}"]`), part).not.toBeNull();
     }
     expect(container.querySelector('[data-part="seek-feedback"]')).not.toBeNull();
+  });
+
+  it("shows a title and eyebrow only when they're given", async () => {
+    const { container, rerender } = render(<VideoPlayer src="/video.mp4" plugins={[]} />);
+    await flush();
+    expect(container.querySelector('[data-part="title"]')).toBeNull();
+    rerender(<VideoPlayer src="/video.mp4" plugins={[]} title="Blue Moon" eyebrow="Trailer" />);
+    await flush();
+    expect(container.querySelector('[data-part="title-text"]')?.textContent).toBe("Blue Moon");
+    expect(container.querySelector('[data-part="title-eyebrow"]')?.textContent).toBe("Trailer");
+    expect(getRoot(container).hasAttribute("title")).toBe(false);
   });
 
   it("keeps the given plugins only", async () => {

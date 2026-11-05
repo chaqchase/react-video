@@ -13,7 +13,9 @@ import { MenuSub } from "../../react/primitives/menu-sub";
 import { useTimelinePreview } from "../../react/primitives/timeline-context";
 
 export interface Chapter {
+  /** Where the chapter starts, in seconds. */
   start: number;
+  /** The chapter's name in the menu and the timeline preview. */
   title: string;
 }
 
@@ -27,7 +29,9 @@ export interface ChaptersOptions {
 /** Splits the timeline into sections, and offers a menu to jump between them. */
 export const chapters = definePlugin("chapters", (options: ChaptersOptions = {}) => ({
   state: () => ({
+    /** The chapters, given directly or read from `src`. */
     items: options.items ?? ([] as readonly Chapter[]),
+    /** Index of the chapter at the current position, or -1 when there is none. */
     active: -1,
   }),
   commands(context) {
@@ -43,9 +47,13 @@ export const chapters = definePlugin("chapters", (options: ChaptersOptions = {})
       if (chapter) context.commands.seek(chapter.start);
     };
     return {
+      /** Returns the index of the chapter at `time`, or -1 when there is none. */
       at,
+      /** Seeks to the start of the chapter at this index. */
       select: go,
+      /** Seeks to the start of the chapter after the current one, if there is one. */
       next: () => go(at(context.clock.time()) + 1),
+      /** Seeks to the start of the chapter before the current one, if there is one. */
       previous: () => go(at(context.clock.time()) - 1),
     };
   },

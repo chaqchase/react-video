@@ -1,5 +1,6 @@
 import { nativeProviderEntry } from "../providers/native";
 import { createClock } from "./clock";
+import { toErrorInfo, VideoKitError } from "./kit-error";
 import { sortPlugins } from "./plugin";
 import { createScope, type OwnedScope, type Scope } from "./scope";
 import { toLoadRequests } from "./source";
@@ -99,7 +100,7 @@ export function createPlayer(options: PlayerOptions = {}): Player {
   const slices: Record<string, object> = {};
   for (const { name, spec } of sorted) {
     if (name === "media") {
-      throw new Error('react-video-kit: "media" is a reserved plugin name.');
+      throw new VideoKitError("plugin-reserved-name", 'react-video-kit: "media" is a reserved plugin name. Give this plugin another name.');
     }
     slices[name] = spec.state?.() ?? {};
   }
@@ -119,6 +120,7 @@ export function createPlayer(options: PlayerOptions = {}): Player {
 
   let input: SourceInput | null | undefined = options.src;
   let root: HTMLElement | null = null;
+  let announcer: HTMLElement | null = null;
   let element: HTMLVideoElement | null = null;
   let mountScope: OwnedScope | null = null;
   let attachScope: OwnedScope | null = null;
@@ -187,10 +189,26 @@ export function createPlayer(options: PlayerOptions = {}): Player {
 
   let failover: (() => boolean) | null = null;
 
-  const handleError = (error: MediaErrorInfo) => {
-    if (error.fatal && failover?.()) return;
+  const errorListeners = new Set<(error: MediaErrorInfo) => void>();
+
+  // Afterwards, so that a listener reloading or throwing can't disturb the failure itself.
+  const announceError = (error: MediaErrorInfo) => {
+    queueMicrotask(() => {
+      for (const listener of [...errorListeners]) listener(error);
+    });
+  };
+
+  const handleError = (reported: MediaErrorInfo) => {
+    const error = { source: media().source ?? undefined, ...reported };
+    if (error.fatal && failover?.()) {
+      // Another source took over, so nothing stopped for the viewer.
+      announceError({ ...error, fatal: false });
+      return;
+    }
+    announceError(error);
     if (!error.fatal) {
-      setMedia({ error });
+      // A failure stands until the next load.
+      if (!media().error?.fatal) setMedia({ error });
       return;
     }
     const time = top()?.time ?? 0;
@@ -315,10 +333,6 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     };
     failover = tryNext;
 
-    const fail = (message: string, code: number | string) => {
-      handleError({ code, message, fatal: true, source: request.source });
-    };
-
     setMedia({ status: "loading", source: request.source, error: null });
     for (const { spec, context } of installed) {
       spec.source?.(context, request.source, scope);
@@ -331,7 +345,13 @@ export function createPlayer(options: PlayerOptions = {}): Player {
         async (final) => {
           const entry = resolveEntry(final.source);
           if (!entry) {
-            fail(`No provider can play ${final.source.src}`, "no-provider");
+            handleError({
+              code: "source-no-provider",
+              message: `No provider can play ${final.source.src}. Add the plugin for its format, or a fallback source.`,
+              fatal: true,
+              retryable: false,
+              source: request.source,
+            });
             return;
           }
           const ProviderClass = await entry.load();
@@ -345,8 +365,10 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       );
     } catch (error) {
       if (signal.aborted) return;
-      const message = error instanceof Error ? error.message : String(error);
-      fail(message, "load-failed");
+      handleError({
+        ...toErrorInfo(error, { code: "source-load-failed", fatal: true, retryable: true }),
+        source: request.source,
+      });
     }
   };
 
@@ -382,6 +404,16 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       // A failed source already reports itself through `error`.
       const refused = name !== "AbortError" && media().status !== "error";
       setMedia({ paused: true, ...(refused && { playRejected: name }) });
+      if (refused) {
+        announceError({
+          ...toErrorInfo(error, {
+            code: name === "NotAllowedError" ? "play-blocked" : "play-failed",
+            fatal: false,
+            retryable: false,
+          }),
+          source: media().source ?? undefined,
+        });
+      }
       return false;
     }
   };
@@ -580,6 +612,7 @@ export function createPlayer(options: PlayerOptions = {}): Player {
       set: (partial) => store.set(name, partial),
       media,
       report: setMedia,
+      error: handleError,
       video: () => element,
       root: () => root,
       watch(scope, select, listener) {
@@ -660,20 +693,47 @@ export function createPlayer(options: PlayerOptions = {}): Player {
     getState: () => store.get(),
     getInitialState: () => store.getInitial(),
     subscribe: store.subscribe,
+    onError(listener) {
+      errorListeners.add(listener);
+      return () => {
+        errorListeners.delete(listener);
+      };
+    },
     plugin<Factory extends AnyPluginFactory>(factory: Factory) {
       const plugin = byName.get(factory.pluginName);
       if (!plugin) {
-        throw new Error(
+        throw new VideoKitError(
+          "plugin-not-installed",
           `react-video-kit: plugin "${factory.pluginName}" isn't installed. Add ${factory.pluginName}() to the plugins prop.`
         );
       }
       return handleOf(plugin) as unknown as PluginHandle<Factory>;
     },
     has: (name) => byName.has(name),
+    announce(message) {
+      if (!announcer) return;
+      // Screen readers stay silent when the text doesn't change, so a repeat has to differ.
+      announcer.textContent = announcer.textContent === message ? `${message}\u00a0` : message;
+    },
     mount(nextRoot) {
       root = nextRoot ?? null;
       const scope = createScope();
       mountScope = scope;
+      if (root) {
+        // A live region has to exist before its text changes, or nothing is announced.
+        const region = document.createElement("div");
+        region.dataset.part = "announcer";
+        region.setAttribute("aria-live", "polite");
+        region.setAttribute("aria-atomic", "true");
+        region.style.cssText =
+          "position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap";
+        root.append(region);
+        announcer = region;
+        scope.add(() => {
+          region.remove();
+          announcer = null;
+        });
+      }
       scope.add(
         store.subscribe(() => {
           const { paused, ended } = media();

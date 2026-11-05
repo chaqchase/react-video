@@ -34,16 +34,23 @@ const elementIn = () => {
 
 /** Fullscreen on the player's root, or the video itself on iPhones, which allow only that. */
 export const fullscreen = definePlugin("fullscreen", (options: FullscreenOptions = {}) => ({
-  state: () => ({ active: false, supported: false }),
+  state: () => ({
+    /** True while the player is in fullscreen. */
+    active: false,
+    /** True when the browser and page allow fullscreen, known once the player mounts. */
+    supported: false,
+  }),
   attrs: { "data-fullscreen": (state) => state.active },
   commands(context) {
     const lock = () => {
       if (options.lockOrientation === false) return;
       const video = context.video();
-      // Only touch devices lock, and only videos that fill a landscape screen better.
+      // Only touch devices lock, and they turn to whichever way the video fills the screen.
       if (!matchMedia("(pointer: coarse)").matches) return;
-      if (video && video.videoHeight > video.videoWidth) return;
-      (screen.orientation as LockableOrientation | undefined)?.lock?.("landscape")?.catch(() => {});
+      const tall = video && video.videoHeight > video.videoWidth;
+      (screen.orientation as LockableOrientation | undefined)
+        ?.lock?.(tall ? "portrait" : "landscape")
+        ?.catch(() => {});
     };
     const enter = async () => {
       const root = context.root() as WebkitElement | null;
@@ -60,8 +67,11 @@ export const fullscreen = definePlugin("fullscreen", (options: FullscreenOptions
       screen.orientation?.unlock?.();
     };
     return {
+      /** Puts the player in fullscreen, or just the video on iPhones. */
       enter,
+      /** Leaves fullscreen and releases any orientation lock. */
       exit,
+      /** Enters fullscreen, or exits it if already active. */
       toggle: () => (context.state().active ? exit() : enter()),
     };
   },
@@ -95,7 +105,7 @@ export const fullscreen = definePlugin("fullscreen", (options: FullscreenOptions
     scope.on(element, "webkitbeginfullscreen", () => context.set({ active: true }));
     scope.on(element, "webkitendfullscreen", () => context.set({ active: false }));
   },
-  slots: { "controls-end": Fullscreen },
+  slots: { "top-start": Fullscreen },
 }));
 
 export type FullscreenProps = ButtonProps;

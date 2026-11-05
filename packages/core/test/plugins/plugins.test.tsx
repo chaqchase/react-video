@@ -138,12 +138,12 @@ describe("fullscreen", () => {
     expect(screen.queryByRole("button")).toBeNull();
   });
 
-  it("contributes its button to the controls slot", async () => {
+  it("contributes its button to the top slot", async () => {
     const plugins = [fullscreen()];
     render(
       <Root src="/video.mp4" plugins={plugins}>
         <Media />
-        <Slot name="controls-end" />
+        <Slot name="top-start" />
       </Root>
     );
     await settle();
@@ -355,6 +355,17 @@ describe("idle", () => {
     expect(view.visible()).toBe(true);
     tap(view.controls);
     expect(view.visible()).toBe(true);
+  });
+
+  it("hides again after the toggle command shows the controls", async () => {
+    const view = await playing();
+    // Starting playback runs a timer of its own, so let that one finish first.
+    await view.wait(3000);
+    expect(view.visible()).toBe(false);
+    act(() => view.player.plugin(idle).commands.toggle());
+    expect(view.visible()).toBe(true);
+    await view.wait(3000);
+    expect(view.visible()).toBe(false);
   });
 
   it("stops its timer on unmount", async () => {

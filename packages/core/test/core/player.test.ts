@@ -111,7 +111,7 @@ describe("errors", () => {
   it("reports a fatal error instead of spinning forever", async () => {
     const { media } = await setup({ src: "/broken.mp4" });
     expect(media().status).toBe("error");
-    expect(media().error).toMatchObject({ code: 4, fatal: true });
+    expect(media().error).toMatchObject({ code: "media-unsupported", nativeCode: 4, fatal: true });
     expect(media().waiting).toBe(false);
   });
 
@@ -166,10 +166,10 @@ describe("errors", () => {
     expect(media().status).toBe("ready");
   });
 
-  it("reports no-provider when nothing can play the source", async () => {
+  it("says so when nothing can play the source", async () => {
     const { media } = await setup({ src: "/a.m3u8" });
     expect(media().status).toBe("error");
-    expect(media().error?.code).toBe("no-provider");
+    expect(media().error).toMatchObject({ code: "source-no-provider", fatal: true, retryable: false });
   });
 });
 
@@ -351,6 +351,25 @@ describe("reload", () => {
     player.commands.reload();
     await settle();
     expect(media()).toMatchObject({ status: "ready", error: null });
+  });
+
+  it("doesn't seek the next source to a position meant for the last one", async () => {
+    const { player, video } = await setup();
+    const load = video.load.bind(video);
+    let stalling = true;
+    let stalled = false;
+    vi.spyOn(video, "load").mockImplementation(() => {
+      // The network hasn't answered by the time the viewer moves on. Clearing the old source still runs.
+      if (stalling && video.src) stalled = true;
+      else load();
+    });
+    player.commands.reload(30);
+    await vi.waitFor(() => expect(stalled).toBe(true));
+    stalling = false;
+    player.commands.setSource("/next.mp4");
+    await vi.waitFor(() => expect(video.src).toContain("/next.mp4"));
+    await vi.waitFor(() => expect(video.duration).toBeGreaterThan(0));
+    expect(video.currentTime).toBe(0);
   });
 
   it("clears the resume position when the source changes", async () => {

@@ -1,0 +1,320 @@
+/*
+ * Flat controls along the bottom, shared by most themes. The rows and groups step aside, so
+ * every control is a flex item of `controls`, and `order` lays them out. A theme then moves
+ * the pieces that differ. The build swaps `rv-theme-bar` for each theme's own class.
+ */
+@layer rv {
+  .rv-root.rv-theme-bar {
+    --rv-glass: transparent;
+    --rv-glass-filter: none;
+    --rv-rim: none;
+    --rv-inset: 12px;
+  }
+
+  .rv-root.rv-theme-bar [data-part="controls"] {
+    --rv-bar: calc(var(--rv-control-size) * var(--rv-scale, 1));
+    flex-flow: row wrap;
+    align-content: flex-end;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    padding-block-end: max(calc(var(--rv-inset-scaled) / 2), env(safe-area-inset-bottom));
+  }
+
+  /* They stand side by side here, so a hit area that spilled sideways would take a neighbour's
+     clicks, and the timeline's generous one mustn't take theirs. */
+  .rv-root.rv-theme-bar [data-part="controls"] [data-control] {
+    z-index: 1;
+  }
+
+  .rv-root.rv-theme-bar [data-part="controls"] [data-control]::before {
+    width: 100%;
+  }
+
+  /* With no glass behind them, a tight shadow gives the glyphs an edge over a bright frame. */
+  .rv-root.rv-theme-bar [data-part="controls"] [data-control] > svg {
+    filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.75)) drop-shadow(0 1px 2px rgb(0 0 0 / 0.5));
+  }
+
+  .rv-root.rv-theme-bar [data-part="controls"]::before,
+  .rv-root.rv-theme-bar [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.55), transparent 22%, transparent 58%, rgb(0 0 0 / 0.78));
+  }
+
+  /* Takes up the room between the two ends of the row. */
+  .rv-root.rv-theme-bar [data-part="controls"]::after {
+    content: "";
+    flex: 1 0 1px;
+    order: 9;
+  }
+
+  .rv-root.rv-theme-bar :is([data-part="control-row"], [data-part="control-group"], [data-part="transport"]) {
+    display: contents;
+  }
+
+  /* Without a box of its own a group's glass would spread across the whole picture. */
+  .rv-root.rv-theme-bar [data-part="control-group"]::before {
+    content: none;
+  }
+
+  .rv-root.rv-theme-bar[data-status="error"] :is([data-part="transport"], [data-position="details"], [data-position="scrubber"]) {
+    display: none;
+  }
+
+  .rv-root.rv-theme-bar [data-part="timeline"] {
+    flex: 0 0 100%;
+    order: 0;
+    height: 18px;
+  }
+
+  .rv-root.rv-theme-bar [data-part="transport"] > [data-control] {
+    width: var(--rv-bar);
+    height: var(--rv-bar);
+    background: transparent;
+    box-shadow: none;
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .rv-root.rv-theme-bar [data-part="transport"] > [data-part="seek-button"] {
+    display: none;
+  }
+
+  /* The large button doesn't take this one's place here, since it has a place of its own. */
+  .rv-root.rv-theme-bar [data-part="transport"] [data-part="play-pause"] {
+    order: var(--rv-bar-play-order, 1);
+    visibility: visible;
+  }
+
+  .rv-root.rv-theme-bar:has([data-part="buffering"][data-visible]) [data-part="play-pause"][data-state="paused"] > [data-show="paused"],
+  .rv-root.rv-theme-bar:has([data-part="buffering"][data-visible]) [data-part="play-pause"][data-state="playing"] > [data-show="playing"],
+  .rv-root.rv-theme-bar:has([data-part="buffering"][data-visible]) [data-part="play-pause"][data-state="ended"] > [data-show="ended"] {
+    opacity: 1;
+  }
+
+  /* Whatever a plugin adds keeps its side of play, such as a playlist's previous and next. */
+  .rv-root.rv-theme-bar [data-part="transport"] > :not([data-part="play-pause"], [data-part="seek-button"]) {
+    order: var(--rv-bar-play-order, 3);
+  }
+
+  .rv-root.rv-theme-bar [data-part="transport"] > :has(~ [data-part="play-pause"]):not([data-part="seek-button"]) {
+    order: var(--rv-bar-play-order, 1);
+  }
+
+  /* The row mirrors, but time still runs the same way. */
+  .rv-root.rv-theme-bar[dir="rtl"] [data-part="transport"] > :not([data-part="play-pause"], [data-part="seek-button"]) {
+    order: var(--rv-bar-play-order, 1);
+  }
+
+  .rv-root.rv-theme-bar[dir="rtl"] [data-part="transport"] > :has(~ [data-part="play-pause"]):not([data-part="seek-button"]) {
+    order: var(--rv-bar-play-order, 3);
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume"] {
+    order: 4;
+    padding-inline-end: 0;
+  }
+
+  /* Tucked away until it's wanted, as on nearly all of these players. */
+  .rv-root.rv-theme-bar [data-part="volume-slider"] {
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume"]:hover [data-part="volume-slider"],
+  .rv-root.rv-theme-bar [data-part="volume"]:focus-within [data-part="volume-slider"] {
+    overflow: visible;
+    width: 64px;
+    opacity: 1;
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume"]:hover,
+  .rv-root.rv-theme-bar [data-part="volume"]:focus-within {
+    padding-inline-end: 12px;
+  }
+
+  .rv-root.rv-theme-bar [data-position="details"] > [data-part="control-group"]:first-child > * {
+    order: 5;
+    margin-inline: 4px;
+  }
+
+  .rv-root.rv-theme-bar [data-part="current-time"] {
+    order: 6;
+    margin-inline-start: 6px;
+    color: var(--rv-foreground);
+    text-shadow: 0 0 2px rgb(0 0 0 / 0.8), 0 1px 3px rgb(0 0 0 / 0.55);
+  }
+
+  .rv-root.rv-theme-bar [data-part="remaining-time"] {
+    order: 7;
+    margin-inline-start: 8px;
+    text-shadow: 0 0 2px rgb(0 0 0 / 0.8), 0 1px 3px rgb(0 0 0 / 0.55);
+  }
+
+  .rv-root.rv-theme-bar [data-position="scrubber"] > [data-part="duration"] {
+    flex: none;
+    order: 7;
+    color: var(--rv-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    text-shadow: 0 0 2px rgb(0 0 0 / 0.8), 0 1px 3px rgb(0 0 0 / 0.55);
+  }
+
+  .rv-root.rv-theme-bar [data-position="details"] > [data-part="control-group"]:last-child > *,
+  .rv-root.rv-theme-bar [data-position="top"] > [data-part="control-group"]:last-child > :not([data-part="volume"]) {
+    order: 10;
+  }
+
+  .rv-root.rv-theme-bar [data-part="menu-trigger"] {
+    order: 11;
+  }
+
+  .rv-root.rv-theme-bar [data-position="top"] > [data-part="control-group"]:first-child > * {
+    order: 12;
+  }
+
+  .rv-root.rv-theme-bar [data-position="top"] > [data-part="control-group"]:first-child > [data-part="fullscreen"] {
+    order: 13;
+  }
+
+  /* A live stream has no end to count to, and these outrank the rules that bring the times back. */
+  .rv-root.rv-theme-bar[data-live] :is([data-part="current-time"], [data-part="remaining-time"]) {
+    display: none;
+  }
+
+  .rv-root.rv-theme-bar[data-live] [data-position="scrubber"] > [data-part="duration"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-bar[data-live]:not([data-dvr]) [data-part="transport"] > [data-part="seek-button"] {
+    display: none;
+  }
+
+  /* The name goes in the corner, clear of the bar. */
+  .rv-root.rv-theme-bar [data-part="title"] {
+    position: absolute;
+    inset-block-start: var(--rv-inset-scaled);
+    inset-inline: var(--rv-inset-scaled);
+    margin: 0;
+    pointer-events: none;
+    text-shadow: 0 0 2px rgb(0 0 0 / 0.8), 0 1px 3px rgb(0 0 0 / 0.55);
+  }
+
+  /* Its size sets it apart, since a dimmed line of its own wouldn't read on a bright frame. */
+  .rv-root.rv-theme-bar [data-part="controls"] [data-part="title-eyebrow"] {
+    color: var(--rv-foreground);
+  }
+
+  /* Tooltips sit above the bar, wherever their button came from. */
+  .rv-root.rv-theme-bar [data-position="top"] [data-control][aria-label]::after {
+    inset-block: auto calc(100% + 10px);
+  }
+
+  /* Its group has no box any more, so the menu hangs from the bar. */
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-bar [data-part="control-group"] [data-part="menu-content"] {
+      inset-inline-end: var(--rv-inset-scaled);
+      bottom: calc(var(--rv-bar) + 26px);
+    }
+  }
+
+  .rv-root.rv-theme-bar[data-orientation="portrait"] [data-part="control-group"] [data-part="menu-content"] {
+    inset-inline: auto var(--rv-inset-scaled);
+    bottom: calc(var(--rv-bar) + 26px);
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-row"] > [data-part="timeline"] [data-part="timeline-track"] {
+    height: var(--rv-bar-track, 3px);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .rv-root.rv-theme-bar [data-part="control-row"] > [data-part="timeline"][data-dragging] [data-part="timeline-track"],
+  .rv-root.rv-theme-bar [data-part="control-row"] > [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-track"] {
+    height: var(--rv-bar-track-active, 5px);
+  }
+
+  .rv-root.rv-theme-bar [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-thumb"],
+  .rv-root.rv-theme-bar [data-part="timeline"][data-dragging] [data-part="timeline-thumb"] {
+    opacity: 1;
+    transform: scale(0.9);
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume-track"] {
+    height: 4px;
+    margin-top: -2px;
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume-fill"],
+  .rv-root.rv-theme-bar [data-part="volume-thumb"] {
+    background: var(--rv-foreground);
+  }
+
+  .rv-root.rv-theme-bar [data-part="volume"]:hover [data-part="volume-thumb"] {
+    opacity: 1;
+  }
+
+  /* No glass here, so the large button needs a shade of its own to read on a bright frame. */
+  .rv-root.rv-theme-bar [data-part="play-overlay"] {
+    background: rgb(0 0 0 / 0.55);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* There's no room for both times on a narrow player, and only the elapsed one is needed. */
+  @container rv (max-width: 479px) {
+    /* The default lift would land on the top row here, so they stop just above the bar. */
+    .rv-root.rv-theme-bar:not([data-controls="hidden"]) [data-part="captions"] {
+      transform: translateY(-57px);
+    }
+
+    .rv-root.rv-theme-bar [data-part="remaining-time"],
+    .rv-root.rv-theme-bar [data-position="scrubber"] > [data-part="duration"] {
+      display: none;
+    }
+
+    /* Small, and often above the shade at this size, so they need the full white. */
+    .rv-root.rv-theme-bar [data-part="controls"] :is([data-part="current-time"], [data-part="remaining-time"], [data-part="duration"]) {
+      color: var(--rv-foreground);
+    }
+
+    .rv-root.rv-theme-bar:not([data-orientation="portrait"]) [data-part="volume"]:hover,
+    .rv-root.rv-theme-bar:not([data-orientation="portrait"]) [data-part="volume"]:focus-within {
+      padding-inline-end: 0;
+    }
+
+    .rv-root.rv-theme-bar:not([data-orientation="portrait"]) [data-part="volume"]:hover [data-part="volume-slider"],
+    .rv-root.rv-theme-bar:not([data-orientation="portrait"]) [data-part="volume"]:focus-within [data-part="volume-slider"] {
+      overflow: hidden;
+      width: 0;
+      opacity: 0;
+    }
+
+    /* Except for the keyboard, which has no other way to set the volume here. */
+    .rv-root.rv-theme-bar:not([data-orientation="portrait"]) [data-part="volume"]:has(input:focus-visible) [data-part="volume-slider"] {
+      overflow: visible;
+      width: 64px;
+      opacity: 1;
+    }
+
+    .rv-root.rv-theme-bar:not([data-orientation="portrait"]) [data-part="volume"]:has(input:focus-visible) {
+      padding-inline-end: 12px;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-bar [data-part="transport"] > [data-control]:hover {
+      background: var(--rv-glass-hover);
+      transform: none;
+    }
+
+    .rv-root.rv-theme-bar [data-part="play-overlay"]:hover {
+      background: rgb(0 0 0 / 0.7);
+      transform: none;
+    }
+  }
+}

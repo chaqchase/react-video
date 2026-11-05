@@ -145,6 +145,66 @@
       "types": "./dist/plugins/drm/index.d.ts",
       "default": "./dist/plugins/drm/index.js"
     },
+    "./episodes": {
+      "types": "./dist/plugins/episodes/index.d.ts",
+      "default": "./dist/plugins/episodes/index.js"
+    },
+    "./skip": {
+      "types": "./dist/plugins/skip/index.d.ts",
+      "default": "./dist/plugins/skip/index.js"
+    },
+    "./info": {
+      "types": "./dist/plugins/info/index.d.ts",
+      "default": "./dist/plugins/info/index.js"
+    },
+    "./ambient": {
+      "types": "./dist/plugins/ambient/index.d.ts",
+      "default": "./dist/plugins/ambient/index.js"
+    },
+    "./mini-player": {
+      "types": "./dist/plugins/mini-player/index.d.ts",
+      "default": "./dist/plugins/mini-player/index.js"
+    },
+    "./screenshot": {
+      "types": "./dist/plugins/screenshot/index.d.ts",
+      "default": "./dist/plugins/screenshot/index.js"
+    },
+    "./loop": {
+      "types": "./dist/plugins/loop/index.d.ts",
+      "default": "./dist/plugins/loop/index.js"
+    },
+    "./shortcuts": {
+      "types": "./dist/plugins/shortcuts/index.d.ts",
+      "default": "./dist/plugins/shortcuts/index.js"
+    },
+    "./stats": {
+      "types": "./dist/plugins/stats/index.d.ts",
+      "default": "./dist/plugins/stats/index.js"
+    },
+    "./share": {
+      "types": "./dist/plugins/share/index.d.ts",
+      "default": "./dist/plugins/share/index.js"
+    },
+    "./fit": {
+      "types": "./dist/plugins/fit/index.d.ts",
+      "default": "./dist/plugins/fit/index.js"
+    },
+    "./transcript": {
+      "types": "./dist/plugins/transcript/index.d.ts",
+      "default": "./dist/plugins/transcript/index.js"
+    },
+    "./analytics/google": {
+      "types": "./dist/plugins/analytics/google.d.ts",
+      "default": "./dist/plugins/analytics/google.js"
+    },
+    "./orientation": {
+      "types": "./dist/plugins/orientation/index.d.ts",
+      "default": "./dist/plugins/orientation/index.js"
+    },
+    "./errors": {
+      "types": "./dist/core/errors.d.ts",
+      "default": "./dist/core/errors.js"
+    },
     "./ads/vast": {
       "types": "./dist/plugins/ads/vast.d.ts",
       "default": "./dist/plugins/ads/vast.js"
@@ -154,6 +214,7 @@
       "default": "./dist/plugins/ads/ima.js"
     },
     "./styles.css": "./dist/styles.css",
+    "./themes/*": "./dist/themes/*",
     "./package.json": "./package.json"
   },
   "scripts": {

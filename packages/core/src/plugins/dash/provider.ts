@@ -1,6 +1,6 @@
 import type { MediaInfo, MediaPlayerClass, MediaPlayerSettingClass } from "dashjs";
-import type { LoadRequest, Provider } from "../../core/types";
-import { NativeProvider } from "../../providers/native/index";
+import type { KnownVideoErrorCode, LoadRequest, Provider } from "../../core/types";
+import { mediaErrorInfo, NativeProvider } from "../../providers/native/index";
 import { toDashDrm, type DrmConfig } from "../drm/config";
 
 export interface DashLibrary {
@@ -11,8 +11,59 @@ export interface DashLibrary {
 const DVR_MIN_SECONDS = 60;
 const LIVE_POLL_MS = 2000;
 
-// dash.js's codes for failed downloads, which the recovery plugin can retry.
-const NETWORK_CODES = new Set([11, 25, 26, 27, 28, 29]);
+// dash.js's numbers. Below 6 they're the element's own, which it hands on.
+const CODES: Record<number, KnownVideoErrorCode> = {
+  10: "dash-manifest-invalid",
+  11: "dash-manifest",
+  12: "dash-network",
+  15: "dash-segment",
+  16: "dash-time-sync",
+  17: "dash-segment",
+  18: "dash-segment",
+  19: "dash-network",
+  20: "dash-media",
+  21: "dash-media",
+  22: "dash-media",
+  23: "dash-unsupported",
+  24: "drm-unsupported",
+  25: "dash-manifest",
+  26: "dash-segment",
+  27: "dash-segment",
+  28: "dash-segment",
+  29: "dash-network",
+  31: "dash-manifest-invalid",
+  32: "dash-manifest-invalid",
+  33: "dash-captions",
+  34: "dash-manifest-invalid",
+  35: "dash-unsupported",
+  36: "drm-session",
+  100: "drm-session",
+  101: "drm-session",
+  102: "drm-session",
+  103: "drm-session",
+  104: "drm-output-restricted",
+  105: "drm-session",
+  106: "drm-session",
+  107: "drm-session",
+  108: "drm-session",
+  109: "drm-certificate",
+  110: "drm-expired",
+  111: "drm-config",
+  112: "drm-unsupported",
+  113: "drm-session",
+  114: "drm-license",
+};
+
+const RETRYABLE = new Set<string>([
+  "dash-manifest",
+  "dash-segment",
+  "dash-network",
+  "drm-certificate",
+  "drm-license",
+]);
+
+// dash.js carries on after these: without captions, or with the manifest's timing.
+const NOTICES = new Set<string>(["dash-captions", "dash-time-sync"]);
 
 const trackId = ({ id, index, lang }: MediaInfo) => String(id ?? lang ?? index);
 const textTrackId = ({ id, index }: MediaInfo) => String(id ?? index);
@@ -71,12 +122,21 @@ export function createDashProvider(
         if (event.mediaType === "audio") this.publishAudio();
       });
       engine.on("error", (event: { error?: { code?: number; message?: string } }) => {
-        const code = event.error?.code ?? "unknown";
+        const nativeCode = event.error?.code ?? 0;
+        const message = event.error?.message ?? "The stream could not be played.";
+        if (nativeCode > 0 && nativeCode < 6) {
+          sink.error(mediaErrorInfo(nativeCode, message, event.error));
+          return;
+        }
+        // Its message is the only place it gives the licence server's response.
+        const code = nativeCode === 114 && /\(40[13]\)/.test(message) ? "drm-denied" : (CODES[nativeCode] ?? "dash-unknown");
         sink.error({
-          code: typeof code === "number" && NETWORK_CODES.has(code) ? "network" : code,
-          message: event.error?.message ?? "The stream could not be played.",
-          fatal: true,
-          source: request.source,
+          code,
+          message,
+          fatal: !NOTICES.has(code),
+          retryable: RETRYABLE.has(code),
+          nativeCode,
+          cause: event.error,
         });
       });
 

@@ -17,7 +17,10 @@ const DEFAULT_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
 export const speed = definePlugin("speed", (options: SpeedOptions = {}) => {
   const rates = options.rates ?? DEFAULT_RATES;
   return {
-    state: () => ({ rates }),
+    state: () => ({
+      /** The rates offered in the menu, in order. */
+      rates,
+    }),
     commands(context) {
       const step = (direction: 1 | -1) => {
         const { rate } = context.media();
@@ -29,8 +32,11 @@ export const speed = definePlugin("speed", (options: SpeedOptions = {}) => {
         if (next !== undefined) context.commands.setRate(next);
       };
       return {
+        /** Sets the playback rate, which doesn't have to be one of `rates`. */
         set: (rate: number) => context.commands.setRate(rate),
+        /** Moves up to the next higher rate in `rates`, if there is one. */
         faster: () => step(1),
+        /** Moves down to the next lower rate in `rates`, if there is one. */
         slower: () => step(-1),
       };
     },

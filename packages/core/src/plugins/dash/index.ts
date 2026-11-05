@@ -1,4 +1,5 @@
 import type { MediaPlayerSettingClass } from "dashjs";
+import { VideoKitError } from "../../core/kit-error";
 import { definePlugin } from "../../core/plugin";
 import type { SourceObject } from "../../core/types";
 import type { DashLibrary } from "./provider";
@@ -23,11 +24,19 @@ export const dash = definePlugin("dash", (options: DashOptions = {}) => ({
       name: "dash",
       canPlay: (source) => isDash(source) && hasMediaSource(),
       async load() {
-        const [{ createDashProvider }, library] = await Promise.all([
-          import("./provider"),
-          options.library?.() ?? import("dashjs"),
-        ]);
-        return createDashProvider(library, options.settings);
+        try {
+          const [{ createDashProvider }, library] = await Promise.all([
+            import("./provider"),
+            options.library?.() ?? import("dashjs"),
+          ]);
+          return createDashProvider(library, options.settings);
+        } catch (cause) {
+          throw new VideoKitError(
+            "dash-engine-load",
+            `dash.js didn't load. Check that it's installed, or the library option. ${String(cause)}`,
+            { retryable: true, cause }
+          );
+        }
       },
     });
   },
