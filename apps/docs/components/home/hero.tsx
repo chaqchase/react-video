@@ -22,7 +22,7 @@ const HERO_PLUGINS = [
 export function Hero({ kernel }: { kernel: string }) {
   const [plugins] = useState(() => createPlugins({ source: "mp4", plugins: HERO_PLUGINS }));
   return (
-    <section id="intro" className="relative isolate overflow-x-clip pt-14 pb-20 text-center sm:pt-20 sm:pb-28">
+    <section id="intro" className="relative isolate overflow-x-clip pt-12 pb-14 text-center sm:pt-16 sm:pb-20">
       <div className="site-wrap flex flex-col items-center">
         <p className="text-[clamp(1.125rem,2vw,1.5rem)] font-semibold tracking-[-0.018em]">
           React Video Kit <span className="text-dim font-normal">4 alpha</span>
@@ -46,7 +46,7 @@ export function Hero({ kernel }: { kernel: string }) {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-12 max-w-[1296px] px-4 sm:mt-16 sm:px-8">
+      <div className="relative mx-auto mt-10 max-w-[1296px] px-4 sm:mt-12 sm:px-8">
         <div
           aria-hidden="true"
           className="absolute inset-x-[4%] top-[6%] bottom-[-4%] -z-10 bg-[url(/media/poster.jpg)] bg-cover bg-center opacity-35 blur-[90px] saturate-[1.6] dark:opacity-60"

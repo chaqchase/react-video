@@ -9,8 +9,11 @@ export function ScrollArea({ label, className, children }: { label: string; clas
   useEffect(() => {
     const element = area.current;
     if (!element) return;
-    const observer = new ResizeObserver(() => setScrolls(element.scrollWidth > element.clientWidth));
+    const measure = () => setScrolls(element.scrollWidth > element.clientWidth);
+    const observer = new ResizeObserver(measure);
     observer.observe(element);
+    // A font that arrives late can widen the code without resizing this box.
+    void document.fonts.ready.then(measure);
     return () => observer.disconnect();
   }, []);
   return (

@@ -67,7 +67,7 @@ export function ThemeLab() {
             styles always win, and every control keeps working the same way.
           </SectionLead>
         </div>
-        <div className="mt-14 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]">
+        <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]">
           <VideoPlayer
             src="/media/sample-720.mp4"
             poster="/media/poster.jpg"

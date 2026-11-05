@@ -261,6 +261,23 @@ test.describe("docs", () => {
     expect(broken.map(([link, from]) => `${from} links to ${link}`)).toEqual([]);
   });
 
+  test("no page scrolls sideways on a phone", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "Layout width doesn't depend on the browser here, so one is enough.");
+    test.setTimeout(180_000);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const response = await page.request.get("/sitemap.xml");
+    const urls = [...(await response.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, url]) => new URL(url as string).pathname);
+    expect(urls.length).toBeGreaterThan(50);
+    const wide: string[] = [];
+    for (const url of urls) {
+      await page.goto(url);
+      await page.evaluate(() => document.fonts.ready);
+      const width = await page.evaluate(() => document.documentElement.scrollWidth);
+      if (width > 390) wide.push(`${url} is ${width} wide`);
+    }
+    expect(wide).toEqual([]);
+  });
+
   test("every page in the sitemap renders, without errors or accessibility violations", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "One browser is enough to find a page that doesn't render.");
     test.setTimeout(400_000);

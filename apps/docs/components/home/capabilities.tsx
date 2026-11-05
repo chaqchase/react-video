@@ -8,7 +8,7 @@ import { Segmented } from "@/components/site/segmented";
 
 function Card({ title, children, art, className = "" }: { title: string; children: ReactNode; art: ReactNode; className?: string }) {
   return (
-    <article className={`bento-card bg-raised group flex min-w-0 flex-col gap-7 overflow-hidden rounded-[24px] p-7 ${className}`}>
+    <article className={`bento-card bg-raised group flex min-w-0 flex-col gap-6 overflow-hidden rounded-[24px] p-6 ${className}`}>
       <div>
         <h3 className="text-[clamp(1.375rem,2.2vw,1.625rem)] leading-[1.16] font-semibold tracking-[-0.018em]">{title}</h3>
         <p className="text-dim mt-2.5 text-[15px] leading-[1.42] tracking-[-0.012em] text-pretty">{children}</p>
@@ -290,7 +290,7 @@ export function Capabilities() {
           Adaptive streaming, live edges, ad breaks, and key systems. Each is a plugin behind the same small interface.
         </SectionLead>
       </div>
-      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card title="HLS and DASH" art={<Ladder />}>
           hls.js and dash.js load only when a source needs them. Quality menus work the same across both, and on plain MP4s.
         </Card>
@@ -312,7 +312,7 @@ export function Capabilities() {
         <Card title="Every language, either direction" art={<Languages />}>
           Translated labels, plurals, and captions you can style. The layout mirrors in RTL, except the parts that shouldn&apos;t.
         </Card>
-        <article className="bento-card bg-raised grid min-w-0 gap-7 overflow-hidden rounded-[24px] p-7 sm:col-span-2 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:items-center md:gap-10">
+        <article className="bento-card bg-raised grid min-w-0 gap-6 overflow-hidden rounded-[24px] p-6 sm:col-span-2 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:items-center md:gap-10">
           <div>
             <h3 className="text-[clamp(1.375rem,2.2vw,1.625rem)] leading-[1.16] font-semibold tracking-[-0.018em]">Tested the way it&apos;s used</h3>
             <p className="text-dim mt-2.5 text-[15px] leading-[1.42] tracking-[-0.012em] text-pretty">

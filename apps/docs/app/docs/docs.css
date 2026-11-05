@@ -134,8 +134,8 @@ html:has(.doc-bar) {
 }
 .doc-nav-marker[data-moves] {
   transition:
-    transform 300ms var(--ease-rv),
-    height 300ms var(--ease-rv);
+    transform 220ms var(--ease-rv),
+    height 220ms var(--ease-rv);
 }
 .doc-nav .doc-nav-link {
   position: relative;
@@ -212,19 +212,12 @@ html:has(.doc-bar) {
   max-width: 784px;
   margin-inline: auto;
   padding: 36px 20px 72px;
-  animation: doc-enter 300ms var(--ease-rv);
-}
-@keyframes doc-enter {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
 }
 .doc-title {
   font-size: clamp(2rem, 3.4vw, 2.375rem);
   font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.024em;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 .doc-description {
@@ -272,8 +265,8 @@ html:has(.doc-bar) {
 }
 .doc-toc-marker[data-moves] {
   transition:
-    transform 280ms var(--ease-rv),
-    height 280ms var(--ease-rv);
+    transform 180ms var(--ease-rv),
+    height 180ms var(--ease-rv);
 }
 .doc-toc-list a {
   display: block;
@@ -404,7 +397,7 @@ html:has(.doc-bar) {
   margin: 52px 0 12px;
   font-size: 23px;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.024em;
 }
 .doc-h3 {
   margin: 34px 0 8px;
@@ -451,6 +444,8 @@ html:has(.doc-bar) {
   color: var(--site-text);
   font-family: var(--font-mono);
   font-size: 0.86em;
+  /* Long tokens break on a phone. Unlike `anywhere`, this can't squeeze a table's columns. */
+  overflow-wrap: break-word;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -536,15 +531,9 @@ html:has(.doc-bar) {
   color: var(--site-dim);
   transition: color 120ms var(--ease-rv);
 }
-.doc-open svg {
-  transition: translate 180ms var(--ease-rv);
-}
 @media (hover: hover) {
   .doc-open:hover {
     color: var(--site-text);
-  }
-  .doc-open:hover svg {
-    translate: 2px 0;
   }
 }
 .doc-demo[data-switched]:not([hidden]),
@@ -703,9 +692,8 @@ html:has(.doc-bar) {
   border-radius: var(--doc-radius);
   background: var(--doc-panel);
   transition:
-    border-color 180ms var(--ease-rv),
-    transform 180ms var(--ease-rv),
-    background-color 180ms var(--ease-rv);
+    border-color 120ms var(--ease-rv),
+    transform 110ms var(--ease-rv);
 }
 .doc-card:active {
   transform: scale(0.99);
@@ -713,10 +701,8 @@ html:has(.doc-bar) {
 @media (hover: hover) {
   .doc-card:hover {
     border-color: var(--site-line-strong);
-    transform: translateY(-1px);
   }
   .doc-card:hover .doc-card-title svg {
-    translate: 2px 0;
     color: var(--site-text);
   }
 }
@@ -733,9 +719,7 @@ html:has(.doc-bar) {
 .doc-card-title svg {
   flex: none;
   color: var(--site-dim);
-  transition:
-    translate 180ms var(--ease-rv),
-    color 180ms var(--ease-rv);
+  transition: color 120ms var(--ease-rv);
 }
 .doc-card-text {
   margin-top: 2px;
@@ -796,7 +780,6 @@ html:has(.doc-bar) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .doc-article,
   .doc-demo[data-switched]:not([hidden]),
   .doc-demo-code:not([hidden]) {
     animation: none;

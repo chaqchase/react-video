@@ -11,7 +11,7 @@ function PagerLink({ page, direction }: { page: Neighbour; direction: "previous"
   return (
     <Link
       href={page.url}
-      className={`group flex min-w-0 flex-1 flex-col gap-0.5 py-1 ${next ? "items-end text-end" : "items-start"}`}
+      className={`flex min-w-0 flex-1 flex-col gap-0.5 py-1 ${next ? "items-end text-end" : "items-start"}`}
     >
       <span className="text-dim text-[12.5px]">{next ? "Next" : "Previous"}</span>
       <span className={`inline-flex items-center gap-1 text-[14.5px] font-medium tracking-[-0.01em] ${next ? "" : "flex-row-reverse"}`}>
@@ -19,7 +19,7 @@ function PagerLink({ page, direction }: { page: Neighbour; direction: "previous"
         <ChevronIcon
           width={12}
           height={12}
-          className={`text-dim transition-transform duration-200 ease-rv ${next ? "group-hover:translate-x-0.5" : "rotate-180 group-hover:-translate-x-0.5"}`}
+          className={`text-dim ${next ? "" : "rotate-180"}`}
         />
       </span>
     </Link>
