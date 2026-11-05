@@ -19,7 +19,7 @@ function Card({ plugin, selected, onToggle }: { plugin: PluginDefinition; select
   const added = addedBy(plugin);
   return (
     <li
-      className={`lift-card group bg-raised relative flex min-w-0 flex-col rounded-[20px] p-5 ${
+      className={`link-card bg-raised relative flex min-w-0 flex-col rounded-[20px] p-5 ${
         selected ? "shadow-[inset_0_0_0_2px_var(--site-sun)]" : ""
       }`}
     >
@@ -42,7 +42,7 @@ function Card({ plugin, selected, onToggle }: { plugin: PluginDefinition; select
             width={13}
             height={13}
             strokeWidth={2.2}
-            className={`transition duration-200 ease-rv ${selected ? "" : "scale-75 opacity-0 group-hover:opacity-50"}`}
+            className={`transition duration-200 ease-rv ${selected ? "" : "scale-75 opacity-0"}`}
           />
         </button>
       </div>

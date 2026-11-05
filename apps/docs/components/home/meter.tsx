@@ -15,12 +15,13 @@ const plugins = [idle()];
 
 function Stat({ label, note, statRef, tone }: { label: string; note: string; statRef: React.Ref<HTMLSpanElement>; tone?: string }) {
   return (
-    <div className="bg-raised flex flex-col justify-center rounded-[20px] p-4 sm:px-6">
+    // A row on a phone, so the counters stay in view under the video.
+    <div className="bg-raised grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-[20px] p-4 sm:flex sm:flex-col sm:items-stretch sm:justify-center sm:px-6">
       <p className="text-[14px] font-semibold tracking-[-0.014em] sm:text-[15px]">{label}</p>
-      <p className={`site-numeral mt-2 text-[clamp(2.25rem,5vw,3.25rem)] ${tone ?? ""}`}>
+      <p className={`site-numeral col-start-2 row-span-2 row-start-1 text-[clamp(2.25rem,5vw,3.25rem)] sm:mt-2 ${tone ?? ""}`}>
         <span ref={statRef}>0</span>
       </p>
-      <p className="text-dim mt-2 text-[13px] leading-[1.35]">{note}</p>
+      <p className="text-dim mt-0.5 text-[13px] leading-[1.35] sm:mt-2">{note}</p>
     </div>
   );
 }
@@ -100,7 +101,7 @@ export function Meter() {
             page.
           </SectionLead>
         </div>
-        <div ref={frame} className="mt-14 grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <div ref={frame} className="mt-10 grid min-w-0 grid-cols-[minmax(0,1fr)] items-start gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
           <VideoPlayer
             src="/media/sample-720.mp4"
             poster="/media/poster.jpg"
@@ -110,7 +111,7 @@ export function Meter() {
             eyebrow="Trailer"
             aria-label="Player being measured"
           />
-          <div className="grid grid-cols-3 gap-2.5 sm:gap-4 xl:h-0 xl:min-h-full xl:grid-cols-1 xl:grid-rows-3" data-attached={attached || undefined}>
+          <div className="grid gap-2.5 sm:grid-cols-3 sm:gap-4 xl:h-0 xl:min-h-full xl:grid-cols-1 xl:grid-rows-3" data-attached={attached || undefined}>
             <Stat label="React commits" note="Since you pressed play" statRef={commits} tone="text-sun" />
             <Stat label="Clock writes" note="To the DOM, no render" statRef={writes} />
             <Stat label="timeupdate" note="Fired by the browser" statRef={events} />

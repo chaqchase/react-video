@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { ThemeColor } from "@/components/site/theme-color";
@@ -8,8 +8,8 @@ import "./global.css";
 // Dark unless someone chose light. This runs before the first paint, so the page never flashes the wrong theme.
 const THEME_SCRIPT = `(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}t=t==="light"?"light":"dark";var r=document.documentElement;r.classList.remove("dark","light");r.classList.add(t);r.style.colorScheme=t})();`;
 
-// Apple's system fonts come first in the stack, and Inter stands in everywhere else.
-const sans = Inter({ subsets: ["latin"], variable: "--font-inter" });
+// The site's own typeface, so it reads the same on every system.
+const sans = Geist({ subsets: ["latin"], variable: "--font-geist" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {

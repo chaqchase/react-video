@@ -18,7 +18,7 @@ export function ComposeTabs({ layers }: { layers: readonly ComposeLayer[] }) {
   const [active, setActive] = useState(layers[0]?.id ?? "");
   const [switched, setSwitched] = useState(false);
   return (
-    <div className="mt-14">
+    <div className="mt-10">
       <Segmented
         kind="tabs"
         label="Ways to use the player"

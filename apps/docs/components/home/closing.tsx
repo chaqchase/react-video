@@ -17,7 +17,7 @@ export function Closing() {
             <ChevronIcon />
           </Link>
         </div>
-        <Install hero className="mt-14" />
+        <Install hero className="mt-10" />
         <p className="text-dim mt-5 text-[14px] leading-[1.45] tracking-[-0.008em]">
           Version 4 is in alpha, and its API can still change.{ALPHA_PUBLISHED ? null : " It isn't on npm yet."}
         </p>

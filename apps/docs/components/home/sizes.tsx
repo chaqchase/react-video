@@ -30,7 +30,7 @@ export function Sizes() {
             going over fails the check. Plugins you don&apos;t import add nothing.
           </SectionLead>
         </div>
-        <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+        <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-4">
           {headline.map(({ value, label, note }) => (
             <div key={label}>
               <dt className="text-[15px] font-semibold tracking-[-0.016em]">{label}</dt>
@@ -39,18 +39,18 @@ export function Sizes() {
             </div>
           ))}
         </dl>
-        <h3 className="mt-16 mb-4 text-[21px] font-semibold tracking-[-0.018em]">What each plugin adds to a player</h3>
+        <h3 className="mt-12 mb-3 text-[21px] font-semibold tracking-[-0.018em]">What each plugin adds to a player</h3>
         <ul className="grid gap-x-12 gap-y-0.5 md:grid-cols-2">
           {rows.map(([name, bytes]) => (
             <li key={name}>
               <Link
                 href={`/docs/v4/plugins/${SECTIONS[name] ?? name}`}
-                className="group hover:bg-hover -mx-2 flex items-center gap-3 rounded-[10px] px-2 py-2 transition-colors duration-150"
+                className="hover:bg-hover -mx-2 flex items-center gap-3 rounded-[10px] px-2 py-2 transition-colors duration-150"
               >
                 <span className="w-[112px] shrink-0 truncate text-[14px]">{name}</span>
                 <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--site-switch-off)]">
                   <span
-                    className="size-bar group-hover:bg-sun block h-full origin-left rounded-full bg-[var(--site-dim)] transition-colors duration-150"
+                    className="size-bar block h-full origin-left rounded-full bg-[var(--site-dim)]"
                     style={{ width: `${(bytes / largest) * 100}%` }}
                   />
                 </span>

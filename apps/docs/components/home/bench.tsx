@@ -48,7 +48,7 @@ export function Bench() {
           </SectionLead>
         </div>
 
-        <div className="mt-14 grid items-start gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+        <div className="mt-10 grid items-start gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
           <div className="ios-list order-2 lg:sticky lg:top-[68px] lg:order-1">
             {BENCH.map((id) => {
               const plugin = pluginById(id);
