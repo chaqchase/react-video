@@ -22,12 +22,14 @@ const IN_USE = [
  */
 export const idle = definePlugin("idle", (options: IdleOptions = {}) => {
   const { mouseTimeout = 3000, touchTimeout = 4000, leaveTimeout = 800 } = options;
+  let show: (() => void) | null = null;
   return {
     state: () => ({ visible: true }),
     attrs: { "data-controls": (state) => (state.visible ? "shown" : "hidden") },
     commands(context) {
       return {
-        show: () => context.set({ visible: true }),
+        /** Reveals the controls, which then hide again as usual. */
+        show: () => (show ? show() : context.set({ visible: true })),
         hide: () => context.set({ visible: false }),
         toggle: () => context.set({ visible: !context.state().visible }),
       };
@@ -66,6 +68,11 @@ export const idle = definePlugin("idle", (options: IdleOptions = {}) => {
         deadline = performance.now() + wait;
         if (timer === undefined) timer = setTimeout(check, wait);
       };
+
+      show = () => reveal(mouseTimeout);
+      scope.add(() => {
+        show = null;
+      });
 
       scope.on(root, "pointermove", ((event: PointerEvent) => {
         if (event.pointerType !== "touch") reveal(mouseTimeout);

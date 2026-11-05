@@ -139,8 +139,9 @@ export function ima(options: ImaOptions) {
                 });
               });
               loaded.addEventListener(AdErrorEvent.Type.AD_ERROR, (failed) => {
+                active.error(failed.getError?.() ?? new Error("IMA reported an error."));
                 active.breakEnd();
-                reject(failed.getError?.() ?? new Error("IMA reported an error."));
+                resolve();
               });
               const { offsetWidth, offsetHeight } = container;
               loaded.init(offsetWidth, offsetHeight, ViewMode.NORMAL);

@@ -39,6 +39,10 @@ export function sortPlugins(instances: readonly AnyPlugin[]): ResolvedPlugin[] {
     if (byName.has(name)) {
       throw new Error(`react-video-kit: plugin "${name}" is installed twice.`);
     }
+    // Props crossing into an island or a client component lose their functions.
+    if (typeof create !== "function") {
+      throw new Error(`react-video-kit: plugin "${name}" has no code. Create plugins on the client.`);
+    }
     const plugin = { name, spec: create() };
     byName.set(name, plugin);
     return plugin;

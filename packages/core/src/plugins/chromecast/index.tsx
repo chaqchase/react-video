@@ -43,6 +43,7 @@ interface CastContext {
   addEventListener(type: string, listener: (event: { castState?: string; sessionState?: string }) => void): void;
   removeEventListener(type: string, listener: (event: never) => void): void;
   requestSession(): Promise<unknown>;
+  getCastState(): string;
   getCurrentSession(): CastSession | null;
 }
 interface CastGlobals {
@@ -73,7 +74,10 @@ interface CastGlobals {
 
 const castGlobals = () => globalThis as unknown as CastGlobals;
 
-/** Resolves when the SDK has loaded. Browsers without Cast support never resolve it. */
+/**
+ * Resolves when the SDK has loaded. Browsers without Cast support never resolve it,
+ * and only Chromium's are worth the request.
+ */
 function loadSdk(url: string, signal: AbortSignal) {
   return new Promise<void>((resolve) => {
     const globals = castGlobals();
@@ -81,6 +85,7 @@ function loadSdk(url: string, signal: AbortSignal) {
       resolve();
       return;
     }
+    if (!globals.chrome) return;
     const previous = globals.__onGCastApiAvailable;
     globals.__onGCastApiAvailable = (available) => {
       previous?.(available);
@@ -102,6 +107,9 @@ const typeFor = ({ src, type }: SourceObject) => {
   if (path.endsWith(".mpd")) return "application/dash+xml";
   return "video/mp4";
 };
+
+// The default receiver has no way to change rate.
+const CAPABILITIES = { seek: true, rate: false, volume: true };
 
 /** Playback on the receiver, reported through the store like any other provider. */
 class CastProvider implements Provider {
@@ -167,7 +175,6 @@ class CastProvider implements Provider {
     if (muted !== this.player.isMuted) this.controller.muteOrUnmute();
   }
 
-  // The default receiver has no way to change rate.
   setRate() {}
 
   snapshot(): Partial<MediaState> {
@@ -175,6 +182,7 @@ class CastProvider implements Provider {
     return {
       duration,
       timeline: { start: 0, end: duration, kind: "vod" },
+      capabilities: CAPABILITIES,
       paused: isPaused,
       muted: isMuted,
       volume: volumeLevel,
@@ -198,13 +206,18 @@ export interface ChromecastOptions {
 }
 
 /**
- * Sends playback to a Chromecast. The Cast SDK loads at runtime, only in browsers
- * that support it, and the receiver then acts as the top provider. The default
- * receiver can't play DRM content.
+ * Sends playback to a Chromecast. The Cast SDK loads at runtime in Chromium browsers,
+ * and the receiver then acts as the top provider. The default receiver can't play
+ * DRM content, and captions stay on this device.
  */
 export const chromecast = definePlugin("chromecast", (options: ChromecastOptions = {}) => {
   let release: (() => void) | null = null;
   let session: CastSession | null = null;
+
+  const titleOf = (source: SourceObject | null) => {
+    const { title } = options;
+    return typeof title === "function" && source ? title(source) : (title as string | undefined);
+  };
 
   return {
     state: () => ({
@@ -224,11 +237,6 @@ export const chromecast = definePlugin("chromecast", (options: ChromecastOptions
     }),
     setup(context, scope) {
       if (typeof document === "undefined") return;
-
-      const titleOf = (source: SourceObject | null) => {
-        const { title } = options;
-        return typeof title === "function" && source ? title(source) : (title as string | undefined);
-      };
 
       /** Hands the current source to the receiver, from where local playback is. */
       const start = (current: CastSession) => {
@@ -272,6 +280,8 @@ export const chromecast = definePlugin("chromecast", (options: ChromecastOptions
         const onCastState = (event: { castState?: string }) => {
           context.set({ available: event.castState !== CastState.NO_DEVICES_AVAILABLE });
         };
+        // The SDK may have found devices before this player mounted.
+        onCastState({ castState: castContext.getCastState() });
         const onSessionState = (event: { sessionState?: string }) => {
           const { sessionState } = event;
           if (sessionState === SessionState.SESSION_ENDED) stop();
@@ -297,7 +307,7 @@ export const chromecast = definePlugin("chromecast", (options: ChromecastOptions
       load(request, next, context) {
         if (!session) return next(request);
         const current = session;
-        const provider = new CastProvider(current, undefined);
+        const provider = new CastProvider(current, titleOf(request.source));
         release = context.pushProvider(provider);
         void provider.load(request).catch(() => {});
         return next(request);

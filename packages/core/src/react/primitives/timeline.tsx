@@ -13,7 +13,7 @@ import { formatTime } from "../../lib/format-time";
 import { usePlayer } from "../context";
 import { useLabel, useVideoState } from "../hooks";
 import { Slot } from "../slot";
-import { mergeRefs, useNodeRef } from "./as-child";
+import { HIDDEN_INPUT, mergeRefs, useNodeRef } from "./as-child";
 import { useSliderGesture } from "./slider-gesture";
 import { TimelineContext } from "./timeline-context";
 import { canSeek, clampFraction, createTimelineController } from "./timeline-controller";
@@ -141,6 +141,7 @@ export const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function Timel
           ref={inputRef}
           type="range"
           data-part="timeline-input"
+          style={HIDDEN_INPUT}
           aria-label={label}
           min={start}
           max={end}

@@ -17,6 +17,9 @@ interface Thumbnail {
   height: number;
 }
 
+const WHOLE_WIDTH = 160;
+const WHOLE_HEIGHT = 90;
+
 export interface ThumbnailsOptions {
   /** A WebVTT file of thumbnails, or a function that picks one for each source. */
   src: string | ((source: SourceObject) => string | null);
@@ -25,7 +28,7 @@ export interface ThumbnailsOptions {
 function parseThumbnails(text: string, base: string): Thumbnail[] {
   return parseVtt(text).flatMap(({ start, end, text: payload }) => {
     const [path = "", fragment] = payload.split("#");
-    const match = fragment?.match(/xywh=(\d+),(\d+),(\d+),(\d+)/);
+    const match = fragment?.match(/xywh=(?:pixel:)?(\d+),(\d+),(\d+),(\d+)/);
     if (!path) return [];
     return [
       {
@@ -52,13 +55,15 @@ export const thumbnails = definePlugin("thumbnails", (options: ThumbnailsOptions
   const load = () => {
     if (loading || !url || typeof fetch === "undefined") return;
     const base = new URL(url, location.href).href;
-    loading = fetch(base, { signal })
+    // A new source can start before an old response lands, and that one's are stale.
+    const current = signal;
+    loading = fetch(base, { signal: current })
       .then((response) => (response.ok ? response.text() : ""))
       .then((text) => {
-        cues = parseThumbnails(text, base);
+        if (!current?.aborted) cues = parseThumbnails(text, base);
       })
       .catch(() => {
-        cues = [];
+        if (!current?.aborted) cues = [];
       });
   };
 
@@ -69,6 +74,8 @@ export const thumbnails = definePlugin("thumbnails", (options: ThumbnailsOptions
         load();
         return cues?.find(({ start, end }) => time >= start && time < end) ?? null;
       },
+      /** Resolves when a load in progress finishes, or null when there's nothing to wait for. */
+      whenLoaded: (): Promise<void> | null => (cues ? null : loading),
       /** Resolves once the image can paint without a flash. */
       prepare(image: string): Promise<void> | null {
         if (decoded.has(image)) return null;
@@ -95,27 +102,40 @@ export const thumbnails = definePlugin("thumbnails", (options: ThumbnailsOptions
 export function ThumbnailPreview() {
   const player = usePlayer();
   const element = useRef<HTMLDivElement>(null);
+  const latest = useRef<number | null>(null);
 
   const write = useCallback(
     (time: number | null) => {
+      latest.current = time;
       const node = element.current;
       if (!node || time === null) return;
-      const { at, prepare } = player.plugin(thumbnails).commands;
-      const thumbnail = at(time);
-      if (!thumbnail) {
-        node.removeAttribute("data-visible");
-        return;
-      }
-      const paint = () => {
-        node.style.width = `${thumbnail.width}px`;
-        node.style.height = `${thumbnail.height}px`;
-        node.style.backgroundImage = `url("${thumbnail.image}")`;
-        node.style.backgroundPosition = `-${thumbnail.x}px -${thumbnail.y}px`;
-        node.setAttribute("data-visible", "");
+      const { at, prepare, whenLoaded } = player.plugin(thumbnails).commands;
+      const show = () => {
+        const thumbnail = at(time);
+        if (!thumbnail) {
+          node.removeAttribute("data-visible");
+          // The first hover starts the load, and the pointer may never move again.
+          void whenLoaded()?.then(() => {
+            if (latest.current === time) show();
+          });
+          return;
+        }
+        const paint = () => {
+          if (latest.current !== time) return;
+          // A cue with no `#xywh` is one image per frame rather than part of a sprite.
+          const sprite = thumbnail.width > 0;
+          node.style.width = `${sprite ? thumbnail.width : WHOLE_WIDTH}px`;
+          node.style.height = `${sprite ? thumbnail.height : WHOLE_HEIGHT}px`;
+          node.style.backgroundImage = `url("${thumbnail.image}")`;
+          node.style.backgroundSize = sprite ? "" : "cover";
+          node.style.backgroundPosition = sprite ? `-${thumbnail.x}px -${thumbnail.y}px` : "center";
+          node.setAttribute("data-visible", "");
+        };
+        const pending = prepare(thumbnail.image);
+        if (pending) void pending.then(paint);
+        else paint();
       };
-      const pending = prepare(thumbnail.image);
-      if (pending) void pending.then(paint);
-      else paint();
+      show();
     },
     [player]
   );

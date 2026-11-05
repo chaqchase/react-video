@@ -25,6 +25,8 @@ export const recovery = definePlugin("recovery", (options: RecoveryOptions = {})
   let position = 0;
   let failedAt = 0;
   let lastSource: string | null = null;
+  const tried = new Set<string>();
+  let reloading = false;
   let cancelRetry = () => {};
 
   return {
@@ -45,6 +47,7 @@ export const recovery = definePlugin("recovery", (options: RecoveryOptions = {})
       );
 
       const retry = () => {
+        reloading = true;
         context.commands.reload(position > 0 ? position : undefined);
       };
 
@@ -53,15 +56,17 @@ export const recovery = definePlugin("recovery", (options: RecoveryOptions = {})
         (media) => media.error,
         (error) => {
           if (!error?.fatal) return;
+          reloading = false;
           cancelRetry();
           const { attempt } = context.state();
-          if (!retryOn(error) || attempt >= retries) {
+          const offline = typeof navigator !== "undefined" && navigator.onLine === false;
+          if (!retryOn(error) || (!offline && attempt >= retries)) {
             context.set({ retrying: false });
             return;
           }
           failedAt = position;
-          context.set({ attempt: attempt + 1, retrying: true });
-          if (typeof navigator !== "undefined" && navigator.onLine === false) {
+          context.set({ attempt: offline ? attempt : attempt + 1, retrying: true });
+          if (offline) {
             window.addEventListener("online", retry, { once: true });
             cancelRetry = () => window.removeEventListener("online", retry);
           } else {
@@ -74,16 +79,21 @@ export const recovery = definePlugin("recovery", (options: RecoveryOptions = {})
         scope,
         (media) => media.status === "ready" && !media.error,
         (ready) => {
-          if (ready) context.set({ retrying: false });
+          if (!ready) return;
+          reloading = false;
+          context.set({ retrying: false });
         }
       );
     },
-    source(context, source) {
-      // A reload keeps its place, but a different video starts from nothing.
-      if (source.src === lastSource) return;
-      lastSource = source.src;
+    source(context, { src }) {
+      // Its own reload keeps counting, even through a list of fallbacks.
+      const own = reloading && tried.has(src);
+      tried.add(src);
+      if (own) return;
+      // Anything else starts counting again, and a different video starts from nothing.
       cancelRetry();
-      position = 0;
+      if (src !== lastSource) position = 0;
+      lastSource = src;
       context.set({ attempt: 0, retrying: false });
     },
   };

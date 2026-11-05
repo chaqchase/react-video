@@ -9,6 +9,7 @@ import { captions, CaptionsToggle } from "../../src/plugins/captions/index";
 import { chapters, ChaptersMenu } from "../../src/plugins/chapters/index";
 import { fullscreen } from "../../src/plugins/fullscreen/index";
 import { hotkeys, HotkeysFeedback } from "../../src/plugins/hotkeys/index";
+import { idle } from "../../src/plugins/idle/index";
 import { i18n } from "../../src/plugins/i18n/index";
 import { mediaSession } from "../../src/plugins/media-session/index";
 import { persistence } from "../../src/plugins/persistence/index";
@@ -349,6 +350,64 @@ describe("hotkeys", () => {
     });
     expect(status.hasAttribute("data-visible")).toBe(false);
   });
+
+  describe("when seeking isn't possible", () => {
+    const heard = (player: ReturnType<typeof createPlayer>) => {
+      const messages: string[] = [];
+      cleanups.push(player.plugin(hotkeys).commands.onFeedback((message) => messages.push(message)));
+      return messages;
+    };
+
+    it("doesn't move a plain live stream, or claim that it did", async () => {
+      let limit = () => {};
+      const liveOnly = definePlugin("live-only", () => ({
+        setup(context) {
+          limit = () => context.report({ capabilities: { seek: false, rate: false, volume: true } });
+        },
+      }));
+      const { player, root, video } = await mounted({ plugins: [hotkeys(), speed(), liveOnly()] });
+      limit();
+      await settle();
+      const messages = heard(player);
+      const target = document.createElement("div");
+      root.append(target);
+      for (const key of ["ArrowRight", "j", "5", "Home", "End", ">"]) press(key, target);
+      await settle();
+      expect(video.currentTime).toBe(0);
+      expect(player.getState().media.rate).toBe(1);
+      expect(messages).toEqual([]);
+    });
+
+    it("says nothing while locked, as during an ad", async () => {
+      let unlock = () => {};
+      const locker = definePlugin("locker", () => ({
+        setup(context) {
+          unlock = context.lock("ad", ["seek", "rate"]);
+        },
+      }));
+      const { player, root, video } = await mounted({ plugins: [hotkeys(), speed(), locker()] });
+      const messages = heard(player);
+      const target = document.createElement("div");
+      root.append(target);
+      for (const key of ["ArrowRight", ">", "<"]) press(key, target);
+      await settle();
+      expect(video.currentTime).toBe(0);
+      expect(player.getState().media.rate).toBe(1);
+      expect(messages).toEqual([]);
+      unlock();
+    });
+  });
+
+  it("reveals the controls for a key pressed with focus outside the player", async () => {
+    const { player, root } = await mounted({ plugins: [hotkeys(), idle()] });
+    root.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    player.plugin(idle).commands.hide();
+    await settle();
+    expect(player.plugin(idle).state().visible).toBe(false);
+    press("m", document.body);
+    await settle();
+    expect(player.plugin(idle).state().visible).toBe(true);
+  });
 });
 
 describe("quality", () => {
@@ -593,6 +652,85 @@ describe("captions", () => {
     await settle();
     expect(screen.queryByRole("button", { name: "Captions" })).toBeNull();
   });
+
+  it("tells two tracks in one language apart", async () => {
+    const plain = fakeTextTrack("en");
+    const described = fakeTextTrack("en");
+    const { prepare } = withTracks(plain, described);
+    const { player } = await mounted({ plugins: [captions()] }, prepare);
+    const handle = player.plugin(captions);
+    expect(handle.state().tracks.map(({ id }) => id)).toEqual(["en", "en-1"]);
+    handle.commands.select("en-1");
+    expect(described.mode).toBe("hidden");
+    expect(plain.mode).toBe("disabled");
+    expect(handle.state().active).toBe("en-1");
+  });
+
+  it("turns off when the active track goes away", async () => {
+    const english = fakeTextTrack("en");
+    const french = fakeTextTrack("fr");
+    const items = [english, french];
+    const list = fakeList(items);
+    const { player } = await mounted({ plugins: [captions()] }, (video) => {
+      Object.defineProperty(video, "textTracks", { value: list });
+    });
+    const handle = player.plugin(captions);
+    handle.commands.select("en");
+    const listener = vi.fn();
+    cleanups.push(handle.commands.onCues(listener));
+    items.shift();
+    list.add(fakeTextTrack("de"), "removetrack");
+    expect(handle.state().active).toBe(null);
+    expect(listener).toHaveBeenLastCalledWith([]);
+  });
+
+  it("follows the active track when its name changes", async () => {
+    const first = fakeTextTrack("en");
+    const second = fakeTextTrack("en");
+    const items = [first, second];
+    const list = fakeList(items);
+    const { player } = await mounted({ plugins: [captions()] }, (video) => {
+      Object.defineProperty(video, "textTracks", { value: list });
+    });
+    const handle = player.plugin(captions);
+    handle.commands.select("en-1");
+    items.shift();
+    list.dispatchEvent(new Event("removetrack"));
+    Object.assign(list, { length: 1, 0: second });
+    list.dispatchEvent(new Event("removetrack"));
+    expect(handle.state().active).toBe("en");
+  });
+
+  it("leaves captions off once the viewer chooses that, as tracks arrive", async () => {
+    const english = fakeTextTrack("en");
+    const { list, prepare } = withTracks(english);
+    const { player } = await mounted({ plugins: [captions({ language: "en" })] }, prepare);
+    const handle = player.plugin(captions);
+    expect(handle.state().active).toBe("en");
+    handle.commands.select(null);
+    list.add(fakeTextTrack("fr"));
+    expect(handle.state().active).toBe(null);
+    expect(handle.state().language).toBe(null);
+  });
+
+  it("keeps a preferred language for the next video's tracks", async () => {
+    const french = fakeTextTrack("fr");
+    const items = [french];
+    const list = fakeList(items);
+    const { player } = await mounted({ plugins: [captions()] }, (video) => {
+      Object.defineProperty(video, "textTracks", { value: list });
+    });
+    const handle = player.plugin(captions);
+    handle.commands.select("fr");
+    items.shift();
+    list.dispatchEvent(new Event("removetrack"));
+    Object.assign(list, { length: 0 });
+    list.dispatchEvent(new Event("removetrack"));
+    expect(handle.state().active).toBe(null);
+    expect(handle.state().language).toBe("fr");
+    list.add(fakeTextTrack("fr"));
+    expect(handle.state().active).toBe("fr");
+  });
 });
 
 describe("chapters", () => {
@@ -704,6 +842,33 @@ describe("thumbnails", () => {
     expect(fetcher).toHaveBeenCalledOnce();
   });
 
+  it("appears on the first hover, with no further pointer movement", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, text: async () => vtt })));
+    vi.stubGlobal(
+      "Image",
+      class {
+        src = "";
+        decode = async () => {};
+      }
+    );
+    const player = createPlayer({
+      src: "/a.mp4",
+      plugins: [thumbnails({ src: "/media/thumbs.vtt" })],
+    });
+    render(
+      <Root player={player}>
+        <Media />
+        <Timeline />
+      </Root>
+    );
+    await settle();
+    const timeline = document.querySelector('[data-part="timeline"]') as HTMLElement;
+    timeline.getBoundingClientRect = () => ({ left: 0, width: 100 }) as DOMRect;
+    fireEvent.pointerMove(timeline, { clientX: 10, pointerType: "mouse" });
+    await settle();
+    expect(document.querySelector('[data-part="thumbnail"]')?.hasAttribute("data-visible")).toBe(true);
+  });
+
   it("copes with a missing file", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false, text: async () => "" })));
     const { player } = await mounted({ plugins: [thumbnails({ src: "/gone.vtt" })] });
@@ -711,6 +876,48 @@ describe("thumbnails", () => {
     at(1);
     await settle();
     expect(at(1)).toBeNull();
+  });
+
+  it("reads the explicit pixel form of a sprite position", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        text: async () => "WEBVTT\n\n00:00.000 --> 00:10.000\nsprite.jpg#xywh=pixel:160,90,160,90\n",
+      }))
+    );
+    const { player } = await mounted({ plugins: [thumbnails({ src: "/t.vtt" })] });
+    const { at } = player.plugin(thumbnails).commands;
+    at(1);
+    await settle();
+    expect(at(1)).toMatchObject({ x: 160, y: 90, width: 160, height: 90 });
+  });
+
+  it("ignores a response for a source that's gone", async () => {
+    let answer: (value: unknown) => void = () => {};
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_url: string, { signal }: { signal: AbortSignal }) =>
+        new Promise((resolve) => {
+          answer = resolve;
+          expect(signal.aborted).toBe(false);
+        })
+      )
+    );
+    const { player } = await mounted({
+      plugins: [thumbnails({ src: (source) => `${source.src}.vtt` })],
+    });
+    const { at } = player.plugin(thumbnails).commands;
+    at(1);
+    const stale = answer;
+    player.commands.setSource("/other.mp4");
+    await settle();
+    stale({ ok: true, text: async () => vtt });
+    await settle();
+    expect(at(5)).toBeNull();
+    answer({ ok: true, text: async () => vtt });
+    await settle();
+    expect(at(5)).toMatchObject({ x: 0 });
   });
 });
 
@@ -825,6 +1032,56 @@ describe("persistence", () => {
     await settle();
     expect(storage.values.has("rv:position:/video.mp4")).toBe(false);
   });
+
+  it("saves a caption choice as soon as it's made", async () => {
+    const storage = memory();
+    const english = fakeTextTrack("en");
+    const list = fakeList([english]);
+    const { player } = await mounted(
+      { plugins: [captions(), persistence({ storage })] },
+      (video) => Object.defineProperty(video, "textTracks", { value: list })
+    );
+    player.plugin(captions).commands.select("en");
+    await settle();
+    expect(JSON.parse(storage.values.get("rv:preferences") ?? "{}").captions).toBe("en");
+    player.plugin(captions).commands.select(null);
+    await settle();
+    expect(JSON.parse(storage.values.get("rv:preferences") ?? "{}").captions).toBe(null);
+  });
+
+  it("keeps a saved language through a video that has no tracks for it", async () => {
+    const storage = memory();
+    storage.values.set("rv:preferences", JSON.stringify({ volume: 1, muted: false, rate: 1, captions: "fr" }));
+    const { player } = await mounted({ plugins: [captions(), persistence({ storage })] });
+    player.commands.setVolume(0.5);
+    await settle();
+    expect(JSON.parse(storage.values.get("rv:preferences") ?? "{}")).toMatchObject({
+      volume: 0.5,
+      captions: "fr",
+    });
+  });
+
+  it("doesn't save autoplay's fallback mute as the viewer's choice", async () => {
+    const storage = memory();
+    const original = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
+      fakeBehaviour.rejectPlayWith = this.muted ? null : "NotAllowedError";
+      return original.call(this);
+    };
+    cleanups.push(() => {
+      HTMLMediaElement.prototype.play = original;
+    });
+    const { player, media } = await mounted({ plugins: [autoplay(), persistence({ storage })] });
+    await settle();
+    await settle();
+    expect(media()).toMatchObject({ paused: false, muted: true });
+    player.commands.setVolume(0.5);
+    await settle();
+    expect(JSON.parse(storage.values.get("rv:preferences") ?? "{}")).toMatchObject({
+      volume: 0.5,
+      muted: false,
+    });
+  });
 });
 
 describe("media-session", () => {
@@ -899,6 +1156,48 @@ describe("media-session", () => {
     await settle();
     expect(media().paused).toBe(false);
   });
+
+  it("updates the title when the source changes", async () => {
+    const { session } = stub();
+    const { player } = await mounted({
+      plugins: [mediaSession({ metadata: (source) => ({ title: source.src }) })],
+    });
+    await player.commands.play();
+    await settle();
+    expect(session.metadata).toMatchObject({ title: "/video.mp4" });
+    player.commands.setSource("/other.mp4");
+    await settle();
+    expect(session.metadata).toMatchObject({ title: "/other.mp4" });
+  });
+
+  it("clears the previous owner's title for a player with none", async () => {
+    const { session } = stub();
+    const first = await mounted({ plugins: [mediaSession({ metadata: { title: "First" } })] });
+    await first.player.commands.play();
+    await settle();
+    expect(session.metadata).toMatchObject({ title: "First" });
+    const second = await mounted({ plugins: [mediaSession()] });
+    await second.player.commands.play();
+    await settle();
+    expect(session.metadata).toBe(null);
+  });
+
+  it("leaves a stream alone that can't seek, whatever the system's buttons say", async () => {
+    const { handlers } = stub();
+    let limit = () => {};
+    const liveOnly = definePlugin("live-only", () => ({
+      setup(context) {
+        limit = () => context.report({ capabilities: { seek: false, rate: false, volume: true } });
+      },
+    }));
+    const { player, video } = await mounted({ plugins: [mediaSession(), liveOnly()] });
+    await player.commands.play();
+    await settle();
+    limit();
+    handlers.get("seekforward")?.({});
+    handlers.get("seekto")?.({ seekTime: 30 });
+    expect(video.currentTime).toBe(0);
+  });
 });
 
 describe("i18n", () => {
@@ -951,6 +1250,17 @@ describe("i18n", () => {
 });
 
 describe("autoplay", () => {
+  it("waits for viewers who prefer reduced motion, unless told otherwise", async () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduced-motion") }));
+    const calm = await mounted({ src: "/a.mp4", plugins: [autoplay()] });
+    expect(calm.player.getState().media.paused).toBe(true);
+    const insisted = await mounted({
+      src: "/a.mp4",
+      plugins: [autoplay({ ignoreReducedMotion: true })],
+    });
+    expect(insisted.player.getState().media.paused).toBe(false);
+  });
+
   it("plays with sound when allowed", async () => {
     const { player, media } = await mounted({ plugins: [autoplay()] });
     await settle();
@@ -1001,6 +1311,27 @@ describe("autoplay", () => {
     const { media } = await mounted({ plugins: [autoplay({ muted: false })] });
     await settle();
     expect(media().muted).toBe(false);
+  });
+
+  it("won't offer sound again once the viewer has unmuted another way", async () => {
+    const original = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
+      fakeBehaviour.rejectPlayWith = this.muted ? null : "NotAllowedError";
+      return original.call(this);
+    };
+    cleanups.push(() => {
+      HTMLMediaElement.prototype.play = original;
+    });
+    const { player } = await mounted({ plugins: [autoplay()] });
+    await settle();
+    await settle();
+    expect(player.plugin(autoplay).state().mutedFallback).toBe(true);
+    player.commands.setMuted(false);
+    await settle();
+    expect(player.plugin(autoplay).state().mutedFallback).toBe(false);
+    player.commands.setMuted(true);
+    await settle();
+    expect(player.plugin(autoplay).state().mutedFallback).toBe(false);
   });
 });
 
@@ -1135,6 +1466,108 @@ describe("recovery", () => {
     await settle();
     expect(loads()).toBe(1);
   });
+
+  it("plays again after retrying, if the viewer was watching", async () => {
+    const { player, video, media } = await mounted({ plugins: [recovery()] });
+    await player.commands.play();
+    advance(video, 12);
+    fail(video);
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    await settle();
+    expect(media().paused).toBe(false);
+    expect(video.currentTime).toBe(12);
+  });
+
+  it("stays paused after retrying, if the viewer had paused", async () => {
+    const { player, video, media } = await mounted({ plugins: [recovery()] });
+    await player.commands.play();
+    player.commands.pause();
+    await settle();
+    fail(video);
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    await settle();
+    expect(media().paused).toBe(true);
+  });
+
+  it("runs out of retries on a list of sources too", async () => {
+    const { player, video, media } = await mounted({
+      src: [{ src: "/broken-a.mp4" }, { src: "/broken-b.mp4" }],
+      plugins: [recovery({ retries: 2, retryOn: () => true })],
+    });
+    const loads = countLoads(video);
+    await settle();
+    await vi.advanceTimersByTimeAsync(60_000);
+    await settle();
+    // Each retry walks the list again, and then it has to stop.
+    expect(player.plugin(recovery).state()).toMatchObject({ attempt: 2, retrying: false });
+    expect(media().status).toBe("error");
+    const after = loads();
+    await vi.advanceTimersByTimeAsync(60_000);
+    await settle();
+    expect(loads()).toBe(after);
+  });
+
+  it("gives a viewer's own reload a fresh set of retries", async () => {
+    const { player, video } = await mounted({ plugins: [recovery({ retries: 1 })] });
+    fail(video);
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    await settle();
+    fail(video);
+    await settle();
+    expect(player.plugin(recovery).state()).toMatchObject({ attempt: 1, retrying: false });
+
+    player.commands.reload();
+    await settle();
+    expect(player.plugin(recovery).state().attempt).toBe(0);
+    fail(video);
+    await settle();
+    expect(player.plugin(recovery).state()).toMatchObject({ attempt: 1, retrying: true });
+  });
+
+  it("spends no retries on failures while offline, even with none left", async () => {
+    const { player, video } = await mounted({ plugins: [recovery({ retries: 1 })] });
+    fail(video);
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    await settle();
+    expect(player.plugin(recovery).state().attempt).toBe(1);
+
+    const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    cleanups.push(() => online.mockRestore());
+    const loads = countLoads(video);
+    fail(video);
+    await settle();
+    expect(player.plugin(recovery).state()).toMatchObject({ attempt: 1, retrying: true });
+    online.mockReturnValue(true);
+    window.dispatchEvent(new Event("online"));
+    await settle();
+    expect(loads()).toBe(1);
+  });
+
+  it("cancels a pending retry when a viewer goes back to an earlier video", async () => {
+    const { player, video } = await mounted({ plugins: [recovery()] });
+    await player.commands.play();
+    player.commands.setSource("/other.mp4");
+    await settle();
+    await player.commands.play();
+    advance(video, 12);
+    player.clock.sync();
+    fail(video);
+    await settle();
+    expect(player.plugin(recovery).state().retrying).toBe(true);
+
+    player.commands.setSource("/video.mp4");
+    await settle();
+    expect(player.plugin(recovery).state()).toMatchObject({ attempt: 0, retrying: false });
+    const loads = countLoads(video);
+    await vi.advanceTimersByTimeAsync(10_000);
+    await settle();
+    expect(loads()).toBe(0);
+    expect(video.currentTime).toBe(0);
+  });
 });
 
 describe("analytics", () => {
@@ -1180,6 +1613,45 @@ describe("analytics", () => {
     await settle();
     const end = events.find(({ type }) => type === "rebuffer-end");
     expect(end?.stalledMs).toBeGreaterThanOrEqual(0);
+  });
+
+  it("doesn't count the stall right after a seek, which seeked can come before", async () => {
+    const { player, video, types } = await collect();
+    await player.commands.play();
+    await settle();
+    video.dispatchEvent(new Event("seeking"));
+    video.dispatchEvent(new Event("waiting"));
+    await settle();
+    video.dispatchEvent(new Event("seeked"));
+    await settle();
+    video.dispatchEvent(new Event("playing"));
+    await settle();
+    expect(types()).not.toContain("rebuffer-start");
+    expect(types()).not.toContain("rebuffer-end");
+  });
+
+  it("beats by seconds played, not around seeks and source changes", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "requestAnimationFrame", "cancelAnimationFrame"] });
+    const events: AnalyticsEvent[] = [];
+    const { player, video } = await mounted({
+      plugins: [analytics({ onEvent: (event) => events.push(event), heartbeat: 10 })],
+    });
+    const beats = () => events.filter(({ type }) => type === "heartbeat");
+    await player.commands.play();
+    await settle();
+    expect(beats()).toEqual([]);
+
+    player.commands.seek(40);
+    player.commands.seek(5);
+    await settle();
+    expect(beats()).toEqual([]);
+
+    for (let second = 0; second < 25; second += 1) {
+      advance(video, 1);
+      await vi.advanceTimersByTimeAsync(1000);
+    }
+    await settle();
+    expect(beats()).toHaveLength(2);
   });
 
   it("reports the end and fatal errors", async () => {

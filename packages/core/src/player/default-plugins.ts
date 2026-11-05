@@ -9,7 +9,7 @@ import { quality } from "../plugins/quality/index";
 import { recovery } from "../plugins/recovery/index";
 import { speed } from "../plugins/speed/index";
 
-/** What `VideoPlayer` installs when it isn't given a `plugins` prop. */
+/** A sensible set for `VideoPlayer`: controls that hide, gestures, keys, and the usual menus. */
 export function defaultPlugins(): AnyPlugin[] {
   return [
     idle(),

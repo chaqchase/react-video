@@ -28,8 +28,29 @@ export interface CaptionsOptions {
 const OFF = "off";
 
 const isTimedText = ({ kind }: TextTrack) => kind === "captions" || kind === "subtitles";
-const trackId = (track: TextTrack, index: number) =>
-  track.id || track.language || track.label || String(index);
+
+/** An engine's tracks come after any `<track>` elements. */
+const reportedFor = (
+  tracks: readonly TextTrack[],
+  reported: readonly MediaTrackInfo[],
+  index: number
+) => reported[index - (tracks.length - reported.length)];
+
+/** Stable names for a list, since two tracks can share a language. */
+function trackIds(tracks: readonly TextTrack[], reported: readonly MediaTrackInfo[]) {
+  const seen = new Set<string>();
+  return tracks.map((track, index) => {
+    const base =
+      reportedFor(tracks, reported, index)?.id ||
+      track.id ||
+      track.language ||
+      track.label ||
+      String(index);
+    const id = seen.has(base) ? `${base}-${index}` : base;
+    seen.add(id);
+    return id;
+  });
+}
 
 function listTracks(element: HTMLVideoElement | null): TextTrack[] {
   const list = element?.textTracks;
@@ -50,7 +71,7 @@ type CueListener = (cues: readonly TextTrackCue[]) => void;
  */
 export const captions = definePlugin("captions", (options: CaptionsOptions = {}) => {
   const listeners = new Set<CueListener>();
-  let wanted = options.language ?? null;
+  let apply: (id: string | null) => void = () => {};
   let lastActive: string | null = null;
   let activeTrack: TextTrack | null = null;
   let nativeFullscreen = false;
@@ -75,39 +96,48 @@ export const captions = definePlugin("captions", (options: CaptionsOptions = {})
   };
 
   return {
-    state: () => ({ tracks: [] as readonly MediaTrackInfo[], active: null as string | null }),
+    state: () => ({
+      tracks: [] as readonly MediaTrackInfo[],
+      active: null as string | null,
+      /** The language the viewer wants, which may not have a track yet. */
+      language: options.language ?? null,
+    }),
     attrs: { "data-captions": (state) => state.active !== null },
     commands(context) {
-      const select = (id: string | null) => {
-        const video = context.video();
-        const tracks = listTracks(video);
-        let chosen: TextTrack | null = null;
+      apply = (id) => {
+        const tracks = listTracks(context.video());
+        const position = trackIds(tracks, context.media().textTracks).indexOf(id ?? "");
+        const chosen = tracks[position] ?? null;
+        // An engine can need telling, as dash.js does before it fetches cues. It sets
+        // modes of its own, so this comes first and the ones below have the last word.
+        context.commands.setTextTrack(chosen ? id : null);
         tracks.forEach((track, index) => {
-          const match = trackId(track, index) === id;
-          if (match) chosen = track;
           // Hidden still loads cues and fires cuechange, without the browser drawing.
-          track.mode = match ? (nativeFullscreen ? "showing" : "hidden") : "disabled";
+          track.mode = index === position ? (nativeFullscreen ? "showing" : "hidden") : "disabled";
         });
         setActiveTrack(chosen);
         context.set({ active: chosen ? id : null });
         if (chosen) lastActive = id;
-        // Remote providers, like Cast, hold their tracks themselves.
-        context.commands.setTextTrack(chosen ? id : null);
+      };
+      const select = (id: string | null) => {
+        const track = context.state().tracks.find((item) => item.id === id);
+        context.set({ language: track?.language ?? null });
+        apply(id);
       };
       return {
         select,
         toggle() {
           const { active, tracks } = context.state();
           if (active !== null) select(null);
-          else select(lastActive ?? tracks[0]?.id ?? null);
+          else select(tracks.find(({ id }) => id === lastActive)?.id ?? tracks[0]?.id ?? null);
         },
         /** Turns a language on now, or as soon as a matching track appears. */
         prefer(language: string | null) {
-          wanted = language;
-          if (language === null) select(null);
+          context.set({ language });
+          if (language === null) apply(null);
           else {
             const match = context.state().tracks.find((track) => track.language === language);
-            if (match) select(match.id);
+            if (match) apply(match.id);
           }
         },
         onCues(listener: CueListener) {
@@ -129,30 +159,45 @@ export const captions = definePlugin("captions", (options: CaptionsOptions = {})
         scope.add(() => track.remove());
       }
 
-      const handle = () => context.player.plugin(captions).commands;
       const list = element.textTracks;
       if (!list) return;
 
       const publish = () => {
         const tracks = listTracks(element);
+        const reported = context.media().textTracks;
+        const ids = trackIds(tracks, reported);
         context.set({
           tracks: tracks.map((track, index) => ({
-            id: trackId(track, index),
-            label: track.label,
+            id: ids[index] ?? "",
+            label: reportedFor(tracks, reported, index)?.label ?? track.label,
             language: track.language,
             kind: track.kind,
           })),
         });
+        // The list changing can remove the active track, or rename it.
+        if (activeTrack) {
+          const index = tracks.indexOf(activeTrack);
+          if (index === -1) apply(null);
+          else if (ids[index] !== context.state().active) {
+            lastActive = ids[index] ?? null;
+            context.set({ active: lastActive });
+          }
+        }
         // Browsers can turn a default track on, which would draw it twice.
         tracks.forEach((track, index) => {
           if (track.mode !== "showing" || nativeFullscreen) return;
           track.mode = "hidden";
-          if (context.state().active === null) handle().select(trackId(track, index));
+          if (context.state().active === null) apply(ids[index] ?? null);
         });
-        if (wanted !== null && context.state().active === null) handle().prefer(wanted);
+        const { language, active } = context.state();
+        if (language !== null && active === null) {
+          const match = tracks.findIndex((track) => track.language === language);
+          if (match !== -1) apply(ids[match] ?? null);
+        }
       };
       scope.on(list, "addtrack", publish);
       scope.on(list, "removetrack", publish);
+      context.watch(scope, (media) => media.textTracks, publish);
       publish();
 
       const setNative = (active: boolean) => {

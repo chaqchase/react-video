@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { definePlugin } from "../../src/core/plugin";
 import { createPlayer } from "../../src/core/player";
 import { fullscreen, Fullscreen } from "../../src/plugins/fullscreen/index";
 import { gestures } from "../../src/plugins/gestures/index";
@@ -148,6 +149,36 @@ describe("fullscreen", () => {
     await settle();
     expect(screen.getByRole("button", { name: "Fullscreen" })).toBeTruthy();
   });
+
+  it("respects a page that has turned fullscreen off, even with the iPhone API", async () => {
+    Object.defineProperty(document, "fullscreenEnabled", { configurable: true, value: false });
+    Object.assign(HTMLVideoElement.prototype, { webkitEnterFullscreen: vi.fn() });
+    const { player } = await mounted({ plugins: [fullscreen()] });
+    expect(player.plugin(fullscreen).state().supported).toBe(false);
+    delete (HTMLVideoElement.prototype as { webkitEnterFullscreen?: unknown }).webkitEnterFullscreen;
+  });
+
+  it("swallows a refusal from the button", async () => {
+    HTMLElement.prototype.requestFullscreen = vi.fn(async () => {
+      throw new TypeError("Refused");
+    });
+    const unhandled = vi.fn();
+    process.on("unhandledRejection", unhandled);
+    const plugins = [fullscreen()];
+    render(
+      <Root src="/video.mp4" plugins={plugins}>
+        <Media />
+        <Fullscreen />
+      </Root>
+    );
+    await settle();
+    fireEvent.click(screen.getByRole("button", { name: "Fullscreen" }));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    process.off("unhandledRejection", unhandled);
+    expect(unhandled).not.toHaveBeenCalled();
+  });
 });
 
 describe("pip", () => {
@@ -194,6 +225,18 @@ describe("pip", () => {
     );
     await settle();
     expect(screen.getByRole("button", { name: "Picture in picture" })).toBeTruthy();
+  });
+
+  it("respects a video that disables it in Safari too", async () => {
+    Object.defineProperty(document, "pictureInPictureEnabled", { configurable: true, value: undefined });
+    const player = createPlayer({ src: "/video.mp4", plugins: [pip()] });
+    const video = document.createElement("video");
+    Object.assign(video, { webkitSupportsPresentationMode: () => true });
+    video.disablePictureInPicture = true;
+    cleanups.push(player.mount(document.createElement("div")));
+    cleanups.push(player.attach(video));
+    await settle();
+    expect(player.plugin(pip).state().supported).toBe(false);
   });
 });
 
@@ -404,5 +447,69 @@ describe("gestures", () => {
     await wait(250);
     expect(enter).toHaveBeenCalled();
     expect(view.video.paused).toBe(true);
+  });
+
+  it("doesn't also go fullscreen on a double tap", async () => {
+    const enter = vi.fn(async () => {});
+    HTMLElement.prototype.requestFullscreen = enter;
+    Object.defineProperty(document, "fullscreenEnabled", { configurable: true, value: true });
+    const view = await mounted({ plugins: [fullscreen(), gestures()] });
+    view.root.getBoundingClientRect = () => ({ left: 0, width: 100 }) as DOMRect;
+    press(view.video, "touch", 80);
+    press(view.video, "touch", 80);
+    view.video.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+    await wait(10);
+    expect(enter).not.toHaveBeenCalled();
+    expect(view.video.currentTime).toBe(10);
+  });
+
+  it("treats two taps far apart as two taps", async () => {
+    const view = await mounted({ plugins: [gestures()] });
+    view.root.getBoundingClientRect = () => ({ left: 0, width: 400 }) as DOMRect;
+    press(view.video, "touch", 20);
+    press(view.video, "touch", 300);
+    await settle();
+    expect(view.video.currentTime).toBe(0);
+  });
+
+  it("counts a first tap, even right after loading", async () => {
+    const realNow = performance.now;
+    performance.now = () => 100;
+    const view = await mounted({ plugins: [gestures()] });
+    view.root.getBoundingClientRect = () => ({ left: 0, width: 100 }) as DOMRect;
+    const seen = vi.fn();
+    view.player.plugin(gestures).commands.onSeek(seen);
+    press(view.video, "touch", 10);
+    expect(seen).not.toHaveBeenCalled();
+    performance.now = realNow;
+  });
+
+  it("neither seeks nor shows feedback when seeking isn't possible", async () => {
+    let unlock = () => {};
+    const locker = definePlugin("locker", () => ({
+      setup(context) {
+        unlock = context.lock("ad", ["seek"]);
+      },
+    }));
+    const view = await mounted({ plugins: [gestures(), locker()] });
+    view.root.getBoundingClientRect = () => ({ left: 0, width: 100 }) as DOMRect;
+    const seen = vi.fn();
+    view.player.plugin(gestures).commands.onSeek(seen);
+    press(view.video, "touch", 80);
+    press(view.video, "touch", 80);
+    await settle();
+    expect(seen).not.toHaveBeenCalled();
+    expect(view.video.currentTime).toBe(0);
+    unlock();
+  });
+
+  it("reports how far a double tap moved, for feedback", async () => {
+    const view = await mounted({ plugins: [gestures({ seekStep: 7 })] });
+    view.root.getBoundingClientRect = () => ({ left: 0, width: 100 }) as DOMRect;
+    const seen = vi.fn();
+    view.player.plugin(gestures).commands.onSeek(seen);
+    press(view.video, "touch", 80);
+    press(view.video, "touch", 80);
+    expect(seen).toHaveBeenCalledWith(1, 7);
   });
 });

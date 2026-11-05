@@ -10,12 +10,15 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { usePlayer } from "../context";
 import { mergeRefs, useNodeRef } from "./as-child";
 import { useMenu } from "./menu-context";
 
 /** Keep in step with the exit transition, plus some margin for timer drift. */
 const EXIT_MS = 200;
 const TYPEAHEAD_RESET_MS = 500;
+/** The gap kept above a menu, plus the distance its entrance starts below where it ends. */
+const ROOM_MARGIN = 14;
 const ITEM_SELECTOR = '[role^="menuitem"]:not([aria-disabled="true"])';
 
 /** Keeps a closing element mounted long enough for its exit transition to play. */
@@ -40,6 +43,7 @@ export interface MenuContentProps extends HTMLAttributes<HTMLDivElement> {
 
 export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(
   function MenuContent({ children, onKeyDown, ...props }, ref) {
+    const player = usePlayer();
     const menu = useMenu();
     const mounted = usePresence(menu.open);
     const content = useRef<HTMLDivElement | null>(null);
@@ -61,8 +65,14 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(
     useEffect(() => {
       if (!open) return;
       const panel = activePanel();
-      if (!panel) return;
-      content.current?.style.setProperty("height", `${panel.offsetHeight}px`);
+      const element = content.current;
+      if (!panel || !element) return;
+      const top = player.root()?.getBoundingClientRect().top;
+      if (top !== undefined) {
+        const room = element.getBoundingClientRect().bottom - top - ROOM_MARGIN;
+        element.style.setProperty("--rv-menu-room", `${room}px`);
+      }
+      element.style.setProperty("height", `${panel.offsetHeight}px`);
       const items = itemsIn(panel);
       const row = view === null ? returnTo.current : null;
       const target =
@@ -70,7 +80,12 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(
         items.find((item) => item.getAttribute("aria-checked") === "true") ??
         items[0];
       target?.focus({ preventScroll: true });
-    }, [activePanel, open, view]);
+      const list = target?.closest<HTMLElement>('[data-part="menu-list"]');
+      if (target && list) {
+        list.scrollTop +=
+          target.getBoundingClientRect().top - list.getBoundingClientRect().top - list.clientHeight / 2;
+      }
+    }, [activePanel, open, player, view]);
 
     useEffect(() => {
       if (!open) return;
@@ -165,7 +180,7 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(
             data-root=""
             aria-hidden={view === null ? undefined : true}
           >
-            {children}
+            <div data-part="menu-list">{children}</div>
           </div>
         </div>
       </div>

@@ -158,7 +158,7 @@
   },
   "scripts": {
     "build": "tsdown && node scripts/build-css.mjs && node scripts/check-dist.mjs",
-    "dev": "tsdown --watch",
+    "dev": "tsdown --watch src --no-clean --on-success \"node scripts/build-css.mjs\"",
     "typecheck": "tsc --noEmit",
     "test:treeshake": "node scripts/check-treeshake.mjs",
     "lint": "eslint .",

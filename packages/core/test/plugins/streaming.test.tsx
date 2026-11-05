@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createPlayer } from "../../src/core/player";
+import { captions } from "../../src/plugins/captions/index";
 import { dash } from "../../src/plugins/dash/index";
 import { clearKeyLicense, toDashDrm, toHlsDrm } from "../../src/plugins/drm/config";
 import { hls } from "../../src/plugins/hls/index";
@@ -36,9 +37,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-async function mounted(options: Parameters<typeof createPlayer>[0]) {
+async function mounted(
+  options: Parameters<typeof createPlayer>[0],
+  prepare?: (video: HTMLVideoElement) => void
+) {
   const player = createPlayer(options);
   const video = document.createElement("video");
+  prepare?.(video);
   cleanups.push(player.mount(document.createElement("div")));
   cleanups.push(player.attach(video));
   await settle();
@@ -346,13 +351,20 @@ function fakeDash() {
 }
 
 describe("dash", () => {
-  const load = async (engine = fakeDash(), extra: Parameters<typeof createPlayer>[0] = {}) => ({
+  const load = async (
+    engine = fakeDash(),
+    extra: Parameters<typeof createPlayer>[0] = {},
+    prepare?: (video: HTMLVideoElement) => void
+  ) => ({
     engine,
-    ...(await mounted({
-      src: "/stream.mpd",
-      ...extra,
-      plugins: [dash({ library: engine.library }), ...(extra.plugins ?? [])],
-    })),
+    ...(await mounted(
+      {
+        src: "/stream.mpd",
+        ...extra,
+        plugins: [dash({ library: engine.library }), ...(extra.plugins ?? [])],
+      },
+      prepare
+    )),
   });
 
   it("claims only DASH sources", async () => {
@@ -453,6 +465,50 @@ describe("dash", () => {
     decode.engine.current().emit("error", { error: { code: 54, message: "Bad" } });
     await settle();
     expect(decode.media().error).toMatchObject({ code: 54, message: "Bad" });
+  });
+
+  it("keeps captions off at first, and names tracks for the captions plugin", async () => {
+    const track = (language: string) =>
+      Object.assign(new EventTarget(), { id: "", kind: "subtitles", label: "null", language, mode: "disabled" });
+    const english = track("en");
+    const spanish = track("es");
+    const list = Object.assign(new EventTarget(), { length: 2, 0: english, 1: spanish });
+    const { engine, player } = await load(fakeDash(), {
+      plugins: [captions()],
+    }, (video) => Object.defineProperty(video, "textTracks", { value: list }));
+    const instance = engine.current();
+    expect(instance.updateSettings).toHaveBeenCalledWith({
+      streaming: { text: { defaultEnabled: false } },
+    });
+    instance.getTracksFor = (() => [
+      { id: null, lang: "en", index: 4, labels: [{ text: "English" }] },
+      { id: null, lang: "es", index: 5, labels: [] },
+    ]) as never;
+    // dash.js creates them showing, just before it says they're ready.
+    english.mode = "showing";
+    spanish.mode = "showing";
+    instance.emit("allTextTracksAdded");
+    await settle();
+
+    expect(english.mode).toBe("disabled");
+    expect(spanish.mode).toBe("disabled");
+    const handle = player.plugin(captions);
+    expect(handle.state().active).toBe(null);
+    expect(handle.state().tracks).toMatchObject([
+      { id: "4", label: "English", language: "en" },
+      { id: "5", label: "es", language: "es" },
+    ]);
+
+    // The engine turns on what it's told to, and the browser mustn't draw that too.
+    instance.setTextTrack.mockImplementation((index: number) => {
+      const chosen = [english, spanish][index];
+      if (chosen) chosen.mode = "showing";
+    });
+    handle.commands.select("5");
+    expect(instance.enableText).toHaveBeenLastCalledWith(true);
+    expect(instance.setTextTrack).toHaveBeenLastCalledWith(1);
+    expect(spanish.mode).toBe("hidden");
+    expect(english.mode).toBe("disabled");
   });
 });
 

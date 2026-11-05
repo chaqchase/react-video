@@ -20,6 +20,13 @@ const CASES = [
   { used: "Mute", dropped: ["Video.VolumeSlider"] },
   { used: "TimelineTrack", dropped: ["Video.Timeline\"", "Video.TimelinePreview"] },
   { used: "MenuItem", dropped: ["Video.MenuSub", "Video.MenuContent"] },
+  // The player layout mustn't bring plugins along unless `defaultPlugins` is called.
+  {
+    from: "react-video-kit/player",
+    used: "VideoPlayer",
+    kept: "Video.PlayOverlay",
+    dropped: ["Video.HotkeysFeedback", "hotkeys-feedback"],
+  },
 ];
 
 const work = mkdtempSync(join(tmpdir(), "rvk-treeshake-"));
@@ -78,14 +85,11 @@ const bundlers = {
 
 let failed = false;
 try {
-  for (const { used, dropped } of CASES) {
-    writeFileSync(
-      entry,
-      `import * as Video from "react-video-kit";\nglobalThis.kept = Video.${used};\n`
-    );
+  for (const { from = "react-video-kit", used, kept: marker = `Video.${used}`, dropped } of CASES) {
+    writeFileSync(entry, `import * as Video from "${from}";\nglobalThis.kept = Video.${used};\n`);
     for (const [name, run] of Object.entries(bundlers)) {
       const code = await run();
-      const kept = code.includes(`Video.${used}`);
+      const kept = code.includes(marker);
       const leaked = dropped.filter((marker) => code.includes(marker));
       const pass = kept && leaked.length === 0;
       failed ||= !pass;

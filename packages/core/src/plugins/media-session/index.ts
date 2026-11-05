@@ -26,17 +26,19 @@ export const mediaSession = definePlugin("media-session", (options: MediaSession
       const session = navigator.mediaSession;
       const me = context.player;
 
+      // The system's buttons stay put on a stream that can't seek, so they do nothing.
+      const seek = (time: number) => {
+        if (context.media().capabilities.seek) context.commands.seek(time);
+      };
       const actions: [MediaSessionAction, MediaSessionActionHandler][] = [
         ["play", () => void context.commands.play()],
         ["pause", () => context.commands.pause()],
         ["seekbackward", (details) =>
-          context.commands.seek(context.clock.time() - (details.seekOffset ?? seekStep))],
+          seek(context.clock.time() - (details.seekOffset ?? seekStep))],
         ["seekforward", (details) =>
-          context.commands.seek(context.clock.time() + (details.seekOffset ?? seekStep))],
+          seek(context.clock.time() + (details.seekOffset ?? seekStep))],
         ["seekto", (details) => {
-          if (details.seekTime !== undefined && details.seekTime !== null) {
-            context.commands.seek(details.seekTime);
-          }
+          if (details.seekTime !== undefined && details.seekTime !== null) seek(details.seekTime);
         }],
       ];
 
@@ -66,21 +68,28 @@ export const mediaSession = definePlugin("media-session", (options: MediaSession
         }
       };
 
-      const claim = () => {
-        owner = me;
-        setHandlers(true);
+      const writeMetadata = () => {
         const { source } = context.media();
         const { metadata } = options;
         const value = typeof metadata === "function" && source ? metadata(source) : metadata;
-        if (value && typeof value !== "function" && typeof MediaMetadata !== "undefined") {
-          session.metadata = new MediaMetadata(value);
-        }
+        if (typeof MediaMetadata === "undefined") return;
+        // Clearing it stops a player with none showing the previous owner's.
+        session.metadata = value && typeof value !== "function" ? new MediaMetadata(value) : null;
+      };
+
+      const claim = () => {
+        owner = me;
+        setHandlers(true);
+        writeMetadata();
         writePosition();
       };
 
       context.watch(scope, (media) => media.paused, (paused) => {
         if (!paused && owner !== me) claim();
         if (owner === me) session.playbackState = paused ? "paused" : "playing";
+      });
+      context.watch(scope, (media) => media.source, () => {
+        if (owner === me) writeMetadata();
       });
       context.watch(
         scope,

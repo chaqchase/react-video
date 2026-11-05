@@ -360,6 +360,83 @@ describe("reload", () => {
     await settle();
     expect(video.currentTime).toBe(0);
   });
+
+  const fail = (video: HTMLVideoElement) => {
+    Object.defineProperty(video, "error", {
+      configurable: true,
+      value: { code: 2, message: "Dropped" },
+    });
+    video.dispatchEvent(new Event("error"));
+    Reflect.deleteProperty(video, "error");
+  };
+
+  it("after a failure, picks up where it was and plays again", async () => {
+    const { player, video, media } = await setup();
+    await player.commands.play();
+    advance(video, 12);
+    fail(video);
+    await settle();
+    expect(media()).toMatchObject({ status: "error", paused: true });
+    player.commands.reload();
+    await settle();
+    expect(video.currentTime).toBe(12);
+    expect(media()).toMatchObject({ status: "ready", paused: false });
+  });
+
+  it("after a failure while paused, keeps its place but stays paused", async () => {
+    const { player, video, media } = await setup();
+    await player.commands.play();
+    advance(video, 12);
+    player.commands.pause();
+    await settle();
+    fail(video);
+    await settle();
+    player.commands.reload();
+    await settle();
+    expect(video.currentTime).toBe(12);
+    expect(media().paused).toBe(true);
+  });
+
+  it("plays after a failure that a viewer's play was waiting on", async () => {
+    const { player, media } = await setup({ src: "/flaky.mp4", load: "play" });
+    fakeBehaviour.brokenPattern = "flaky";
+    await player.commands.play();
+    await settle();
+    expect(media().status).toBe("error");
+    fakeBehaviour.brokenPattern = "never-matches";
+    player.commands.reload();
+    await settle();
+    expect(media()).toMatchObject({ status: "ready", paused: false });
+  });
+
+  it("keeps its place through a reload that fails before reaching it", async () => {
+    const { player, video, media } = await setup({ src: "/flaky.mp4" });
+    await player.commands.play();
+    advance(video, 12);
+    fail(video);
+    await settle();
+    fakeBehaviour.brokenPattern = "flaky";
+    player.commands.reload();
+    await settle();
+    expect(media().status).toBe("error");
+    fakeBehaviour.brokenPattern = "never-matches";
+    player.commands.reload();
+    await settle();
+    expect(video.currentTime).toBe(12);
+    expect(media().paused).toBe(false);
+  });
+
+  it("forgets a failure when the source changes", async () => {
+    const { player, video, media } = await setup();
+    await player.commands.play();
+    advance(video, 12);
+    fail(video);
+    await settle();
+    player.commands.setSource("/other.mp4");
+    await settle();
+    expect(video.currentTime).toBe(0);
+    expect(media().paused).toBe(true);
+  });
 });
 
 describe("load strategy", () => {
@@ -381,6 +458,49 @@ describe("load strategy", () => {
     const { video } = await setup({ load: "visible" });
     expect(video.src).toBe("/video.mp4");
     vi.stubGlobal("IntersectionObserver", original);
+  });
+
+  it("runs source hooks before the play gates, so they can use what those set up", async () => {
+    const order: string[] = [];
+    const plugin = definePlugin("order", () => ({
+      source() {
+        order.push("source");
+      },
+      gates: {
+        play(request: void, next: (request: void) => void | Promise<void>) {
+          order.push("gate");
+          return next(request);
+        },
+      },
+    }));
+    const { player } = await setup({ load: "play", plugins: [plugin()] });
+    expect(order).toEqual([]);
+    void player.commands.play();
+    expect(order).toEqual(["source", "gate"]);
+    await settle();
+  });
+
+  it("doesn't load again on becoming visible, once a play has started it", async () => {
+    let notify: (visible: boolean) => void = () => {};
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        constructor(callback: (records: { isIntersecting: boolean }[]) => void) {
+          notify = (isIntersecting) => callback([{ isIntersecting }]);
+        }
+        observe() {}
+        disconnect() {}
+      }
+    );
+    const { player, video } = await setup({ load: "visible" });
+    expect(video.src).toBe("");
+    await player.commands.play();
+    await settle();
+    advance(video, 12);
+    notify(true);
+    await settle();
+    expect(video.currentTime).toBe(12);
+    vi.unstubAllGlobals();
   });
 });
 
@@ -627,6 +747,13 @@ describe("gates", () => {
     release();
     await settle();
     expect(video.src).toBe("/fast.mp4");
+  });
+});
+
+describe("plugins passed from the server", () => {
+  it("explains what happened to one that lost its code", () => {
+    const serialized = { name: "hls", create: null } as never;
+    expect(() => createPlayer({ plugins: [serialized] })).toThrow(/Create plugins on the client/);
   });
 });
 

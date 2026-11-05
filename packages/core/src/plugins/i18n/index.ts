@@ -13,6 +13,7 @@ export interface Strings {
   unmuted?: string;
   volume?: string;
   settings?: string;
+  back?: string;
   fullscreen?: string;
   exitFullscreen?: string;
   pip?: string;
@@ -27,7 +28,6 @@ export interface Strings {
   captionsOff?: string;
   audio?: string;
   chapters?: string;
-  seekBy?: string;
   tapToUnmute?: string;
   live?: string;
   goLive?: string;

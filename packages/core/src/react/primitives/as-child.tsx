@@ -12,6 +12,20 @@ import {
 
 type Props = Record<string, unknown>;
 
+/**
+ * Sliders are real range inputs for keyboards and screen readers, while pointers use
+ * the visible track. This is behaviour rather than a skin, so even headless parts have it.
+ */
+export const HIDDEN_INPUT = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  margin: 0,
+  opacity: 0,
+  pointerEvents: "none",
+} as const;
+
 function assign<Value>(ref: Ref<Value> | undefined, value: Value | null) {
   if (typeof ref === "function") ref(value);
   else if (ref) (ref as { current: Value | null }).current = value;

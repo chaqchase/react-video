@@ -15,6 +15,7 @@ const LIVE_POLL_MS = 2000;
 const NETWORK_CODES = new Set([11, 25, 26, 27, 28, 29]);
 
 const trackId = ({ id, index, lang }: MediaInfo) => String(id ?? lang ?? index);
+const textTrackId = ({ id, index }: MediaInfo) => String(id ?? index);
 const labelOf = ({ labels, lang }: MediaInfo) => labels?.[0]?.text ?? lang ?? undefined;
 
 export function createDashProvider(
@@ -36,6 +37,8 @@ export function createDashProvider(
 
       const engine = library.MediaPlayer().create();
       this.engine = engine;
+      // Captions stay off until asked for, as they do with every other provider.
+      engine.updateSettings({ streaming: { text: { defaultEnabled: false } } });
       engine.updateSettings(settings);
       if (request.drm) engine.setProtectionData(toDashDrm(request.drm as DrmConfig));
 
@@ -43,6 +46,23 @@ export function createDashProvider(
         this.publishLevels();
         this.publishAudio();
         this.watchLive();
+      });
+      engine.on("allTextTracksAdded", () => {
+        const tracks = engine.getTracksFor("text");
+        // It creates these showing, which would have the browser draw them as well.
+        const list = element.textTracks;
+        for (let index = list.length - tracks.length; index < list.length; index += 1) {
+          const track = list[index];
+          if (track) track.mode = "disabled";
+        }
+        sink.update({
+          textTracks: tracks.map((track) => ({
+            id: textTrackId(track),
+            // The element's own label can read "null" when the manifest gives nothing.
+            label: labelOf(track) ?? textTrackId(track),
+            language: track.lang ?? undefined,
+          })),
+        });
       });
       engine.on("qualityChangeRendered", (event: { mediaType: string; newRepresentation?: { id: string } }) => {
         if (event.mediaType === "video") this.publishQuality(event.newRepresentation?.id ?? null);
@@ -89,7 +109,7 @@ export function createDashProvider(
       if (!engine) return;
       engine.enableText(id !== null);
       if (id === null) return;
-      const index = engine.getTracksFor("text").findIndex((track) => trackId(track) === id);
+      const index = engine.getTracksFor("text").findIndex((track) => textTrackId(track) === id);
       if (index !== -1) engine.setTextTrack(index);
     }
 

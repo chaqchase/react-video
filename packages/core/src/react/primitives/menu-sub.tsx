@@ -2,6 +2,7 @@
 
 import { forwardRef, useId, type HTMLAttributes, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useLabel } from "../hooks";
 import { useItemHandlers, useMenu } from "./menu-context";
 
 export interface MenuSubProps extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
@@ -17,9 +18,10 @@ export interface MenuSubProps extends Omit<HTMLAttributes<HTMLDivElement>, "titl
 
 /** A row that drills down to a panel of its own. */
 export const MenuSub = forwardRef<HTMLDivElement, MenuSubProps>(function MenuSub(
-  { title, value, icon, backLabel = "Back", children, ...props },
+  { title, value, icon, backLabel, children, ...props },
   ref
 ) {
+  const defaultBack = useLabel("back", "Back");
   const menu = useMenu();
   const id = useId();
   const active = menu.view === id;
@@ -56,12 +58,12 @@ export const MenuSub = forwardRef<HTMLDivElement, MenuSubProps>(function MenuSub
                 role="menuitem"
                 data-part="menu-back"
                 tabIndex={-1}
-                aria-label={backLabel}
+                aria-label={backLabel ?? defaultBack}
                 {...back}
               >
                 <span data-part="menu-item-label">{title}</span>
               </div>
-              {children}
+              <div data-part="menu-list">{children}</div>
             </div>,
             menu.panelHost
           )

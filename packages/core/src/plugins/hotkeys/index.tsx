@@ -7,6 +7,7 @@ import { labelFrom } from "../../lib/labels";
 import { usePlayer } from "../../react/context";
 import type { captions } from "../captions/index";
 import type { fullscreen } from "../fullscreen/index";
+import type { idle } from "../idle/index";
 import type { pip } from "../pip/index";
 import type { speed } from "../speed/index";
 
@@ -83,7 +84,9 @@ export const hotkeys = definePlugin("hotkeys", (options: HotkeysOptions = {}) =>
         for (const listener of listeners) listener(message);
       };
 
+      const canSeek = () => !context.isLocked("seek") && context.media().capabilities.seek;
       const seekBy = (delta: number) => {
+        if (!canSeek()) return;
         commands.seek(context.clock.time() + delta);
         say(`${delta > 0 ? "+" : ""}${delta}s`);
       };
@@ -107,6 +110,7 @@ export const hotkeys = definePlugin("hotkeys", (options: HotkeysOptions = {}) =>
       const changeSpeed = (direction: "faster" | "slower") => {
         const handle = context.find<typeof speed>("speed");
         if (!handle) return false;
+        if (context.isLocked("rate") || !context.media().capabilities.rate) return true;
         handle.commands[direction]();
         say(`${context.media().rate}×`);
         return true;
@@ -131,8 +135,8 @@ export const hotkeys = definePlugin("hotkeys", (options: HotkeysOptions = {}) =>
         c: () => context.find<typeof captions>("captions")?.commands.toggle(),
         ">": () => changeSpeed("faster"),
         "<": () => changeSpeed("slower"),
-        Home: () => commands.seek(context.media().timeline.start),
-        End: () => commands.seek(context.media().timeline.end),
+        Home: () => canSeek() && commands.seek(context.media().timeline.start),
+        End: () => canSeek() && commands.seek(context.media().timeline.end),
       };
 
       scope.on(root, "pointerdown", () => {
@@ -158,14 +162,17 @@ export const hotkeys = definePlugin("hotkeys", (options: HotkeysOptions = {}) =>
         const { key } = event;
         if (/^[0-9]$/.test(key)) {
           const { start, end } = context.media().timeline;
-          if (end > start) commands.seek(start + ((end - start) * Number(key)) / 10);
+          if (end > start && canSeek()) commands.seek(start + ((end - start) * Number(key)) / 10);
           event.preventDefault();
+          context.find<typeof idle>("idle")?.commands.show();
           return;
         }
         const action = actions[key] ?? actions[key.toLowerCase()];
         if (!action) return;
         event.preventDefault();
         action();
+        // This key may have come from outside the player, where idle can't see it.
+        context.find<typeof idle>("idle")?.commands.show();
       }) as EventListener);
     },
     slots: { overlay: HotkeysFeedback },
