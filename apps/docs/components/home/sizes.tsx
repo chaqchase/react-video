@@ -4,6 +4,8 @@ import { ChevronIcon } from "@/components/site/icons";
 import { COMPLETE, KERNEL, kb, LAYOUT, marginal, STYLES } from "@/lib/sizes";
 
 const SKIP = new Set(["ads/vast", "ads/ima", "compat"]);
+// Covered on another plugin's page.
+const SECTIONS: Record<string, string> = { "analytics/google": "analytics#google-analytics" };
 
 export function Sizes() {
   const rows = Object.entries(marginal)
@@ -42,7 +44,7 @@ export function Sizes() {
           {rows.map(([name, bytes]) => (
             <li key={name}>
               <Link
-                href={`/docs/v4/plugins/${name}`}
+                href={`/docs/v4/plugins/${SECTIONS[name] ?? name}`}
                 className="group hover:bg-hover -mx-2 flex items-center gap-3 rounded-[10px] px-2 py-2 transition-colors duration-150"
               >
                 <span className="w-[112px] shrink-0 truncate text-[14px]">{name}</span>

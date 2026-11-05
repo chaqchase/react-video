@@ -26,6 +26,7 @@ export default function GoogleAnalytics() {
     <div className="flex flex-col gap-3">
       <VideoPlayer src="/media/sample-720.mp4?signed=secret-token" poster="/media/poster.jpg" plugins={plugins} load="visible" />
       <ol aria-label="Events for Google Analytics" className="flex min-h-44 flex-col gap-1 font-mono text-xs break-all text-current">
+        {log.length === 0 && <li className="opacity-80">Nothing sent yet. Press play.</li>}
         {log.map((line, index) => (
           <li key={index}>{line}</li>
         ))}
