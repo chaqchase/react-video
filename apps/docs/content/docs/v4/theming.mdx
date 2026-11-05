@@ -3,7 +3,7 @@ title: Theming
 description: Change the skin with CSS variables, and style anything further with plain CSS.
 ---
 
-The default skin is plain CSS with no dependencies. Every value worth changing is a CSS variable.
+The default skin is plain CSS with no dependencies. Every value worth changing is a CSS variable. For a whole new look in one import, see [Themes](/docs/v4/themes).
 
 ## Try the tokens
 
@@ -95,7 +95,7 @@ The skin responds to the player's own width rather than the window's, through a 
 | 480px to 839px | The default |
 | 840px and over | Larger controls |
 
-The player is `16 / 9` and fills its container by default. To change the shape, set `aspect-ratio` on it. The video letterboxes to fit by default, and you can change that on the media part:
+The player is `16 / 9` and fills its container by default. The [Orientation](/docs/v4/plugins/orientation) plugin, part of `defaultPlugins()`, gives it the video's own shape instead. To set a shape yourself, set `aspect-ratio` on it. The video letterboxes to fit by default, and you can change that on the media part:
 
 ```css
 .my-player {
@@ -120,8 +120,11 @@ Controls animate with CSS only. With `prefers-reduced-motion: reduce`, transform
   --rv-ease: ease-out;
   --rv-duration-in: 100ms;
   --rv-duration-out: 100ms;
+  --rv-duration-fade: 200ms;
 }
 ```
+
+`--rv-duration-fade` is how long the controls take to appear and disappear.
 
 ## Replace the skin
 

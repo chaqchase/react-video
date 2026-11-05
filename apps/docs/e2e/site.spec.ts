@@ -39,6 +39,26 @@ test.describe("home", () => {
     expect(after - before).toBe(0);
   });
 
+  test("nothing plays until it's asked to", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".rv-root").first()).toBeVisible();
+    await page.waitForTimeout(1000);
+    const videos = await page.locator("video").evaluateAll((elements) =>
+      (elements as HTMLVideoElement[]).map(({ paused, currentTime, autoplay, loop }) => ({ paused, currentTime, autoplay, loop }))
+    );
+    expect(videos.length).toBeGreaterThan(0);
+    for (const video of videos) {
+      expect(video).toEqual({ paused: true, currentTime: 0, autoplay: false, loop: false });
+    }
+  });
+
+  test("dark is the default, whatever the system prefers", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveClass(/dark/);
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#000000");
+  });
+
   for (const theme of ["dark", "light"] as const) {
     test(`has no accessibility violations in the ${theme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme });
@@ -127,14 +147,14 @@ test.describe("playground", () => {
     await page.goto("/playground");
     await page.getByRole("radio", { name: "Minimal" }).click();
     await page.getByRole("switch", { name: "Speed" }).click();
-    await page.getByRole("radio", { name: "Accent #ffb27a" }).click();
+    await page.getByRole("radio", { name: "Accent #0a84ff" }).click();
     await expect(page).toHaveURL(/accent=/);
     const url = page.url();
 
     await page.goto(url);
     await expect(page.getByRole("radio", { name: "Minimal" })).toBeChecked();
     await expect(page.getByRole("switch", { name: "Speed" })).not.toBeChecked();
-    await expect(page.getByRole("radio", { name: "Accent #ffb27a" })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Accent #0a84ff" })).toBeChecked();
     await expect(page.locator(".rv-root")).toBeVisible();
   });
 
@@ -220,6 +240,8 @@ test.describe("docs", () => {
     expect(urls.length).toBeGreaterThan(50);
     const errors = noErrors(page);
     const found: string[] = [];
+    // Scroll-tied text starts translucent, and this test never scrolls.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     for (const url of urls) {
       const visit = await page.goto(url);
       expect(visit?.status(), url).toBe(200);
@@ -245,6 +267,13 @@ test.describe("docs", () => {
   });
 });
 
+test("the autoplay demo waits to be asked", async ({ page }) => {
+  await page.goto("/docs/v4/plugins/autoplay");
+  await expect(page.locator("#demo-autoplay video")).toHaveCount(0);
+  await page.getByRole("button", { name: "Start this demo" }).click();
+  await expect(page.locator("#demo-autoplay video")).toHaveCount(1);
+});
+
 test.describe("tokens", () => {
   // The skin scales these by the player's size, and that must never replace a consumer's value.
   for (const [name, width] of [["compact", 400], ["default", 640], ["large", 1000]] as const) {
@@ -252,7 +281,7 @@ test.describe("tokens", () => {
       await page.setViewportSize({ width: Math.max(width + 40, 500), height: 800 });
       await page.goto("/examples/player");
       const root = page.locator(".rv-root");
-      const play = root.locator('[data-part="control-group"] [data-part="play-pause"]');
+      const play = root.locator('[data-part="mute"]');
       await root.evaluate((element, size) => {
         element.style.width = `${size}px`;
       }, width);

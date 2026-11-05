@@ -15,13 +15,14 @@ export async function Compose() {
     ["compose-ready", "compose-parts", "compose-headless"].map(source)
   );
   return (
-    <section id="composition" className="mx-auto max-w-[1120px] px-4 py-20 sm:px-6 sm:py-28">
+    <section id="composition" className="band site-section">
+      <div className="site-wrap">
       <div className="reveal">
-        <Eyebrow time="00:52">Composition</Eyebrow>
-        <SectionTitle>Three ways in, and they all share one engine.</SectionTitle>
+        <Eyebrow>Composition</Eyebrow>
+        <SectionTitle>Three ways in. One engine.</SectionTitle>
         <SectionLead>
           Start with a finished player today. Rearrange it next week. Replace every pixel when the design calls for it.
-          Your plugins keep working at each step, because the layers underneath don&apos;t change.
+          Your plugins keep working at each step.
         </SectionLead>
       </div>
       <ComposeTabs
@@ -58,6 +59,7 @@ export async function Compose() {
           },
         ]}
       />
+      </div>
     </section>
   );
 }

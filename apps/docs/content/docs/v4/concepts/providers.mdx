@@ -51,4 +51,4 @@ Providers report through a `Sink`, and only that way, which is what lets the sta
 
 <Api entry="react-video-kit/core" name="Sink" />
 
-`time` is read by the clock on every tick, so it must not allocate.
+`time` is read by the clock on every tick, so it must not allocate. Report failures through the sink's `error`, with a code from [Errors](/docs/v4/concepts/errors) or one of your own.

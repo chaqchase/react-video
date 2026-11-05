@@ -1,5 +1,5 @@
 // What the site says about each plugin. It's only data, so listing plugins doesn't ship them.
-export type PluginGroup = "Controls" | "Menus" | "Timeline" | "Streaming" | "Viewing" | "Revenue and rights" | "Casting";
+export type PluginGroup = "Controls" | "Menus" | "Timeline" | "Streaming" | "Viewing" | "Revenue and rights" | "Casting" | "Extras";
 
 export interface PluginDefinition {
   id: string;
@@ -7,6 +7,8 @@ export interface PluginDefinition {
   entry: string;
   /** Extra imports this plugin's call needs, as `[name, entry]`. */
   extraImports?: readonly (readonly [string, string])[];
+  /** Plugins this one can't run without. */
+  needs?: readonly string[];
   factory: string;
   title: string;
   blurb: string;
@@ -56,6 +58,39 @@ export const PLUGINS: readonly PluginDefinition[] = [
     ],
   })`,
   },
+  {
+    id: "episodes",
+    entry: "episodes",
+    factory: "episodes",
+    needs: ["playlist"],
+    title: "Episodes",
+    blurb: "Seasons on a shelf, with progress",
+    group: "Viewing",
+    code: "episodes()",
+  },
+  {
+    id: "skip",
+    entry: "skip",
+    factory: "skip",
+    title: "Skip intro",
+    blurb: "Skip intros, recaps, and credits",
+    group: "Viewing",
+    code: `skip({
+    segments: [{ kind: "intro", start: 3, end: 12 }],
+  })`,
+  },
+  {
+    id: "info",
+    entry: "info",
+    factory: "info",
+    title: "Info panel",
+    blurb: "Artwork, details, and credits",
+    group: "Viewing",
+    code: `info({
+    title: "The Long Coast",
+    facts: ["2024", "TV-PG", "1h 20m"],
+  })`,
+  },
   { id: "autoplay", entry: "autoplay", factory: "autoplay", title: "Autoplay", blurb: "With sound, then muted", group: "Viewing", code: "autoplay()" },
   { id: "persistence", entry: "persistence", factory: "persistence", title: "Persistence", blurb: "Resume where they left off", group: "Viewing", code: "persistence()" },
   { id: "media-session", entry: "media-session", factory: "mediaSession", title: "Media Session", blurb: "Lock screen and media keys", group: "Viewing", code: "mediaSession()" },
@@ -95,6 +130,16 @@ export const PLUGINS: readonly PluginDefinition[] = [
   },
   { id: "airplay", entry: "airplay", factory: "airplay", title: "AirPlay", blurb: "Button appears on Safari", group: "Casting", code: "airplay()" },
   { id: "chromecast", entry: "chromecast", factory: "chromecast", title: "Chromecast", blurb: "Button appears with a device", group: "Casting", code: "chromecast()" },
+  { id: "ambient", entry: "ambient", factory: "ambient", title: "Ambient light", blurb: "A glow from the picture's edges", group: "Extras", code: "ambient()" },
+  { id: "mini-player", entry: "mini-player", factory: "miniPlayer", title: "Mini player", blurb: "Keeps playing in a corner", group: "Extras", code: "miniPlayer()" },
+  { id: "screenshot", entry: "screenshot", factory: "screenshot", title: "Screenshot", blurb: "Saves the frame as a PNG", group: "Extras", code: "screenshot()" },
+  { id: "loop", entry: "loop", factory: "loop", title: "Loop", blurb: "The whole video, or A to B", group: "Extras", code: "loop()" },
+  { id: "shortcuts", entry: "shortcuts", factory: "shortcuts", needs: ["hotkeys"], title: "Shortcuts list", blurb: "Press ? to see every key", group: "Extras", code: "shortcuts()" },
+  { id: "stats", entry: "stats", factory: "stats", title: "Stats for nerds", blurb: "A live readout for debugging", group: "Extras", code: "stats()" },
+  { id: "share", entry: "share", factory: "share", title: "Share", blurb: "Links to a moment in the video", group: "Extras", code: "share()" },
+  { id: "orientation", entry: "orientation", factory: "orientation", title: "Orientation", blurb: "Takes the shape of a vertical video", group: "Viewing", code: "orientation()" },
+  { id: "fit", entry: "fit", factory: "fit", title: "Fit or fill", blurb: "Whole picture, or fill the frame", group: "Extras", code: "fit()" },
+  { id: "transcript", entry: "transcript", factory: "transcript", needs: ["captions"], title: "Transcript", blurb: "Read along, click to jump", group: "Extras", code: "transcript()" },
 ];
 
 const byId = new Map(PLUGINS.map((plugin) => [plugin.id, plugin]));

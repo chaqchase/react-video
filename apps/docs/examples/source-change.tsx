@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import * as Video from "react-video-kit";
+import { VideoPlayer } from "react-video-kit/player";
 
 const clips = {
   Low: [
@@ -17,14 +17,16 @@ const clips = {
 export default function SourceChange() {
   const [clip, setClip] = useState<keyof typeof clips>("Low");
   return (
-    <Video.Root src={clips[clip]} load="visible">
-      <Video.Media width={640} height={360} />
-      <button type="button" onClick={() => setClip("Low")}>
-        Low
-      </button>
-      <button type="button" onClick={() => setClip("High")}>
-        High
-      </button>
-    </Video.Root>
+    <div className="flex flex-col gap-3">
+      <div role="group" aria-label="Clip" className="flex gap-2">
+        <button type="button" aria-pressed={clip === "Low"} onClick={() => setClip("Low")}>
+          Low
+        </button>
+        <button type="button" aria-pressed={clip === "High"} onClick={() => setClip("High")}>
+          High
+        </button>
+      </div>
+      <VideoPlayer src={clips[clip]} poster="/media/poster.jpg" load="visible" />
+    </div>
   );
 }

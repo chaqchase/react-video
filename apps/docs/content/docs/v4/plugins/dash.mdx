@@ -53,11 +53,7 @@ const sources = [
 <VideoPlayer src={sources} plugins={plugins} />;
 ```
 
-After the last source, the player reports a fatal `no-provider` error.
-
-<Callout type="warn" title="Not tested on real devices yet">
-  DASH live hasn't run against any stream, and its tests use a fake dash.js. Nothing on this page has run on an iPhone or iPad, and Managed Media Source, which the plugin accepts in place of Media Source, hasn't been exercised anywhere. The browser tests cover on-demand DASH in Chrome, Firefox, and desktop WebKit.
-</Callout>
+After the last source, the player reports a fatal `source-no-provider` error.
 
 ## When dash.js loads
 
@@ -73,12 +69,12 @@ dash.js downloads when a source the plugin claims starts loading, so `dash()` ad
 <VideoPlayer src="/stream.mpd" plugins={plugins} load="visible" />;
 ```
 
-`load` is read once, when the player is created. If dash.js fails to download, the player reports a fatal `load-failed` error instead of hanging.
+`load` is read once, when the player is created. If dash.js fails to download, the player reports a fatal `dash-engine-load` error instead of hanging.
 
 ## Behaviour
 
 - Choosing a quality turns off dash.js's automatic switching and replaces what's buffered, so the new quality shows right away. Choosing **Auto** turns switching back on.
-- The player treats every error dash.js emits as fatal. Failed downloads (dash.js codes 11 and 25 to 29) are reported with code `"network"`, which the [recovery](/docs/v4/plugins/recovery) plugin retries. Other errors keep their dash.js code.
+- The player treats what dash.js emits as fatal, apart from unreadable captions and a failed time sync, which it carries on after. Each has one of the [`dash-` codes](/docs/v4/concepts/errors#dash), with dash.js's own number as `nativeCode`. Failed downloads are ones the [recovery](/docs/v4/plugins/recovery) plugin retries.
 - Audio tracks from the manifest go to the [audio tracks](/docs/v4/plugins/audio-tracks) menu, and quality levels to the [quality](/docs/v4/plugins/quality) menu.
 - For a live manifest, the player reads dash.js's DVR window every 2 seconds and reports it to the [live](/docs/v4/plugins/live) plugin.
 - The [DRM](/docs/v4/plugins/drm) plugin hands dash.js its protection data before the stream starts.

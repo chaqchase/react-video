@@ -1,0 +1,69 @@
+---
+title: Stats for nerds
+description: A live readout of what the player is doing, for debugging playback.
+---
+
+<PluginSummary id="stats" />
+
+Adds a row to the settings menu that opens a panel of live figures, with a button to copy them for a bug report. Open the settings menu below and turn it on, then play the video and watch the buffer move.
+
+<Demo slug="stats" />
+
+## Usage
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { stats } from "react-video-kit/stats";
+
+const plugins = [stats()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Stats are for developers and support teams. To keep them away from most viewers, install the plugin only behind a flag:
+
+```tsx
+const plugins = debug ? [stats()] : [];
+```
+
+## What it shows
+
+| Row            | Value                                                    |
+| -------------- | -------------------------------------------------------- |
+| Video          | The picture's size in pixels                             |
+| Viewport       | The player's size on the page, and the screen's density  |
+| Dropped frames | Frames dropped, out of the frames shown so far           |
+| Buffer         | Seconds downloaded ahead of the current position         |
+| Speed          | The playback rate                                        |
+| Engine         | The active provider, such as `native`, `hls`, or `dash`  |
+| Quality        | The active level and its bitrate, when there are levels  |
+| Latency        | Seconds behind the live edge, for a live stream          |
+
+Quality and Latency only appear when they apply.
+
+## Read the figures yourself
+
+`read` returns the same figures as text, for logging or sending with an error report.
+
+```tsx
+"use client";
+
+import { useCommands } from "react-video-kit";
+import { stats } from "react-video-kit/stats";
+
+function ReportProblem({ onReport }: { onReport(details: object): void }) {
+  const { read } = useCommands(stats);
+  return <button onClick={() => onReport(read())}>Report a problem</button>;
+}
+```
+
+## Behaviour
+
+- The panel costs nothing while it's closed. While it's open, the figures go straight to the DOM once a second, with no renders.
+- The panel stays open while the controls hide, so you can watch a video play without them.
+- Escape closes it while focus is inside, and returns focus to where it was.
+- Dropped frames needs `getVideoPlaybackQuality`, and shows a dash in a browser without it.
+
+## API
+
+<PluginApi id="stats" />

@@ -48,13 +48,33 @@ const plugins = [
 
 Importing `defaultPlugins` costs all nine plugins. Listing them yourself means you only pay for the ones you list.
 
+## Give it a title
+
+`title` names the video above the timeline, `eyebrow` adds a smaller line over it, and `description` adds a sentence or two under it. All three fade with the controls, and they hide on small players, where they'd cover the picture.
+
+<Demo slug="player-title" />
+
+```tsx
+<VideoPlayer
+  src="/video.mp4"
+  plugins={plugins}
+  eyebrow="Season 1, Episode 1"
+  title="The Green Coast"
+  description="The swell arrives after a thousand miles of open ocean."
+/>
+```
+
+The description shows while the video is paused and folds away once it plays, so it isn't in the way. It stops at two lines. For longer text, or for artwork and credits, add the [info panel](/docs/v4/plugins/info).
+
+When none of the three is set, the [`title` slot](/docs/v4/composition/slots) takes their place. The [playlist](/docs/v4/plugins/playlist) plugin fills it from the current item, so the title follows the queue.
+
 ## Add your own UI
 
-Children render above the media and below the controls, so a title or a custom overlay goes here. Your children can use any [hook](/docs/v4/hooks).
+Children render above the media and below the controls, so a custom overlay goes here. Your children can use any [hook](/docs/v4/hooks).
 
 ```tsx
 <VideoPlayer src="/video.mp4" plugins={plugins}>
-  <h2 className="absolute top-3 left-4 text-white">The long ridge</h2>
+  <span className="absolute top-3 left-4 text-white">Sponsored</span>
 </VideoPlayer>
 ```
 

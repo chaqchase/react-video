@@ -1,87 +1,135 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { AirPlayIcon, CastIcon } from "react-video-kit";
 import { Eyebrow, SectionLead, SectionTitle } from "@/components/site/eyebrow";
+import { CheckIcon } from "@/components/site/icons";
 import { Segmented } from "@/components/site/segmented";
 
 function Card({ title, children, art, className = "" }: { title: string; children: ReactNode; art: ReactNode; className?: string }) {
   return (
-    <article className={`bento-card border-line bg-raised group flex min-w-0 flex-col justify-between gap-5 overflow-hidden rounded-2xl border p-5 transition-colors duration-200 ease-rv hover:border-[var(--site-line-strong)] ${className}`}>
-      <div className="flex min-h-[92px] items-center justify-center">{art}</div>
+    <article className={`bento-card bg-raised group flex min-w-0 flex-col gap-7 overflow-hidden rounded-[24px] p-7 ${className}`}>
       <div>
-        <h3 className="text-[15.5px] font-semibold tracking-[-0.015em]">{title}</h3>
-        <p className="text-dim mt-1.5 text-[13.5px] leading-relaxed text-pretty">{children}</p>
+        <h3 className="text-[clamp(1.375rem,2.2vw,1.625rem)] leading-[1.16] font-semibold tracking-[-0.018em]">{title}</h3>
+        <p className="text-dim mt-2.5 text-[15px] leading-[1.42] tracking-[-0.012em] text-pretty">{children}</p>
       </div>
+      <div className="mt-auto flex min-h-[186px] items-center justify-center">{art}</div>
     </article>
   );
 }
 
-const LADDER = [
-  { label: "270p", height: 30 },
-  { label: "360p", height: 46 },
-  { label: "720p", height: 66 },
-  { label: "1080p", height: 88 },
-];
+/** A small player, drawn with the same glass and the same frame as the real one. */
+function Frame({ children, dir }: { children: ReactNode; dir?: "ltr" | "rtl" }) {
+  return (
+    <div
+      dir={dir}
+      aria-hidden="true"
+      className="relative aspect-video w-full max-w-[330px] overflow-hidden rounded-[14px] bg-[url(/media/poster.jpg)] bg-cover bg-center text-white"
+    >
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60" />
+      {children}
+    </div>
+  );
+}
+
+const glass = "rounded-full bg-black/25 shadow-[inset_0_0_0_0.5px_rgb(255_255_255/0.28)] backdrop-blur-md";
+
+const RUNGS = ["1080p", "720p", "480p", "270p"];
 
 function Ladder() {
   return (
-    <div className="flex items-end gap-2" aria-hidden="true">
-      {LADDER.map(({ label, height }, index) => (
-        <div key={label} className="flex w-11 flex-col items-center gap-1.5">
-          <span className="abr-bar w-full rounded-md" style={{ height, animationDelay: `${index * 1.1}s` }} />
-          <span className="text-faint font-mono text-[10.5px]">{label}</span>
-        </div>
-      ))}
+    <div className="relative h-[176px] w-full max-w-[330px]" aria-hidden="true">
+      <div className="grid h-full grid-rows-4">
+        {RUNGS.map((rung) => (
+          <div key={rung} className="text-faint flex items-center gap-3 text-[12px] tabular-nums">
+            <span className="w-10 shrink-0">{rung}</span>
+            <span className="bg-line h-px flex-1" />
+          </div>
+        ))}
+      </div>
+      <svg
+        className="abr-line absolute inset-y-0 right-0 left-[52px] h-full w-[calc(100%-52px)] overflow-visible"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        fill="none"
+      >
+        <path
+          d="M0 87.5H12V62.5H26V37.5H42V12.5H62V37.5H76V12.5H100"
+          stroke="var(--site-sun)"
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
     </div>
   );
 }
 
 function LiveArt() {
   return (
-    <div className="flex w-full max-w-[240px] flex-col gap-3" aria-hidden="true">
-      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[#cc2f35] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white">
+    <Frame>
+      <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-[#d70015] px-2.5 py-1 text-[11px] font-semibold tracking-wide">
         <span className="live-dot size-1.5 rounded-full bg-white" />
         LIVE
       </span>
-      <div className="bg-line relative h-1.5 overflow-hidden rounded-full">
-        <span className="dvr-window absolute inset-y-0 rounded-full" />
+      <div className="absolute inset-x-3 bottom-3 flex flex-col gap-2">
+        <div className="relative h-1.5 overflow-hidden rounded-full bg-white/25 backdrop-blur-md">
+          <span className="dvr-window absolute inset-y-0 right-0 rounded-full bg-white" />
+        </div>
+        <div className="flex justify-between text-[11px] text-white/85 tabular-nums">
+          <span>−1:40:00</span>
+          <span>Live</span>
+        </div>
       </div>
-      <div className="text-faint flex justify-between font-mono text-[10.5px]">
-        <span>−1:40:00</span>
-        <span>edge</span>
-      </div>
-    </div>
+    </Frame>
   );
 }
 
 function AdArt() {
   return (
-    <div className="flex items-center gap-2" aria-hidden="true">
-      <span className="border-line-strong rounded-lg border px-2.5 py-1.5 font-mono text-[12px]">Ad · 0:06</span>
-      <span className="ad-skip border-line-strong relative grid h-[31px] w-[86px] rounded-lg border text-[12px] font-medium">
-        {["Skip in 3", "Skip in 2", "Skip in 1", "Skip ad"].map((label, index) => (
-          <span key={label} className="ad-skip-step col-start-1 row-start-1 grid place-items-center" style={{ animationDelay: `${index * 1.2}s` }}>
-            {label}
-          </span>
-        ))}
-      </span>
-    </div>
+    <Frame>
+      <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2 text-[12px]">
+        <span className={`${glass} px-3 py-1.5 tabular-nums`}>Ad · 0:06</span>
+        <span className="ad-skip relative grid h-[29px] w-[88px] rounded-full bg-white font-semibold text-[#1d1d1f]">
+          {["Skip in 3", "Skip in 2", "Skip in 1", "Skip ad"].map((label, index) => (
+            <span key={label} className="ad-skip-step col-start-1 row-start-1 grid place-items-center" style={{ animationDelay: `${index * 1.2}s` }}>
+              {label}
+            </span>
+          ))}
+        </span>
+      </div>
+    </Frame>
   );
 }
 
+const ENGINES = ["hls.js", "dash.js", "Native"];
+
 function DrmArt() {
   return (
-    <div className="flex items-center gap-4" aria-hidden="true">
-      <svg viewBox="0 0 32 40" width="34" height="42" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="text-sun shrink-0">
-        <path className="lock-shackle" d="M9 18v-6a7 7 0 0 1 14 0v6" />
-        <rect x="4" y="18" width="24" height="18" rx="5" fill="var(--site-sun-soft)" />
-        <path d="M16 25v4" />
-      </svg>
-      <div className="flex flex-col gap-1 font-mono text-[11.5px]">
-        {["com.widevine.alpha", "com.apple.fps", "com.microsoft.playready", "org.w3.clearkey"].map((system) => (
-          <span key={system} className="text-dim">
-            {system}
+    <div className="flex w-full max-w-[330px] flex-col gap-3" aria-hidden="true">
+      <pre className="text-text overflow-hidden font-mono text-[13px] leading-[1.7]">
+        <span className="code-tok-fn">drm</span>
+        <span className="code-tok-dim">{"({"}</span>
+        {"\n  "}
+        <span className="code-tok-attr">widevine</span>
+        <span className="code-tok-dim">{": { "}</span>
+        licenseUrl
+        <span className="code-tok-dim">{" },"}</span>
+        {"\n  "}
+        <span className="code-tok-attr">fairplay</span>
+        <span className="code-tok-dim">{": {"}</span>
+        {"\n    licenseUrl"}
+        <span className="code-tok-dim">,</span> certificateUrl
+        <span className="code-tok-dim">,</span>
+        {"\n  "}
+        <span className="code-tok-dim">{"},"}</span>
+        {"\n"}
+        <span className="code-tok-dim">{"})"}</span>
+      </pre>
+      <div className="flex gap-1.5">
+        {ENGINES.map((engine) => (
+          <span key={engine} className="text-dim flex-1 rounded-full bg-[var(--site-segment)] py-1 text-center text-[12.5px]">
+            {engine}
           </span>
         ))}
       </div>
@@ -91,30 +139,37 @@ function DrmArt() {
 
 function CastArt() {
   return (
-    <div className="flex items-center gap-6" aria-hidden="true">
-      <svg viewBox="0 0 48 40" width="58" height="48" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="text-dim">
-        <path d="M6 14V8a3 3 0 0 1 3-3h30a3 3 0 0 1 3 3v22a3 3 0 0 1-3 3H28" />
-        <path className="cast-wave" style={{ animationDelay: "0.3s" }} d="M6 34a4 4 0 0 1 4 4" transform="translate(0 -3)" />
-        <path className="cast-wave" style={{ animationDelay: "0.15s" }} d="M6 26a12 12 0 0 1 12 12" transform="translate(0 -3)" />
-        <path className="cast-wave" d="M6 19a19 19 0 0 1 19 19" transform="translate(0 -3)" />
-      </svg>
-      <svg viewBox="0 0 40 36" width="50" height="46" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" className="text-dim">
-        <path d="M9 25H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h26a3 3 0 0 1 3 3v15a3 3 0 0 1-3 3h-2" />
-        <path className="airplay-triangle" d="M20 20l9 12H11z" fill="var(--site-sun-soft)" />
-      </svg>
+    <div className="w-full max-w-[330px]" aria-hidden="true">
+      <Frame>
+        <div className="absolute top-2.5 right-2.5 flex gap-1.5">
+          <span className={`${glass} grid size-7 place-items-center`}>
+            <AirPlayIcon width={15} height={15} />
+          </span>
+          <span className={`${glass} grid size-7 place-items-center`}>
+            <CastIcon width={15} height={15} />
+          </span>
+        </div>
+        <div className="absolute inset-x-2.5 bottom-2.5 flex items-center gap-2 text-[11px] text-white/85 tabular-nums">
+          <span>0:42</span>
+          <span className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/25">
+            <span className="absolute inset-y-0 left-0 w-1/3 rounded-full bg-white" />
+          </span>
+          <span>−1:38</span>
+        </div>
+      </Frame>
     </div>
   );
 }
 
-const KEYS: { key: string; code: string[]; label: string; action: string; wide?: boolean }[] = [
-  { key: "Space", code: [" "], label: "Space", action: "Play or pause", wide: true },
-  { key: "←", code: ["ArrowLeft"], label: "←", action: "Back 5 seconds" },
-  { key: "→", code: ["ArrowRight"], label: "→", action: "Forward 5 seconds" },
-  { key: "↑", code: ["ArrowUp"], label: "↑", action: "Volume up" },
-  { key: "↓", code: ["ArrowDown"], label: "↓", action: "Volume down" },
-  { key: "M", code: ["m", "M"], label: "M", action: "Mute" },
-  { key: "F", code: ["f", "F"], label: "F", action: "Fullscreen" },
-  { key: "C", code: ["c", "C"], label: "C", action: "Captions" },
+const KEYS: { key: string; code: string[]; label: string; action: string; area: string }[] = [
+  { key: "M", code: ["m", "M"], label: "M", action: "Mute", area: "1 / 1" },
+  { key: "F", code: ["f", "F"], label: "F", action: "Fullscreen", area: "1 / 2" },
+  { key: "C", code: ["c", "C"], label: "C", action: "Captions", area: "1 / 3" },
+  { key: "↑", code: ["ArrowUp"], label: "↑", action: "Volume up", area: "1 / 6" },
+  { key: "Space", code: [" "], label: "Space", action: "Play or pause", area: "2 / 1 / 2 / span 3" },
+  { key: "←", code: ["ArrowLeft"], label: "←", action: "Back 5 seconds", area: "2 / 5" },
+  { key: "↓", code: ["ArrowDown"], label: "↓", action: "Volume down", area: "2 / 6" },
+  { key: "→", code: ["ArrowRight"], label: "→", action: "Forward 5 seconds", area: "2 / 7" },
 ];
 
 /** Keycaps press when you press the key, anywhere on the page. It only listens. */
@@ -151,15 +206,15 @@ function Keyboard() {
   }, []);
 
   return (
-    <div ref={root} className="flex w-full flex-col items-center gap-3">
-      <div className="flex flex-wrap justify-center gap-1.5" aria-hidden="true">
-        {KEYS.map(({ key, label, wide }) => (
-          <kbd key={key} data-key={key} className={`keycap ${wide ? "px-5" : "w-9"}`}>
+    <div ref={root} className="flex w-full flex-col items-center gap-4">
+      <div className="grid w-full max-w-[330px] grid-cols-[repeat(3,minmax(0,1fr))_8px_repeat(3,minmax(0,1fr))] gap-1.5" aria-hidden="true">
+        {KEYS.map(({ key, label, area }) => (
+          <kbd key={key} data-key={key} className="keycap" style={{ gridArea: area }}>
             {label}
           </kbd>
         ))}
       </div>
-      <p className="text-sun h-4 font-mono text-[12px] pointer-coarse:hidden" aria-live="polite">
+      <p className="text-dim h-4 text-[13px] pointer-coarse:hidden" aria-live="polite">
         {action}
       </p>
     </div>
@@ -167,26 +222,23 @@ function Keyboard() {
 }
 
 const CUES = {
-  en: { label: "English", dir: "ltr", cue: "The ridges take the last of the light.", play: "Play", time: "0:12" },
-  ar: { label: "العربية", dir: "rtl", cue: "تأخذ التلال آخر ما تبقى من الضوء.", play: "تشغيل", time: "٠:١٢" },
+  en: { label: "English", dir: "ltr", cue: "The sea doesn't wait for anyone.", title: "Subtitles" },
+  ar: { label: "العربية", dir: "rtl", cue: "البحر لا ينتظر أحدًا.", title: "الترجمة" },
 } as const;
 type Language = keyof typeof CUES;
 
 function Languages() {
   const [language, setLanguage] = useState<Language>("ar");
-  const { dir, cue, play, time } = CUES[language];
+  const { dir, cue, title } = CUES[language];
   return (
     <div className="flex w-full flex-col items-center gap-3">
-      <div dir={dir} className="relative w-full max-w-[280px] overflow-hidden rounded-xl bg-[url(/media/poster.jpg)] bg-cover bg-center">
-        <div className="flex aspect-[16/8] flex-col justify-end gap-2 bg-gradient-to-t from-black/60 to-transparent p-2.5 text-white">
-          <p key={language} className="caption-in mx-auto rounded bg-black/70 px-2 py-0.5 text-center text-[12px]">
+      <div className="w-full max-w-[270px]">
+        <Frame dir={dir}>
+          <span className={`${glass} absolute start-2.5 top-2.5 px-2.5 py-1 text-[11px]`}>{title}</span>
+          <p key={language} className="caption-in absolute inset-x-3 bottom-3 text-center text-[13px] font-medium [text-shadow:0_1px_3px_rgb(0_0_0/0.7)]">
             {cue}
           </p>
-          <div className="flex items-center justify-between rounded-full bg-black/40 px-2.5 py-1 text-[10.5px] backdrop-blur-sm">
-            <span>{play}</span>
-            <span className="font-mono">{time}</span>
-          </div>
-        </div>
+        </Frame>
       </div>
       <Segmented
         size="sm"
@@ -199,18 +251,46 @@ function Languages() {
   );
 }
 
+const TESTED = [
+  { group: "Browsers", items: ["Chromium", "Firefox", "WebKit"] },
+  { group: "React", items: ["18", "19"] },
+  { group: "Next.js", items: ["App Router", "Pages Router"] },
+  { group: "Bundlers", items: ["esbuild", "Rollup", "webpack"] },
+  { group: "Accessibility", items: ["axe on every example"] },
+];
+
+function Tested() {
+  return (
+    <ul className="w-full" aria-hidden="true">
+      {TESTED.map(({ group, items }) => (
+        <li key={group} className="border-line flex items-baseline gap-4 border-t py-2.5 first:border-t-0 first:pt-0 last:pb-0">
+          <span className="text-dim w-[92px] shrink-0 text-[13px]">{group}</span>
+          <span className="flex min-w-0 flex-wrap gap-x-4 gap-y-1 text-[14px] tracking-[-0.01em]">
+            {items.map((item) => (
+              <span key={item} className="inline-flex items-center gap-1.5">
+                <CheckIcon width={12} height={12} strokeWidth={2.2} className="text-sun shrink-0" />
+                {item}
+              </span>
+            ))}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function Capabilities() {
   return (
-    <section id="capabilities" className="mx-auto max-w-[1120px] px-4 py-20 sm:px-6 sm:py-28">
+    <section id="capabilities" className="band site-section">
+      <div className="site-wrap">
       <div className="reveal">
-        <Eyebrow time="01:19">Everything else</Eyebrow>
-        <SectionTitle>The hard parts of video, already done.</SectionTitle>
+        <Eyebrow>Take a closer look</Eyebrow>
+        <SectionTitle>The hard parts of video,<br />already done.</SectionTitle>
         <SectionLead>
-          The parts that take a team months: adaptive streaming, live edges, ad breaks, and key systems. Each is a plugin
-          behind the same small interface.
+          Adaptive streaming, live edges, ad breaks, and key systems. Each is a plugin behind the same small interface.
         </SectionLead>
       </div>
-      <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card title="HLS and DASH" art={<Ladder />}>
           hls.js and dash.js load only when a source needs them. Quality menus work the same across both, and on plain MP4s.
         </Card>
@@ -229,33 +309,21 @@ export function Capabilities() {
         <Card title="The keyboard, properly" art={<Keyboard />}>
           Sliders are real range inputs, focus returns where it came from, and no shortcut fires while you&apos;re typing.
         </Card>
-        <Card title="Every language, either direction" art={<Languages />} className="sm:col-span-2 lg:col-span-1">
+        <Card title="Every language, either direction" art={<Languages />}>
           Translated labels, plurals, and captions you can style. The layout mirrors in RTL, except the parts that shouldn&apos;t.
         </Card>
-        <Card
-          title="Tested the way it's used"
-          className="sm:col-span-2"
-          art={
-            <div className="flex flex-wrap justify-center gap-1.5 font-mono text-[11.5px]" aria-hidden="true">
-              {["Chromium", "Firefox", "WebKit", "React 18", "React 19", "App Router", "Pages Router", "axe on every example", "esbuild", "Rollup", "webpack"].map((item) => (
-                <span key={item} className="border-line text-dim rounded-md border px-2 py-1">
-                  {item}
-                </span>
-              ))}
-            </div>
-          }
-        >
-          Real playback through real engines in three browsers, every example checked for accessibility, server rendering tested from the packed tarball, and tree-shaking proven in three bundlers.
-        </Card>
+        <article className="bento-card bg-raised grid min-w-0 gap-7 overflow-hidden rounded-[24px] p-7 sm:col-span-2 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:items-center md:gap-10">
+          <div>
+            <h3 className="text-[clamp(1.375rem,2.2vw,1.625rem)] leading-[1.16] font-semibold tracking-[-0.018em]">Tested the way it&apos;s used</h3>
+            <p className="text-dim mt-2.5 text-[15px] leading-[1.42] tracking-[-0.012em] text-pretty">
+              Real playback through real engines, every example checked for accessibility, server rendering run from the packed
+              tarball, and tree-shaking proven in three bundlers.
+            </p>
+          </div>
+          <Tested />
+        </article>
       </div>
-      <p className="text-dim mt-6 max-w-[72ch] text-[14px] leading-relaxed">
-        iPhone and iPad, AirPlay, Chromecast, Widevine, FairPlay, and the Google IMA SDK are built, but they haven&apos;t run on
-        real devices or services yet.{" "}
-        <Link href="/docs/v4#whats-been-tested" className="text-text underline underline-offset-2">
-          See what&apos;s been tested
-        </Link>
-        .
-      </p>
+      </div>
     </section>
   );
 }

@@ -21,13 +21,13 @@ const plugins = [ads({ engine: vast({ tag: "https://ads.example.com/tag.xml" }) 
 <VideoPlayer src="/video.mp4" plugins={plugins} />;
 ```
 
-`timeout` is how long to wait for a pre-roll before playing the content, 3000 milliseconds by default. `onError` hears about failures, since the viewer never sees them:
+`timeout` is how long to wait for a pre-roll before playing the content, 3000 milliseconds by default. `onError` hears about failures, since the viewer never sees them. It receives the same [error object](/docs/v4/concepts/errors#ads) as `onError` on the player, with the engine's own error as `cause`:
 
 ```tsx
 ads({
   engine: vast({ tag: "https://ads.example.com/tag.xml" }),
   timeout: 5000,
-  onError: (error) => console.warn("No ad played", error),
+  onError: (error) => console.warn("No ad played", error.code, error.message),
 });
 ```
 
@@ -73,10 +73,6 @@ const plugins = [ads({ engine: ima({ tag: "https://ads.example.com/ima-tag" }) }
 - If the viewer presses play before it's ready, `ads` skips the pre-roll for that source and tells `onError`. With `load="play"` the SDK only starts loading on that press, so use `"eager"` or `"visible"` with `ima()`.
 - The SDK draws its own countdown and skip button, so `AdOverlay` stays out of the way.
 - When the content ends, the plugin tells the SDK, which decides whether anything else plays.
-
-<Callout type="warn" title="Not tested on real devices yet">
-  `ima()` has never run against Google's real SDK. Its tests use a fake one, so real ad tags, its countdown and skip button, and any mid-roll or post-roll it might schedule are all unproven. `vast()` is tested in Chrome, Firefox, and desktop WebKit against local tags, covering wrappers, skip, tracking, empty tags, blocked tags, and missing files. Neither engine has run on an iPhone or iPad.
-</Callout>
 
 ## When an ad fails or is blocked
 

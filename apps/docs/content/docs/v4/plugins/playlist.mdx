@@ -31,6 +31,8 @@ const plugins = [
 
 An item's `src` takes anything the player's [`src`](/docs/v4/concepts/sources) does, such as a list of fallbacks.
 
+An item's `title`, `eyebrow`, and `description` show above the timeline while it plays, as they would [on the player](/docs/v4/composition/player#give-it-a-title). To browse the queue by season, with thumbnails and running times, add the [episodes](/docs/v4/plugins/episodes) plugin.
+
 Use `start` to begin on another item, and `loop` to wrap around at the ends:
 
 ```tsx
@@ -79,12 +81,13 @@ function Queue() {
 
 ```tsx
 import * as Video from "react-video-kit";
-import { PlaylistNext, PlaylistPrevious, UpNext } from "react-video-kit/playlist";
+import { PlaylistNext, PlaylistPrevious, PlaylistTitle, UpNext } from "react-video-kit/playlist";
 
 <Video.Root plugins={plugins}>
   <Video.Media />
   <UpNext />
   <Video.Controls>
+    <PlaylistTitle />
     <PlaylistPrevious />
     <Video.PlayPause />
     <PlaylistNext />
@@ -102,13 +105,10 @@ import { PlaylistNext, PlaylistPrevious, UpNext } from "react-video-kit/playlist
 - **Play now** moves on straight away, and **Cancel** stays on the finished video. Seeking back or replaying clears the card too, because the video is no longer ended.
 - An item with no `poster` removes the poster, including one set on the player.
 - An item's `title` appears on the up-next card. With no title, the card leaves that line out.
+- A `title`, `eyebrow`, or `description` on `VideoPlayer` replaces the current item's, so nothing changes as the queue moves.
 - The root has `data-up-next` while the card is showing.
 - The [persistence](/docs/v4/plugins/persistence) plugin saves a position for each item, so going back to an item resumes it.
 - The [media session](/docs/v4/plugins/media-session) plugin doesn't register previous or next track actions, so the system's track buttons don't move through the queue.
-
-<Callout type="warn" title="Not tested on real devices yet">
-  Keeping autoplay permission from one item to the next hasn't been run on an iPhone or iPad. The browser tests cover moving through the queue on one element in desktop Chrome, Firefox, and WebKit.
-</Callout>
 
 ## API
 

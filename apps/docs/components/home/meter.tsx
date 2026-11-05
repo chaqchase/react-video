@@ -15,12 +15,12 @@ const plugins = [idle()];
 
 function Stat({ label, note, statRef, tone }: { label: string; note: string; statRef: React.Ref<HTMLSpanElement>; tone?: string }) {
   return (
-    <div className="border-line bg-raised rounded-2xl border p-4 sm:p-5">
-      <p className="text-dim text-[13px]">{label}</p>
-      <p className={`mt-1 font-mono text-[clamp(1.9rem,4vw,2.75rem)] leading-none font-medium tracking-tight tabular-nums ${tone ?? ""}`}>
+    <div className="bg-raised flex flex-col justify-center rounded-[20px] p-4 sm:px-6">
+      <p className="text-[14px] font-semibold tracking-[-0.014em] sm:text-[15px]">{label}</p>
+      <p className={`site-numeral mt-2 text-[clamp(2.25rem,5vw,3.25rem)] ${tone ?? ""}`}>
         <span ref={statRef}>0</span>
       </p>
-      <p className="text-faint mt-2 text-[12.5px] leading-snug">{note}</p>
+      <p className="text-dim mt-2 text-[13px] leading-[1.35]">{note}</p>
     </div>
   );
 }
@@ -89,31 +89,28 @@ export function Meter() {
   }, []);
 
   return (
-    <section id="performance" className="border-line border-y bg-[color-mix(in_srgb,var(--site-sunken)_70%,transparent)]">
-      <div className="mx-auto grid max-w-[1120px] gap-10 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center">
+    <section id="performance" className="site-section">
+      <div className="site-wrap">
         <div className="reveal">
-          <Eyebrow time="00:37">Performance</Eyebrow>
+          <Eyebrow>Performance</Eyebrow>
           <SectionTitle>Time never touches React.</SectionTitle>
           <SectionLead>
-            Browsers report the time about four times a second. Put that in React state and every part renders with
-            it, as version 3 of this package did. Now time stays out of state altogether: a shared clock writes
-            transforms straight to the DOM, only when a pixel would change, and stops when playback does.
+            A shared clock writes straight to the DOM, only when a pixel would change, and stops when playback does. Press
+            play and leave your mouse alone. These counters are live, and the first one watches every React commit on this
+            page.
           </SectionLead>
-          <p className="text-dim mt-4 max-w-[56ch] text-[15px] leading-relaxed">
-            Press play and leave your mouse alone. These counters are live, and the first one watches every React
-            commit on this page.
-          </p>
         </div>
-        <div ref={frame} className="flex min-w-0 flex-col gap-4">
+        <div ref={frame} className="mt-14 grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
           <VideoPlayer
             src="/media/sample-720.mp4"
             poster="/media/poster.jpg"
             plugins={plugins}
             load="visible"
-            className="shadow-raised"
+            title="View From A Blue Moon"
+            eyebrow="Trailer"
             aria-label="Player being measured"
           />
-          <div className="grid grid-cols-3 gap-3" data-attached={attached || undefined}>
+          <div className="grid grid-cols-3 gap-2.5 sm:gap-4 xl:h-0 xl:min-h-full xl:grid-cols-1 xl:grid-rows-3" data-attached={attached || undefined}>
             <Stat label="React commits" note="Since you pressed play" statRef={commits} tone="text-sun" />
             <Stat label="Clock writes" note="To the DOM, no render" statRef={writes} />
             <Stat label="timeupdate" note="Fired by the browser" statRef={events} />

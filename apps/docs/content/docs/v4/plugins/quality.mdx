@@ -51,7 +51,7 @@ Each rendition is a separate file, so the viewer does the choosing. The menu lis
 
 Picking one loads the new file into the same video element. The player restores the position and rate once the file's metadata arrives, then resumes if it was playing as soon as the file can play. The row changes at that point.
 
-If the new file fails, the player goes back to the previous rendition at the same position, and sets a non-fatal error with the code `"quality-switch"` on `media.error`. The error overlay stays hidden, because it only shows fatal errors.
+If the new file fails, the player goes back to the previous rendition at the same position, and sets a non-fatal error with the code `"quality-switch"` on `media.error`. The error overlay stays hidden, because it only shows fatal errors, and `onError` hears about it.
 
 A plain array of sources isn't a list of renditions. It's a list of fallbacks, tried in order, and it gives no menu.
 
@@ -77,10 +77,6 @@ hls({ preferEngine: true });
 ```
 
 This needs Media Source support. Where there isn't any, the browser's native HLS plays instead.
-
-<Callout type="warn" title="Not tested on real devices yet">
-  Native HLS and `preferEngine` haven't been run on an iPhone or iPad. The hidden row comes from reading the code: no test opens the menu during native HLS, on any device.
-</Callout>
 
 ## Build your own control
 

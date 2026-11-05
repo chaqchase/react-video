@@ -24,8 +24,8 @@ export function TokenEditor() {
   }, [values]);
 
   return (
-    <div className="not-prose my-6 flex flex-col gap-4">
-      <div className="lg:sticky lg:top-[calc(var(--fd-nav-height,56px)+12px)] lg:z-20">
+    <div className="my-6 flex flex-col">
+      <div className="lg:sticky lg:top-[calc(var(--site-nav-height)+12px)] lg:z-20">
         <VideoPlayer
           src="/media/sample-720.mp4"
           poster="/media/poster.jpg"
@@ -36,11 +36,11 @@ export function TokenEditor() {
         />
       </div>
       <GeneratedCode code={css} label="Copy this CSS" />
-      <div className="border-line divide-line divide-y overflow-hidden rounded-2xl border">
+      <div className="doc-panel divide-line divide-y !mt-0">
         {tokens.map(({ name, value: fallback }) => {
           const value = values[name] ?? fallback;
           return (
-            <label key={name} className="hover:bg-sun-soft/40 grid items-center gap-x-3 gap-y-1 px-3.5 py-2 transition-colors duration-150 sm:grid-cols-[190px_minmax(0,1fr)_auto]">
+            <label key={name} className="hover:bg-hover grid items-center gap-x-3 gap-y-1 px-4 py-2 transition-colors duration-150 sm:grid-cols-[190px_minmax(0,1fr)_auto]">
               <code className="font-mono text-[12.5px]">{name}</code>
               {isPixels(fallback) ? (
                 <input

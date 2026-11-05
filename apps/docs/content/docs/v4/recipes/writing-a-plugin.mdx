@@ -3,7 +3,7 @@ title: Writing a plugin
 description: Build a skip intro button, and meet each part of a plugin on the way.
 ---
 
-Your plugins use the same API as the ones the package ships. This page builds one it doesn't: a skip intro button that shows while the current time is inside the intro, and seeks to the end of the intro when pressed.
+Your plugins use the same API as the ones the package ships. This page builds a small one from scratch: a skip intro button that shows while the current time is inside the intro, and seeks to the end of the intro when pressed. For a real player, the [skip](/docs/v4/plugins/skip) plugin is the complete version.
 
 Press play below. The button appears at 2 seconds, and pressing it jumps to 12.
 
@@ -243,6 +243,20 @@ export const startFast = definePlugin("start-fast", ({ rate }: { rate: number })
 ```
 
 `context.find` reads another plugin by name. With `import type`, it adds none of that plugin's code to your bundle, which suits an optional dependency: drop `requires`, and `find` returns `undefined` when the plugin isn't there.
+
+## Report failures
+
+`context.error` reports a failure the same way the library's own plugins do. Give it a code of your own with your plugin's prefix, and say whether it stops playback:
+
+```tsx
+context.error({
+  code: "skip-intro-load",
+  message: "The intro markers didn't load.",
+  fatal: false,
+});
+```
+
+A non-fatal error reaches `onError` and `player.onError` while the video keeps playing. A fatal one also shows the error overlay. Set `retryable: true` on a failure that can pass, so that [`recovery()`](/docs/v4/plugins/recovery) retries it. To choose the code from a load gate or a provider, throw a `VideoKitError`. [Errors](/docs/v4/concepts/errors) lists every code the library uses.
 
 ## Keep it light and safe on the server
 

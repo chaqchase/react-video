@@ -1,0 +1,67 @@
+---
+title: Ambient light
+description: A soft glow around the player, in the colours of the video.
+---
+
+<PluginSummary id="ambient" />
+
+Lights the page around the player with the colours at the picture's left and right edges, and adds a switch to the settings menu. Press play below and watch the sides change with the scene.
+
+<Demo slug="ambient" />
+
+## Usage
+
+```tsx
+import { ambient } from "react-video-kit/ambient";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [ambient()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+The glow falls outside the player, so leave some space around it, and make sure no parent clips it with `overflow: hidden`. It shows best on a dark page.
+
+To start with it off, and let viewers turn it on from the menu:
+
+```tsx
+ambient({ enabled: false });
+```
+
+## Video from another origin
+
+A browser only lets a page read a video's pixels when the video is on the same origin or is served with CORS. For a video on a CDN, allow your site in the `Access-Control-Allow-Origin` header and ask for it with CORS:
+
+```tsx
+<VideoPlayer
+  src="https://cdn.example.com/video.mp4"
+  media={{ crossOrigin: "anonymous" }}
+  plugins={plugins}
+/>
+```
+
+When the browser refuses, `available` turns false, the menu row goes away, and the video plays on as normal. A new source tries again.
+
+## Style the glow
+
+The plugin writes the two colours to `--rv-ambient-left` and `--rv-ambient-right` on the root, and sets `data-ambient` while it's on. Replace the default shadow with your own:
+
+```css
+.rv-root[data-ambient] {
+  box-shadow:
+    -40px 0 140px var(--rv-ambient-left),
+    40px 0 140px var(--rv-ambient-right);
+}
+```
+
+## Behaviour
+
+- Colours go straight to the root's style, never through the store, so nothing re-renders while it runs.
+- It samples a tiny copy of the frame up to four times a second while playing, and once after a seek while paused. Set a lower rate with the `rate` option. With reduced motion on, it samples once a second at most.
+- A small change in colour writes nothing, so a still scene costs no repaints.
+- Dark footage is brightened, so a night scene still gives some light. A black frame gives none.
+- It stops sampling in fullscreen, where there's nothing around the player to light.
+
+## API
+
+<PluginApi id="ambient" />

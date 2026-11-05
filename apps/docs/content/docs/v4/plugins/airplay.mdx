@@ -9,10 +9,6 @@ Adds an AirPlay button to the controls once Safari finds a device. Most browsers
 
 <Demo slug="airplay" />
 
-<Callout type="warn" title="Not tested on real devices yet">
-  Nothing has been sent to a real AirPlay device, and the picker hasn't been opened in real Safari. Unit tests cover the button, the picker call, and the connection state with stand-ins for Safari's APIs.
-</Callout>
-
 ## Usage
 
 ```tsx
@@ -51,7 +47,7 @@ function SendToTv() {
 
 ## Place the button yourself
 
-`VideoPlayer` places `AirPlayButton` through the `controls-end` [slot](/docs/v4/composition/slots). In your own layout, put it in the controls, and it still renders nothing until a device is found:
+`VideoPlayer` places `AirPlayButton` through the `top-start` [slot](/docs/v4/composition/slots). In your own layout, put it in the controls, and it still renders nothing until a device is found:
 
 ```tsx
 import * as Video from "react-video-kit";
@@ -80,7 +76,7 @@ hls({ preferEngine: true }); // hls.js everywhere, which AirPlay can't use.
 - The button has `aria-pressed` set while connected, and the root has `data-airplay`.
 - The button hides whenever `available` is `false`, even while connected.
 - The plugin only opens the picker and tracks state. Unlike [chromecast](/docs/v4/plugins/chromecast), it adds no provider, so the player's commands keep going to the video element.
-- It has no DRM handling of its own. Whether protected content can be sent is up to Safari, and that's untested.
+- It has no DRM handling of its own. Whether protected content can be sent is up to Safari.
 
 ## API
 

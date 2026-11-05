@@ -10,10 +10,13 @@ A plugin's controls appear without you placing them because plugins add componen
 | Slot | Where it is in `VideoPlayer` | Used by |
 |---|---|---|
 | `overlay` | Above the media, below the controls | [Ads](/docs/v4/plugins/ads), [autoplay](/docs/v4/plugins/autoplay), [captions](/docs/v4/plugins/captions), [Chromecast](/docs/v4/plugins/chromecast), [gestures](/docs/v4/plugins/gestures), [hotkeys](/docs/v4/plugins/hotkeys), [playlist](/docs/v4/plugins/playlist) |
-| `transport-start` | Before the play button | [Playlist](/docs/v4/plugins/playlist) |
-| `transport-end` | After the play button | [Playlist](/docs/v4/plugins/playlist) |
-| `controls-start` | End of the left group | [Live](/docs/v4/plugins/live) |
-| `controls-end` | Start of the right group | [Fullscreen](/docs/v4/plugins/fullscreen), [PiP](/docs/v4/plugins/pip), [AirPlay](/docs/v4/plugins/airplay), [Chromecast](/docs/v4/plugins/chromecast), [captions](/docs/v4/plugins/captions) |
+| `top-start` | The group at the top left | [Fullscreen](/docs/v4/plugins/fullscreen), [PiP](/docs/v4/plugins/pip), [AirPlay](/docs/v4/plugins/airplay), [Chromecast](/docs/v4/plugins/chromecast) |
+| `top-end` | The group at the top right, before the volume | Nothing yet, so it's yours |
+| `transport-start` | Before the buttons in the centre | [Playlist](/docs/v4/plugins/playlist) |
+| `transport-end` | After the buttons in the centre | [Playlist](/docs/v4/plugins/playlist) |
+| `controls-start` | In its own pill, at the start of the row above the timeline | [Live](/docs/v4/plugins/live) |
+| `controls-end` | In the group above the timeline, before the settings button | [Captions](/docs/v4/plugins/captions), [episodes](/docs/v4/plugins/episodes), [info](/docs/v4/plugins/info) |
+| `title` | Above the timeline, when `VideoPlayer` has no `title`, `eyebrow`, or `description` | [Playlist](/docs/v4/plugins/playlist) |
 | `menu` | Inside the settings menu | [Audio tracks](/docs/v4/plugins/audio-tracks), [captions](/docs/v4/plugins/captions), [chapters](/docs/v4/plugins/chapters), [quality](/docs/v4/plugins/quality), [speed](/docs/v4/plugins/speed) |
 | `timeline-track` | Inside the timeline's track | [Chapters](/docs/v4/plugins/chapters) |
 | `timeline-preview` | In the preview above the timeline | [Chapters](/docs/v4/plugins/chapters), [thumbnails](/docs/v4/plugins/thumbnails) |
@@ -29,13 +32,14 @@ Render a `Slot` wherever you want those controls to go:
   <Video.Media />
   <Video.Slot name="overlay" />
   <Video.Controls>
-    <Video.Timeline />
     <Video.ControlRow>
       <Video.ControlGroup>
         <Video.PlayPause />
+        <Video.Timeline />
       </Video.ControlGroup>
       <Video.ControlGroup>
         <Video.Slot name="controls-end" />
+        <Video.Slot name="top-start" />
         <Video.SettingsMenu />
       </Video.ControlGroup>
     </Video.ControlRow>
@@ -53,7 +57,7 @@ import { Fullscreen } from "react-video-kit/fullscreen";
 </Video.ControlGroup>;
 ```
 
-With `controls-end` left out, nothing renders twice.
+With `top-start` left out, nothing renders twice.
 
 ## Add to a slot
 

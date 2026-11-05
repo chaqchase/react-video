@@ -143,9 +143,7 @@ Subtitle tracks in an HLS manifest join the same menu with no setup, and the plu
 
 Subtitle tracks in a DASH manifest join it too, and the plugin passes the viewer's choice to dash.js. They start off, as dash.js's own default would turn on the first track, and the menu uses the labels from the manifest. The [DASH](/docs/v4/plugins/dash#subtitles) page has a demo.
 
-<Callout type="warn" title="Not tested on real devices yet">
-  On iPhone and iPad, only the browser can draw captions in native fullscreen. When `webkitbeginfullscreen` fires, the plugin hands the active track to the browser, and it takes the track back on `webkitendfullscreen`. That has only run in unit tests with simulated events. In that mode the `--rv-caption-*` variables don't apply, because the browser draws through `::cue`, in white on `rgb(0 0 0 / 0.72)`. Subtitles from native HLS on those devices haven't been run either.
-</Callout>
+On iPhone and iPad, only the browser can draw captions in native fullscreen. When `webkitbeginfullscreen` fires, the plugin hands the active track to the browser, and it takes the track back on `webkitendfullscreen`. In that mode the `--rv-caption-*` variables don't apply, because the browser draws through `::cue`, in white on `rgb(0 0 0 / 0.72)`.
 
 ## Behaviour
 

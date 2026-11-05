@@ -1,4 +1,10 @@
 {
   "title": "Concepts",
-  "pages": ["sources", "plugins", "state-and-time", "providers"]
+  "pages": [
+    "sources",
+    "errors",
+    "plugins",
+    "state-and-time",
+    "providers"
+  ]
 }

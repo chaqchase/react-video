@@ -1,0 +1,58 @@
+---
+title: Mini player
+description: Keeps a playing video in the corner while the viewer scrolls on.
+---
+
+<PluginSummary id="mini-player" />
+
+When a playing video scrolls out of view, it floats in a corner of the screen and keeps playing. Press play below, then scroll down this page.
+
+<Demo slug="mini-player" />
+
+## Usage
+
+```tsx
+import { miniPlayer } from "react-video-kit/mini-player";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [miniPlayer()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Choose a corner with `corner`. `start` and `end` follow the text direction, so `bottom-end` is on the left in Arabic:
+
+```tsx
+miniPlayer({ corner: "bottom-start" });
+```
+
+## Size and layer
+
+The floating player is 360px wide, or 62% of a narrow screen. A CSS variable changes each:
+
+```css
+.rv-root {
+  --rv-mini-width: 280px;
+  --rv-mini-layer: 100;
+}
+```
+
+`--rv-mini-layer` is its `z-index`. Raise it if a sticky header or a dialog on your page should stay below the video.
+
+## Parents that move it
+
+The floating player uses `position: fixed`. A parent with a `transform`, `filter`, `perspective`, or `contain: paint` turns that into a position inside the parent, and a parent with its own stacking context can hold it below other content. Keep those off the player's parents.
+
+## Behaviour
+
+- The same video element moves to the corner, with no remount, so playback, buffer, and captions carry on. A placeholder holds its place, so the page doesn't jump.
+- It only floats while playing. A paused video scrolls away like any other content.
+- The close button pauses the video and puts it back. It won't float again until the viewer has scrolled back to it.
+- The back button scrolls to the video's place in the page, which ends the floating.
+- The floating player has the timeline and the play button, and hides the other controls. Its corner shows in the `data-mini` attribute on the root.
+- It doesn't float in fullscreen or picture in picture.
+- With reduced motion on, it fades in instead of sliding.
+
+## API
+
+<PluginApi id="mini-player" />

@@ -1,6 +1,6 @@
 # react-video-kit
 
-A plugin-first React video player. `packages/core` is the published package, and `apps/docs` is the Fumadocs site whose `/examples` routes are also the Playwright fixtures.
+A plugin-first React video player. `packages/core` is the published package, and `apps/docs` is the docs site (Next.js, with its own MDX pipeline in `lib/docs`), and its `/examples` routes are also the Playwright fixtures.
 
 See `CONTRIBUTING.md` for setup, checks, and the release process.
 

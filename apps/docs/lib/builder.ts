@@ -1,3 +1,4 @@
+import type { ThemeId } from "@/lib/themes";
 import { ads } from "react-video-kit/ads";
 import { vast } from "react-video-kit/ads/vast";
 import { airplay } from "react-video-kit/airplay";
@@ -10,6 +11,7 @@ import type { AnyPlugin, SourceInput } from "react-video-kit/core";
 import { chromecast } from "react-video-kit/chromecast";
 import { dash } from "react-video-kit/dash";
 import { drm } from "react-video-kit/drm";
+import { episodes } from "react-video-kit/episodes";
 import { fullscreen } from "react-video-kit/fullscreen";
 import { gestures } from "react-video-kit/gestures";
 import { hls } from "react-video-kit/hls";
@@ -17,15 +19,27 @@ import { hotkeys } from "react-video-kit/hotkeys";
 import { i18n } from "react-video-kit/i18n";
 import { ar } from "react-video-kit/i18n/ar";
 import { idle } from "react-video-kit/idle";
+import { info } from "react-video-kit/info";
 import { live } from "react-video-kit/live";
 import { mediaSession } from "react-video-kit/media-session";
+import { orientation } from "react-video-kit/orientation";
 import { persistence } from "react-video-kit/persistence";
 import { pip } from "react-video-kit/pip";
 import { playlist } from "react-video-kit/playlist";
 import { quality } from "react-video-kit/quality";
 import { recovery } from "react-video-kit/recovery";
+import { skip } from "react-video-kit/skip";
 import { speed } from "react-video-kit/speed";
 import { thumbnails } from "react-video-kit/thumbnails";
+import { ambient } from "react-video-kit/ambient";
+import { fit } from "react-video-kit/fit";
+import { loop } from "react-video-kit/loop";
+import { miniPlayer } from "react-video-kit/mini-player";
+import { screenshot } from "react-video-kit/screenshot";
+import { share } from "react-video-kit/share";
+import { shortcuts } from "react-video-kit/shortcuts";
+import { stats } from "react-video-kit/stats";
+import { transcript } from "react-video-kit/transcript";
 import { DEFAULTS, type Layout, type SourceId, type Tokens } from "@/components/playground/url-state";
 import { PLUGINS } from "./catalog";
 import { LAYOUT, marginal, MINIMAL_LAYOUT } from "./sizes";
@@ -37,10 +51,17 @@ const CAPTION_TRACKS = [
   { src: "/media/captions.ar.vtt", language: "ar", label: "العربية" },
 ];
 const PLAYLIST_ITEMS = [
-  { src: "/media/sample-720.mp4", title: "First light", poster: "/media/poster.jpg" },
-  { src: "/media/sample-360.mp4", title: "The long ridge" },
-  { src: "/media/sample-270.mp4", title: "Last light" },
-];
+  { title: "The Green Coast", description: "The swell meets the first land it has seen in days." },
+  { title: "Open Water", description: "A turtle crosses a stretch of deep blue." },
+  { title: "Breakwater", description: "Every wave along the point stands up and holds its shape." },
+].map((episode, index) => ({
+  ...episode,
+  src: `/media/episodes/${index + 1}.mp4`,
+  poster: `/media/episodes/${index + 1}.jpg`,
+  thumbnail: `/media/episodes/${index + 1}.jpg`,
+  eyebrow: `Episode ${index + 1}`,
+  duration: 14,
+}));
 const CLEAR_KEY = { "000102030405060708090a0b0c0d0e0f": "101112131415161718191a1b1c1d1e1f" };
 
 const CREATE: Record<string, () => AnyPlugin> = {
@@ -60,6 +81,9 @@ const CREATE: Record<string, () => AnyPlugin> = {
   live: () => live(),
   recovery: () => recovery(),
   playlist: () => playlist({ items: PLAYLIST_ITEMS }),
+  episodes: () => episodes(),
+  skip: () => skip({ segments: [{ kind: "intro", start: 3, end: 12 }] }),
+  info: () => info({ title: "The Long Coast", facts: ["2024", "TV-PG", "1h 20m"] }),
   autoplay: () => autoplay(),
   persistence: () => persistence(),
   "media-session": () => mediaSession(),
@@ -69,6 +93,16 @@ const CREATE: Record<string, () => AnyPlugin> = {
   drm: () => drm({ clearkey: { keys: CLEAR_KEY } }),
   airplay: () => airplay(),
   chromecast: () => chromecast(),
+  ambient: () => ambient(),
+  "mini-player": () => miniPlayer(),
+  screenshot: () => screenshot(),
+  loop: () => loop(),
+  shortcuts: () => shortcuts(),
+  stats: () => stats(),
+  share: () => share(),
+  orientation: () => orientation(),
+  fit: () => fit(),
+  transcript: () => transcript(),
 };
 
 export type { Layout, SourceId, Tokens } from "@/components/playground/url-state";
@@ -80,6 +114,8 @@ export interface SourceDefinition {
   code: string;
   /** Plugins this source can't play without. */
   needs: readonly string[];
+  /** The still to show before it plays. */
+  poster?: string;
 }
 
 export const SOURCES: readonly SourceDefinition[] = [
@@ -95,6 +131,14 @@ export const SOURCES: readonly SourceDefinition[] = [
     },
     code: "/video.mp4",
     needs: [],
+  },
+  {
+    id: "vertical",
+    label: "9:16",
+    input: "/media/sample-vertical.mp4",
+    code: "/vertical.mp4",
+    needs: ["orientation"],
+    poster: "/media/sample-vertical.jpg",
   },
   { id: "hls", label: "HLS", input: "/media/hls/master.m3u8", code: "/stream.m3u8", needs: ["hls"] },
   { id: "dash", label: "DASH", input: "/media/dash/manifest.mpd", code: "/manifest.mpd", needs: ["dash"] },
@@ -112,6 +156,7 @@ export interface BuilderConfig {
   plugins: readonly string[];
   layout: Layout;
   tokens: Tokens;
+  theme?: ThemeId;
 }
 
 /** Everything that needs a new player, as opposed to one that can restyle in place. */
@@ -120,14 +165,23 @@ export const playerKey = ({ source, plugins, layout }: BuilderConfig) =>
 
 const installed = (config: Pick<BuilderConfig, "source" | "plugins">) => {
   const wanted = new Set([...config.plugins, ...sourceById(config.source).needs]);
+  for (const { id, needs = [] } of PLUGINS) {
+    if (wanted.has(id)) for (const need of needs) wanted.add(need);
+  }
   return PLUGINS.filter(({ id }) => wanted.has(id));
 };
+
+const hasPlaylist = (config: Pick<BuilderConfig, "source" | "plugins">) =>
+  installed(config).some(({ id }) => id === "playlist");
 
 export const createPlugins = (config: Pick<BuilderConfig, "source" | "plugins">) =>
   installed(config).flatMap(({ id }) => CREATE[id]?.() ?? []);
 
+export const sourcePoster = (config: Pick<BuilderConfig, "source">) =>
+  sourceById(config.source).poster ?? "/media/poster.jpg";
+
 export const sourceInput = (config: Pick<BuilderConfig, "source" | "plugins">) =>
-  config.plugins.includes("playlist") ? undefined : sourceById(config.source).input;
+  hasPlaylist(config) ? undefined : sourceById(config.source).input;
 
 /** An estimate, since a real bundle compresses shared strings better than the sum. */
 export const estimateSize = (config: Pick<BuilderConfig, "source" | "plugins" | "layout">) =>
@@ -136,20 +190,23 @@ export const estimateSize = (config: Pick<BuilderConfig, "source" | "plugins" | 
     config.layout === "complete" ? LAYOUT : MINIMAL_LAYOUT
   );
 
+/** Only what's been changed, since setting a default here would override a theme's own value. */
 export const tokenStyle = (tokens: Tokens) =>
   ({
-    "--rv-accent": tokens.accent,
-    "--rv-radius": `${tokens.radius}px`,
-    "--rv-menu-radius": `${Math.round(tokens.radius * 1.1)}px`,
-    "--rv-blur": `${tokens.blur}px`,
-    "--rv-control-size": `${tokens.control}px`,
+    ...(tokens.accent !== DEFAULT_TOKENS.accent && { "--rv-accent": tokens.accent }),
+    ...(tokens.radius !== DEFAULT_TOKENS.radius && {
+      "--rv-radius": `${tokens.radius}px`,
+      "--rv-menu-radius": `${Math.round(tokens.radius * 1.1)}px`,
+    }),
+    ...(tokens.blur !== DEFAULT_TOKENS.blur && { "--rv-blur": `${tokens.blur}px` }),
+    ...(tokens.control !== DEFAULT_TOKENS.control && { "--rv-control-size": `${tokens.control}px` }),
   }) as React.CSSProperties;
 
 const importLine = (names: string, path: string) => `import { ${names} } from "${path}";`;
 
 export function generateCode(config: BuilderConfig) {
   const plugins = installed(config);
-  const usesPlaylist = config.plugins.includes("playlist");
+  const usesPlaylist = hasPlaylist(config);
   const source = sourceById(config.source);
   const minimal = config.layout === "minimal";
 
@@ -162,13 +219,16 @@ export function generateCode(config: BuilderConfig) {
       ...extraImports.map(([name, path]) => importLine(name, `react-video-kit/${path}`)),
     ]),
     `import "react-video-kit/styles.css";`,
+    ...(config.theme && config.theme !== "default" ? [`import "react-video-kit/themes/${config.theme}.css";`] : []),
   ];
 
   const pluginLines = plugins.length
     ? ["const plugins = [", ...plugins.map(({ code }) => `  ${code},`), "];"]
     : ["const plugins = [];"];
 
-  const srcProp = usesPlaylist ? "" : ` src="${source.code}"`;
+  const srcProp = `${config.theme && config.theme !== "default" ? ` className="rv-theme-${config.theme}"` : ""}${
+    usesPlaylist ? "" : ` src="${source.code}"`
+  }`;
   const body = minimal
     ? [
         `    <Video.Root${srcProp} plugins={plugins}>`,
@@ -178,14 +238,15 @@ export function generateCode(config: BuilderConfig) {
         `      <Video.PlayOverlay />`,
         `      <Video.ErrorOverlay />`,
         `      <Video.Controls>`,
-        `        <Video.Timeline />`,
         `        <Video.ControlRow>`,
         `          <Video.ControlGroup>`,
         `            <Video.PlayPause />`,
+        `            <Video.Timeline />`,
         `            <Video.Time />`,
         `          </Video.ControlGroup>`,
         `          <Video.ControlGroup>`,
         `            <Video.Slot name="controls-end" />`,
+        `            <Video.Slot name="top-start" />`,
         `            <Video.SettingsMenu />`,
         `          </Video.ControlGroup>`,
         `        </Video.ControlRow>`,
