@@ -28,7 +28,22 @@
       "cache": false,
       "persistent": true
     },
+    "react-video-kit#dev": {
+      "dependsOn": ["react-video-kit#build"],
+      "cache": false,
+      "persistent": true
+    },
+    "docs#dev": {
+      "dependsOn": ["react-video-kit#build"],
+      "cache": false,
+      "persistent": true
+    },
     "test": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "check": {
       "dependsOn": [
         "^build"
       ]

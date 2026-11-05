@@ -13,7 +13,8 @@
     "lint:pkg": "turbo run lint:pkg",
     "test:e2e": "turbo run test:e2e",
     "media": "pnpm --filter docs media",
-    "test:ssr": "turbo run test:ssr"
+    "test:ssr": "turbo run test:ssr",
+    "check": "turbo run check"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",

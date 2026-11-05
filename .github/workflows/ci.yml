@@ -28,6 +28,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm lint:pkg
+      - run: pnpm check
       - run: pnpm --filter react-video-kit test:treeshake
 
   unit:
