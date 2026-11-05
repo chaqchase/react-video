@@ -1,0 +1,94 @@
+---
+title: DASH
+description: Plays DASH streams through dash.js.
+---
+
+<PluginSummary id="dash" />
+
+Plays `.mpd` streams through dash.js, downloaded only when a DASH source loads. Press play below, then open the settings menu to pick a quality.
+
+<Demo slug="dash" />
+
+## Usage
+
+dash.js is an optional peer dependency, so add it yourself. The package asks for `^5.0.0`.
+
+```bash
+npm install dashjs
+```
+
+```tsx
+import { dash } from "react-video-kit/dash";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [dash(), ...defaultPlugins()];
+
+<VideoPlayer src="/stream.mpd" plugins={plugins} />;
+```
+
+`dash()` isn't part of `defaultPlugins()`, so list it alongside them.
+
+To change how dash.js behaves, pass its settings as `settings`. They go to `updateSettings` before the stream starts:
+
+```tsx
+dash({ settings: { streaming: { buffer: { bufferTimeAtTopQuality: 30 } } } });
+```
+
+## How the provider gets chosen
+
+`dash()` claims a source whose `type` is `application/dash+xml`. With no `type`, it claims a path ending in `.mpd`, ignoring any query string or hash. A URL with no extension needs a type:
+
+```tsx
+<VideoPlayer src={{ src: "/streams/42", type: "application/dash+xml" }} plugins={plugins} />;
+```
+
+dash.js needs Media Source or Managed Media Source. Without either, the plugin steps aside and the browser gets the source if `canPlayType` says it can play it. If it can't, the player tries the next [fallback source](/docs/v4/concepts/sources), so a list keeps those browsers playing:
+
+```tsx
+const sources = [
+  { src: "/stream.mpd", type: "application/dash+xml" },
+  { src: "/video.mp4", type: "video/mp4" },
+];
+
+<VideoPlayer src={sources} plugins={plugins} />;
+```
+
+After the last source, the player reports a fatal `no-provider` error.
+
+<Callout type="warn" title="Not tested on real devices yet">
+  DASH live hasn't run against any stream, and its tests use a fake dash.js. Nothing on this page has run on an iPhone or iPad, and Managed Media Source, which the plugin accepts in place of Media Source, hasn't been exercised anywhere. The browser tests cover on-demand DASH in Chrome, Firefox, and desktop WebKit.
+</Callout>
+
+## When dash.js loads
+
+dash.js downloads when a source the plugin claims starts loading, so `dash()` adds little to a page of MP4s. The `load` prop decides when that is:
+
+| `load` | The source starts loading |
+| --- | --- |
+| `"eager"` | As soon as the player mounts. This is the default. |
+| `"visible"` | When the player scrolls into view, or straight away if the browser has no `IntersectionObserver`. |
+| `"play"` | On the first play. |
+
+```tsx
+<VideoPlayer src="/stream.mpd" plugins={plugins} load="visible" />;
+```
+
+`load` is read once, when the player is created. If dash.js fails to download, the player reports a fatal `load-failed` error instead of hanging.
+
+## Behaviour
+
+- Choosing a quality turns off dash.js's automatic switching and replaces what's buffered, so the new quality shows right away. Choosing **Auto** turns switching back on.
+- The player treats every error dash.js emits as fatal. Failed downloads (dash.js codes 11 and 25 to 29) are reported with code `"network"`, which the [recovery](/docs/v4/plugins/recovery) plugin retries. Other errors keep their dash.js code.
+- Audio tracks from the manifest go to the [audio tracks](/docs/v4/plugins/audio-tracks) menu, and quality levels to the [quality](/docs/v4/plugins/quality) menu.
+- For a live manifest, the player reads dash.js's DVR window every 2 seconds and reports it to the [live](/docs/v4/plugins/live) plugin.
+- The [DRM](/docs/v4/plugins/drm) plugin hands dash.js its protection data before the stream starts.
+
+## Subtitles
+
+Text tracks in the manifest appear under **Captions** when the [captions](/docs/v4/plugins/captions) plugin is installed, and the plugin draws them like any other track. They start off, because `dash()` turns off dash.js's `defaultEnabled` setting, and the menu uses each adaptation set's label. A set with no label shows its language, and one with neither shows its id. `defaultPlugins()` includes the captions plugin, so this demo needs nothing more. Press play, then open **Captions** in the settings menu.
+
+<Demo slug="dash-captions" />
+
+## API
+
+<PluginApi id="dash" />

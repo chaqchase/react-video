@@ -1,0 +1,94 @@
+---
+title: Plugins
+description: How plugins add features, and how to use them from your code.
+---
+
+Everything optional is a plugin, including controls you might expect to be built in, like fullscreen and auto-hide. You import the ones you want and list them in `plugins`.
+
+```tsx
+import { fullscreen } from "react-video-kit/fullscreen";
+import { idle } from "react-video-kit/idle";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [idle(), fullscreen()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Each one is its own import, so an unused plugin adds 0 bytes. The package's checks test this in esbuild, Rollup, and webpack.
+
+## What a plugin can add
+
+A plugin can provide any of these:
+
+- **State**, which your components can read and subscribe to
+- **Commands**, which your components can call
+- **UI**, placed in the player's [slots](/docs/v4/composition/slots)
+- **Attributes** on the player's root, for styling with CSS
+- **A provider**, to play more formats
+- **Gates**, which can hold up loading, playing, or seeking until something finishes
+
+Controls appear when their plugin is installed. With `fullscreen()` in the list, the button appears, and without it there's nothing to hide or configure.
+
+## Use a plugin from your code
+
+Pass the plugin to a hook, and TypeScript infers its state and commands. Both hooks work anywhere inside the player.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { fullscreen } from "react-video-kit/fullscreen";
+
+function FullscreenButton() {
+  const active = useVideoState(fullscreen, (state) => state.active);
+  const { toggle } = useCommands(fullscreen);
+  return <button onClick={() => void toggle()}>{active ? "Exit" : "Enter"} fullscreen</button>;
+}
+```
+
+Asking for a plugin that isn't installed throws an error that names it, so a missing plugin never fails silently.
+
+Outside the player, use a `ref`:
+
+```tsx
+const player = useRef<Player>(null);
+
+<VideoPlayer ref={player} src="/video.mp4" plugins={plugins} />;
+
+player.current?.plugin(fullscreen).commands.toggle();
+```
+
+## Plugins are read once
+
+The player reads `plugins` once, when it's created. This has two consequences.
+
+**Keep the array stable.** Define it outside your component, or in `useMemo`:
+
+```tsx
+const plugins = [idle(), fullscreen()];
+
+export function Player() {
+  return <VideoPlayer src="/video.mp4" plugins={plugins} />;
+}
+```
+
+**To change plugins, remount.** Change the player's `key` so that React builds a new one:
+
+```tsx
+const plugins = useMemo(() => [i18n({ locale, strings })], [locale, strings]);
+
+<VideoPlayer key={locale} src="/video.mp4" plugins={plugins} />;
+```
+
+One plugin instance can safely be shared between players, because each player sets up its own copy.
+
+## Order and dependencies
+
+Plugins run in the order you list them, adjusted so that any plugin's dependencies come first. Order also decides how their controls line up in a shared slot.
+
+A plugin can require another. If that one is missing, creating the player throws an error that tells you which one to add. To write your own, see [Writing a plugin](/docs/v4/recipes/writing-a-plugin).
+
+## On the server
+
+A plugin's state and commands are pure, and they run during server rendering. Everything that touches the browser runs after mount, so the server's HTML and the first client render match, even for plugins that restore saved settings.

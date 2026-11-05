@@ -5,3 +5,489 @@
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 @import "react-video-kit/styles.css";
+
+:root {
+  --site-bg: #fbf9f6;
+  --site-raised: #ffffff;
+  --site-sunken: #f3efe9;
+  --site-line: rgb(32 24 58 / 0.11);
+  --site-line-strong: rgb(32 24 58 / 0.2);
+  --site-text: #17132b;
+  --site-dim: #5e5873;
+  --site-faint: #6f6985;
+  --site-sun: #b84f12;
+  --site-sun-soft: rgb(217 111 42 / 0.13);
+  --site-dusk: #5a45cf;
+  --site-dusk-soft: rgb(90 69 207 / 0.1);
+  --site-on-sun: #ffffff;
+  --site-button: #17132b;
+  --site-on-button: #fbf9f6;
+  --site-shadow: 0 1px 2px rgb(23 19 43 / 0.05), 0 12px 32px -12px rgb(23 19 43 / 0.16);
+  --site-code-bg: #f6f3ee;
+
+  --color-fd-background: var(--site-bg);
+  --color-fd-foreground: var(--site-text);
+  --color-fd-muted: var(--site-sunken);
+  --color-fd-muted-foreground: var(--site-dim);
+  --color-fd-popover: var(--site-raised);
+  --color-fd-popover-foreground: var(--site-text);
+  --color-fd-card: var(--site-raised);
+  --color-fd-card-foreground: var(--site-text);
+  --color-fd-border: var(--site-line);
+  --color-fd-primary: var(--site-sun);
+  --color-fd-primary-foreground: var(--site-on-sun);
+  --color-fd-secondary: var(--site-sunken);
+  --color-fd-secondary-foreground: var(--site-text);
+  --color-fd-accent: var(--site-sun-soft);
+  --color-fd-accent-foreground: var(--site-text);
+  --color-fd-ring: var(--site-sun);
+}
+
+.dark {
+  --site-bg: #0c0a15;
+  --site-raised: #15121f;
+  --site-sunken: #100e1a;
+  --site-line: rgb(236 230 255 / 0.09);
+  --site-line-strong: rgb(236 230 255 / 0.18);
+  --site-text: #f3f0fb;
+  --site-dim: #a8a3bd;
+  --site-faint: #8d88a3;
+  --site-sun: #ffb27a;
+  --site-sun-soft: rgb(255 178 122 / 0.12);
+  --site-dusk: #a698f5;
+  --site-dusk-soft: rgb(166 152 245 / 0.12);
+  --site-on-sun: #1a0f08;
+  --site-button: #f3f0fb;
+  --site-on-button: #0c0a15;
+  --site-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
+  --site-code-bg: #100e1a;
+}
+
+.dark #nd-sidebar {
+  --color-fd-muted: rgb(236 230 255 / 0.07);
+  --color-fd-secondary: rgb(236 230 255 / 0.09);
+  --color-fd-muted-foreground: var(--site-dim);
+}
+
+@theme inline {
+  --color-ink: var(--site-bg);
+  --color-raised: var(--site-raised);
+  --color-sunken: var(--site-sunken);
+  --color-line: var(--site-line);
+  --color-line-strong: var(--site-line-strong);
+  --color-text: var(--site-text);
+  --color-dim: var(--site-dim);
+  --color-faint: var(--site-faint);
+  --color-sun: var(--site-sun);
+  --color-sun-soft: var(--site-sun-soft);
+  --color-dusk: var(--site-dusk);
+  --color-dusk-soft: var(--site-dusk-soft);
+  --color-button: var(--site-button);
+  --color-on-button: var(--site-on-button);
+  --color-code: var(--site-code-bg);
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --ease-rv: cubic-bezier(0.32, 0.72, 0, 1);
+  --shadow-raised: var(--site-shadow);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--site-bg);
+  color: var(--site-text);
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection {
+  background: color-mix(in srgb, var(--site-sun) 28%, transparent);
+}
+
+/* In a layer, so that a component which draws its own focus can turn this off. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--site-sun);
+    outline-offset: 2px;
+  }
+}
+
+/* Every press in the site moves the same way the player's own controls do. */
+.press {
+  transition:
+    transform 110ms var(--ease-rv),
+    background-color 160ms var(--ease-rv),
+    border-color 160ms var(--ease-rv),
+    color 160ms var(--ease-rv),
+    box-shadow 200ms var(--ease-rv),
+    opacity 160ms var(--ease-rv);
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding-inline: 18px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--site-button);
+  color: var(--site-on-button);
+}
+.btn-ghost {
+  border: 1px solid var(--site-line-strong);
+  color: var(--site-text);
+}
+.btn svg.arrow {
+  transition: transform 220ms var(--ease-rv);
+}
+@media (hover: hover) {
+  .btn-primary:hover {
+    box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--site-sun) 55%, transparent);
+  }
+  .btn-ghost:hover {
+    background: var(--site-line);
+  }
+  .btn:hover svg.arrow {
+    transform: translateX(3px);
+  }
+}
+
+/* Reveals as it scrolls in, where the browser can tie animation to scroll. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 32%;
+    }
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+.eyebrow-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--site-line-strong), transparent);
+}
+
+/* Lines added to generated code arrive rather than appear. */
+@keyframes line-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+    background: var(--site-sun-soft);
+  }
+  40% {
+    background: var(--site-sun-soft);
+  }
+}
+.code-line {
+  display: block;
+  min-height: 1.65em;
+  padding-inline: 18px;
+  animation: line-in 480ms var(--ease-rv) both;
+}
+.code-tok-keyword {
+  color: var(--site-dusk);
+}
+.code-tok-string {
+  color: var(--site-sun);
+}
+.code-tok-comment {
+  color: var(--site-faint);
+}
+.code-tok-tag {
+  color: var(--site-dusk);
+}
+
+/* Shiki writes both themes as variables, and this picks one. */
+.shiki-themed span {
+  color: var(--shiki-light);
+}
+.dark .shiki-themed span {
+  color: var(--shiki-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .press:active {
+    transform: none;
+  }
+  .btn:hover svg.arrow {
+    transform: none;
+  }
+  .code-line {
+    animation: none;
+  }
+}
+
+/* The page's own controls, in the player's glass. */
+.page-timeline-glass,
+.page-timeline-tip {
+  background: rgb(22 19 34 / 0.72);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+}
+.page-timeline {
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 12px;
+  transition:
+    opacity 280ms var(--ease-rv),
+    translate 280ms var(--ease-rv),
+    visibility 0s linear 280ms;
+}
+.page-timeline[data-past-hero][data-awake],
+.page-timeline[data-past-hero]:hover,
+.page-timeline[data-past-hero]:focus-within {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity 160ms var(--ease-rv),
+    translate 160ms var(--ease-rv),
+    visibility 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-timeline {
+    translate: none;
+    transition: opacity 120ms linear, visibility 0s linear 120ms;
+  }
+}
+
+.site-range {
+  appearance: none;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+.site-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--site-line-strong);
+}
+.site-range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--site-line-strong);
+}
+.site-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--site-sun);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  transition: transform 160ms var(--ease-rv);
+}
+.site-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--site-sun);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  transition: transform 160ms var(--ease-rv);
+}
+.site-range:active::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+.site-range:active::-moz-range-thumb {
+  transform: scale(1.2);
+}
+
+/* Capability cards. Their art moves on hover, or all the time where hover doesn't exist. */
+.abr-bar {
+  background: var(--site-line-strong);
+  animation: abr-step 4.4s steps(1, end) infinite;
+}
+@keyframes abr-step {
+  0%,
+  25% {
+    background: var(--site-sun);
+  }
+  25.01%,
+  100% {
+    background: var(--site-line-strong);
+  }
+}
+.live-dot {
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+.dvr-window {
+  background: linear-gradient(to right, transparent, var(--site-sun));
+  left: 18%;
+  right: 0;
+  animation: dvr-slide 5s ease-in-out infinite alternate;
+}
+@keyframes dvr-slide {
+  to {
+    left: 40%;
+  }
+}
+.ad-skip-step {
+  opacity: 0;
+  animation: ad-step 4.8s linear infinite;
+}
+@keyframes ad-step {
+  0%,
+  24% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+  }
+}
+.lock-shackle {
+  transition: transform 320ms var(--ease-rv);
+}
+.bento-card:hover .lock-shackle {
+  transform: translateY(-3px);
+}
+.cast-wave {
+  animation: cast-wave 2.2s ease-in-out infinite;
+}
+@keyframes cast-wave {
+  40% {
+    stroke: var(--site-sun);
+  }
+}
+.airplay-triangle {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transition: transform 320ms var(--ease-rv);
+}
+.bento-card:hover .airplay-triangle {
+  transform: scale(1.1);
+}
+.keycap {
+  display: inline-grid;
+  place-items: center;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--site-line-strong);
+  border-bottom-width: 3px;
+  background: var(--site-sunken);
+  font: 500 12px var(--font-geist-mono), monospace;
+  transition:
+    transform 80ms var(--ease-rv),
+    border-color 80ms var(--ease-rv),
+    color 80ms var(--ease-rv),
+    border-bottom-width 80ms var(--ease-rv);
+}
+.keycap[data-down] {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+  border-color: var(--site-sun);
+  color: var(--site-sun);
+}
+@keyframes caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.caption-in {
+  animation: caption-in 240ms var(--ease-rv);
+}
+@media (hover: hover) {
+  .bento-card:not(:hover) :is(.abr-bar, .live-dot, .dvr-window, .ad-skip-step, .cast-wave) {
+    animation-play-state: paused;
+  }
+  .bento-card:not(:hover) .ad-skip-step:first-child {
+    animation: none;
+    opacity: 1;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .size-bar {
+      animation: size-grow linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 70%;
+    }
+  }
+}
+@keyframes size-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .abr-bar,
+  .live-dot,
+  .dvr-window,
+  .cast-wave,
+  .caption-in {
+    animation: none;
+  }
+  .ad-skip-step {
+    animation: none;
+  }
+  .ad-skip-step:first-child {
+    opacity: 1;
+  }
+  .lock-shackle,
+  .airplay-triangle,
+  .keycap {
+    transition: none;
+  }
+}
+
+.selection-bar {
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 12px;
+  transition:
+    opacity 280ms var(--ease-rv),
+    translate 280ms var(--ease-rv),
+    visibility 0s linear 280ms;
+}
+.selection-bar[data-open] {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity 160ms var(--ease-rv),
+    translate 220ms var(--ease-rv),
+    visibility 0s;
+}
+.playground-stage {
+  background-color: var(--site-sunken);
+  background-image: radial-gradient(var(--site-line-strong) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .selection-bar {
+    translate: none;
+  }
+}

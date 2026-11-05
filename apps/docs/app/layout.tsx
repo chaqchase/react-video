@@ -1,21 +1,44 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import "./global.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const sans = Geist({ subsets: ["latin"], variable: "--font-geist" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: { default: "React Video Kit", template: "%s | React Video Kit" },
-  description: "A composable, plugin-first React video player.",
+  description:
+    "A composable React video player. Everything is a plugin, from fullscreen to DRM, so you only ship what you use.",
+  openGraph: {
+    title: "React Video Kit",
+    description: "The React video player you compose. Everything is a plugin.",
+    images: ["/media/poster.jpg"],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0c0a15" },
+    { media: "(prefers-color-scheme: light)", color: "#fbf9f6" },
+  ],
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${mono.variable} font-sans`} suppressHydrationWarning>
+      <head>
+        {/*
+          Counts React commits for the render meter on the home page. React reports to
+          this hook in every build, where <Profiler> only works in development.
+        */}
+        <Script id="commit-counter" strategy="beforeInteractive">{`(function(){var w=window,h=w.__REACT_DEVTOOLS_GLOBAL_HOOK__;if(!h){h=w.__REACT_DEVTOOLS_GLOBAL_HOOK__={supportsFiber:true,isDisabled:false,renderers:new Map(),inject:function(){return 1},onCommitFiberRoot:function(){},onCommitFiberUnmount:function(){},onPostCommitFiberRoot:function(){},checkDCE:function(){}}}var o=h.onCommitFiberRoot;w.__rvkCommits=0;h.onCommitFiberRoot=function(){w.__rvkCommits++;return o&&o.apply(this,arguments)}})();`}</Script>
+      </head>
       <body className="flex min-h-screen flex-col">
-        <RootProvider>{children}</RootProvider>
+        <RootProvider theme={{ defaultTheme: "dark" }}>{children}</RootProvider>
       </body>
     </html>
   );

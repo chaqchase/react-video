@@ -55,15 +55,17 @@ const landscape = (index, [top, middle, low], sun) => {
   const upper = blend(top, middle, "min(ld(0)/0.34,1)");
   const sky = blend(upper, low, "max(min((ld(0)-0.30)/0.32,1),0)");
   const glow = `${sun}*(0.85*exp(-ld(2)/0.035)+0.5*exp(-ld(2)/0.003))`;
-  let value = `min(${sky}+${glow},255)`;
-  for (const [layer, { base, shape, color }] of RIDGES.entries()) {
+  // Each ridge blends over what's behind it across one pixel, which keeps its edge
+  // smooth when the picture is scaled up.
+  const layers = RIDGES.map(({ base, shape, color }, layer) => {
     // Nearer ridges catch less of the sun's haze than far ones.
     const haze = `${sun}*${0.16 - layer * 0.06}*exp(-pow((ld(1)-0.36)*2.2,2))`;
-    value = `if(gt(ld(0),${base}+${shape}),${color[index]}+${haze},${value})`;
-  }
+    const cover = `clip((ld(0)-(${base}+${shape}))*H,0,1)`;
+    return `st(3,ld(3)+(${color[index]}+${haze}-ld(3))*${cover});`;
+  }).join("");
   const sunX = `(0.36+0.012*sin(2*PI*T/${DURATION}))`;
   const sunY = `(0.47+0.010*cos(2*PI*T/${DURATION}))`;
-  return `st(0,Y/H);st(1,X/W);st(2,pow((ld(1)-${sunX})*1.78,2)+pow(ld(0)-${sunY},2));${value}`;
+  return `st(0,Y/H);st(1,X/W);st(2,pow((ld(1)-${sunX})*1.78,2)+pow(ld(0)-${sunY},2));st(3,min(${sky}+${glow},255));${layers}ld(3)`;
 };
 const scene = [
   `r='${landscape(0, [20, 88, 250], 255)}'`,
@@ -130,6 +132,23 @@ ffmpeg(
   "-f", "dash", "-seg_duration", String(SEGMENT), "-use_template", "1", "-use_timeline", "1",
   "-adaptation_sets", "id=0,streams=v id=1,streams=a",
   file("dash", "manifest.mpd")
+);
+
+// The same stream with subtitles the manifest delivers, for dash.js to list and fetch.
+const textSet = (language, label) => `<AdaptationSet contentType="text" mimeType="text/vtt" lang="${language}">
+			<Label>${label}</Label>
+			<Representation id="captions-${language}" bandwidth="256">
+				<BaseURL>../captions.${language}.vtt</BaseURL>
+			</Representation>
+		</AdaptationSet>`;
+writeFileSync(
+  file("dash", "subtitled.mpd"),
+  readFileSync(file("dash", "manifest.mpd"), "utf8").replace(
+    "</Period>",
+    `${textSet("en", "English")}
+		${textSet("ar", "العربية")}
+	</Period>`
+  )
 );
 
 const timestamp = (seconds) =>

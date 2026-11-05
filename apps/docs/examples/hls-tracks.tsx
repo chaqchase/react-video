@@ -7,5 +7,5 @@ import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
 const plugins = [hls({ preferEngine: true }), audioTracks(), ...defaultPlugins()];
 
 export default function HlsTracks() {
-  return <VideoPlayer src="/media/hls-tracks/master.m3u8" plugins={plugins} />;
+  return <VideoPlayer src="/media/hls-tracks/master.m3u8" plugins={plugins} load="visible" />;
 }

@@ -1,0 +1,86 @@
+---
+title: Next.js App Router
+description: Render the player from a Server Component, with its plugins created in a client file.
+---
+
+<Install />
+
+## Add the player
+
+Create the plugins in a file marked `"use client"`:
+
+```tsx title="components/player.tsx"
+"use client";
+
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = defaultPlugins();
+
+export function Player({ src, poster }: { src: string; poster?: string }) {
+  return <VideoPlayer src={src} poster={poster} plugins={plugins} />;
+}
+```
+
+Import the skin once, in the root layout:
+
+```tsx title="app/layout.tsx"
+import type { ReactNode } from "react";
+import "react-video-kit/styles.css";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+Then use it from any page. This one is a Server Component:
+
+```tsx title="app/page.tsx"
+import { Player } from "@/components/player";
+
+export default function Page() {
+  return <Player src="/video.mp4" poster="/poster.jpg" />;
+}
+```
+
+## Why plugins go in a client file
+
+Plugins hold functions, and most of them are client code. Call `defaultPlugins()` in a Server Component and the build stops with this error:
+
+```text
+Attempted to call gestures() from the server but gestures is on the client.
+```
+
+A plugin with no client code of its own, like `idle()`, gets a little further and then stops on a different one:
+
+```text
+Functions cannot be passed directly to Client Components
+```
+
+Plain data like `src` and `poster` crosses the boundary without trouble, so pass that down from the server, as above.
+
+With no plugins at all, there's nothing to move, and `VideoPlayer` works directly in a Server Component.
+
+## You don't need `next/dynamic`
+
+The player renders on the server, so the page's HTML already contains the video element, the poster, and the controls. Leave it out of `next/dynamic` and you keep that first paint.
+
+Loading the source starts after hydration. To wait until the player is on screen, pass `load="visible"`.
+
+## Use it with Tailwind 4
+
+Put the skin in your global stylesheet, after a line that declares the layer order. The skin lives in the `rv` layer, so placing `rv` before `utilities` lets a class like `rounded-none` override it. Without that line, the skin wins.
+
+```css title="app/globals.css"
+@layer theme, base, rv, components, utilities;
+
+@import "tailwindcss";
+@import "react-video-kit/styles.css";
+```
+
+Import `./globals.css` from your layout in place of `react-video-kit/styles.css`. [Theming](/docs/v4/theming) has the details.
+
+Last built against Next.js 16.4.5 with Turbopack, React 19.3.0, and Tailwind CSS 4.3.4, with Cache Components both on and off.

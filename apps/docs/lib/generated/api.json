@@ -1,0 +1,6274 @@
+{
+  "entries": {
+    "react-video-kit": [
+      "AirPlayIcon",
+      "AsChild",
+      "BufferingIndicator",
+      "BufferingIndicatorProps",
+      "Button",
+      "ButtonProps",
+      "CaptionsIcon",
+      "CastIcon",
+      "ControlGroup",
+      "ControlGroupProps",
+      "ControlRow",
+      "ControlRowProps",
+      "Controls",
+      "ControlsProps",
+      "CurrentTime",
+      "CurrentTimeProps",
+      "Duration",
+      "DurationProps",
+      "ErrorOverlay",
+      "ErrorOverlayProps",
+      "FullscreenEnterIcon",
+      "FullscreenExitIcon",
+      "IconProps",
+      "Media",
+      "MediaProps",
+      "Menu",
+      "MenuContent",
+      "MenuContentProps",
+      "MenuItem",
+      "MenuItemProps",
+      "MenuProps",
+      "MenuRadioGroup",
+      "MenuRadioGroupProps",
+      "MenuRadioItem",
+      "MenuRadioItemProps",
+      "MenuSub",
+      "MenuSubProps",
+      "MenuTrigger",
+      "MenuTriggerProps",
+      "Mute",
+      "MuteProps",
+      "NextIcon",
+      "PauseIcon",
+      "PipIcon",
+      "PlayIcon",
+      "PlayOverlay",
+      "PlayOverlayProps",
+      "PlayPause",
+      "PlayPauseProps",
+      "PlayerContext",
+      "PreviousIcon",
+      "RemainingTime",
+      "RemainingTimeProps",
+      "ReplayIcon",
+      "Root",
+      "RootProps",
+      "SettingsIcon",
+      "SettingsMenu",
+      "SettingsMenuProps",
+      "Slot",
+      "SpinnerIcon",
+      "Time",
+      "TimeProps",
+      "Timeline",
+      "TimelineBuffered",
+      "TimelineFill",
+      "TimelinePartProps",
+      "TimelinePreview",
+      "TimelinePreviewProps",
+      "TimelineProps",
+      "TimelineThumb",
+      "TimelineTrack",
+      "Volume",
+      "VolumeIcon",
+      "VolumeProps",
+      "VolumeSlider",
+      "VolumeSliderProps",
+      "mergeRefs",
+      "shallow",
+      "useClock",
+      "useCommands",
+      "useCurrentTime",
+      "useLabel",
+      "usePlayer",
+      "useTimelinePreview",
+      "useVideoState"
+    ],
+    "react-video-kit/primitives": [
+      "AsChild",
+      "BufferingIndicator",
+      "BufferingIndicatorProps",
+      "Button",
+      "ButtonProps",
+      "ControlGroup",
+      "ControlGroupProps",
+      "ControlRow",
+      "ControlRowProps",
+      "Controls",
+      "ControlsProps",
+      "CurrentTime",
+      "CurrentTimeProps",
+      "Duration",
+      "DurationProps",
+      "ErrorOverlay",
+      "ErrorOverlayProps",
+      "Media",
+      "MediaProps",
+      "Menu",
+      "MenuContent",
+      "MenuContentProps",
+      "MenuItem",
+      "MenuItemProps",
+      "MenuProps",
+      "MenuRadioGroup",
+      "MenuRadioGroupProps",
+      "MenuRadioItem",
+      "MenuRadioItemProps",
+      "MenuSub",
+      "MenuSubProps",
+      "MenuTrigger",
+      "MenuTriggerProps",
+      "Mute",
+      "MuteProps",
+      "PlayOverlay",
+      "PlayOverlayProps",
+      "PlayPause",
+      "PlayPauseProps",
+      "PlayerContext",
+      "RemainingTime",
+      "RemainingTimeProps",
+      "Root",
+      "RootProps",
+      "Slot",
+      "Timeline",
+      "TimelineBuffered",
+      "TimelineFill",
+      "TimelinePartProps",
+      "TimelinePreview",
+      "TimelinePreviewProps",
+      "TimelineProps",
+      "TimelineThumb",
+      "TimelineTrack",
+      "VolumeSlider",
+      "VolumeSliderProps",
+      "mergeRefs",
+      "shallow",
+      "useClock",
+      "useCommands",
+      "useCurrentTime",
+      "useLabel",
+      "usePlayer",
+      "useTimelinePreview",
+      "useVideoState"
+    ],
+    "react-video-kit/core": [
+      "AnyPlugin",
+      "AnyPluginFactory",
+      "Capabilities",
+      "Clock",
+      "CommandsOf",
+      "CoreCommands",
+      "Gate",
+      "Gates",
+      "LiveState",
+      "LoadRequest",
+      "LoadStrategy",
+      "Lock",
+      "LockableCommand",
+      "MediaErrorInfo",
+      "MediaState",
+      "MediaStatus",
+      "MediaTrackInfo",
+      "OwnedScope",
+      "Player",
+      "PlayerOptions",
+      "PlayerState",
+      "PluginContext",
+      "PluginFactory",
+      "PluginHandle",
+      "PluginInstance",
+      "PluginSpec",
+      "Provider",
+      "ProviderEntry",
+      "ProviderEnvironment",
+      "QualityLevel",
+      "Rendition",
+      "RenditionSet",
+      "Scope",
+      "Sink",
+      "SlotName",
+      "SourceInput",
+      "SourceObject",
+      "StateOf",
+      "Timeline",
+      "createClock",
+      "createPlayer",
+      "createScope",
+      "definePlugin",
+      "sourceKey",
+      "toLoadRequests"
+    ],
+    "react-video-kit/player": [
+      "VideoPlayer",
+      "VideoPlayerProps",
+      "defaultPlugins"
+    ],
+    "react-video-kit/compat": [
+      "useVideoContext"
+    ],
+    "react-video-kit/fullscreen": [
+      "Fullscreen",
+      "FullscreenOptions",
+      "FullscreenProps",
+      "fullscreen"
+    ],
+    "react-video-kit/pip": [
+      "Pip",
+      "PipProps",
+      "pip"
+    ],
+    "react-video-kit/idle": [
+      "IdleOptions",
+      "idle"
+    ],
+    "react-video-kit/gestures": [
+      "GesturesOptions",
+      "SeekFeedback",
+      "gestures"
+    ],
+    "react-video-kit/hotkeys": [
+      "HotkeysFeedback",
+      "HotkeysOptions",
+      "hotkeys"
+    ],
+    "react-video-kit/speed": [
+      "SpeedMenu",
+      "SpeedOptions",
+      "speed"
+    ],
+    "react-video-kit/quality": [
+      "QualityMenu",
+      "quality"
+    ],
+    "react-video-kit/audio-tracks": [
+      "AudioMenu",
+      "audioTracks"
+    ],
+    "react-video-kit/captions": [
+      "CaptionTrack",
+      "CaptionsDisplay",
+      "CaptionsMenu",
+      "CaptionsOptions",
+      "CaptionsToggle",
+      "CaptionsToggleProps",
+      "captions"
+    ],
+    "react-video-kit/thumbnails": [
+      "ThumbnailPreview",
+      "ThumbnailsOptions",
+      "thumbnails"
+    ],
+    "react-video-kit/chapters": [
+      "Chapter",
+      "ChapterGaps",
+      "ChapterTitle",
+      "ChaptersMenu",
+      "ChaptersOptions",
+      "chapters"
+    ],
+    "react-video-kit/persistence": [
+      "PersistenceOptions",
+      "persistence"
+    ],
+    "react-video-kit/media-session": [
+      "MediaSessionMetadata",
+      "MediaSessionOptions",
+      "mediaSession"
+    ],
+    "react-video-kit/i18n": [
+      "I18nOptions",
+      "Strings",
+      "i18n"
+    ],
+    "react-video-kit/autoplay": [
+      "AutoplayOptions",
+      "UnmuteChip",
+      "autoplay"
+    ],
+    "react-video-kit/recovery": [
+      "RecoveryOptions",
+      "recovery"
+    ],
+    "react-video-kit/analytics": [
+      "AnalyticsEvent",
+      "AnalyticsEventType",
+      "AnalyticsOptions",
+      "analytics"
+    ],
+    "react-video-kit/i18n/ar": [
+      "ar"
+    ],
+    "react-video-kit/i18n/es": [
+      "es"
+    ],
+    "react-video-kit/i18n/fr": [
+      "fr"
+    ],
+    "react-video-kit/hls": [
+      "HlsOptions",
+      "hls"
+    ],
+    "react-video-kit/dash": [
+      "DashOptions",
+      "dash"
+    ],
+    "react-video-kit/live": [
+      "LiveIndicator",
+      "LiveIndicatorProps",
+      "LiveOptions",
+      "live"
+    ],
+    "react-video-kit/playlist": [
+      "PlaylistButtonProps",
+      "PlaylistItem",
+      "PlaylistNext",
+      "PlaylistOptions",
+      "PlaylistPrevious",
+      "UpNext",
+      "playlist"
+    ],
+    "react-video-kit/airplay": [
+      "AirPlayButton",
+      "AirPlayButtonProps",
+      "airplay"
+    ],
+    "react-video-kit/chromecast": [
+      "CastButton",
+      "CastButtonProps",
+      "CastingOverlay",
+      "ChromecastOptions",
+      "chromecast"
+    ],
+    "react-video-kit/ads": [
+      "AdEngine",
+      "AdHost",
+      "AdInfo",
+      "AdOverlay",
+      "AdsOptions",
+      "ads"
+    ],
+    "react-video-kit/drm": [
+      "ClearKeyConfig",
+      "DrmConfig",
+      "DrmOptions",
+      "FairPlayConfig",
+      "KeySystemConfig",
+      "drm"
+    ],
+    "react-video-kit/ads/vast": [
+      "VastOptions",
+      "vast"
+    ],
+    "react-video-kit/ads/ima": [
+      "ImaOptions",
+      "ima"
+    ]
+  },
+  "symbols": {
+    "react-video-kit#RootProps": {
+      "entry": "react-video-kit",
+      "name": "RootProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "src",
+          "type": "SourceInput | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "plugins",
+          "type": "readonly AnyPlugin[] | undefined",
+          "optional": true,
+          "doc": "Set once. Define the array outside the component or memoize it."
+        },
+        {
+          "name": "load",
+          "type": "LoadStrategy | undefined",
+          "optional": true,
+          "doc": "When the provider and its engine load. Set once. Defaults to `eager`."
+        },
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "Bring your own player instead of creating one."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#Root": {
+      "entry": "react-video-kit",
+      "name": "Root",
+      "doc": "The player root with the default skin. Import `react-video-kit/styles.css` for it.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "src",
+          "type": "SourceInput | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "plugins",
+          "type": "readonly AnyPlugin[] | undefined",
+          "optional": true,
+          "doc": "Set once. Define the array outside the component or memoize it."
+        },
+        {
+          "name": "load",
+          "type": "LoadStrategy | undefined",
+          "optional": true,
+          "doc": "When the provider and its engine load. Set once. Defaults to `eager`."
+        },
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "Bring your own player instead of creating one."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#BufferingIndicator": {
+      "entry": "react-video-kit",
+      "name": "BufferingIndicator",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#Mute": {
+      "entry": "react-video-kit",
+      "name": "Mute",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#PlayOverlay": {
+      "entry": "react-video-kit",
+      "name": "PlayOverlay",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#PlayPause": {
+      "entry": "react-video-kit",
+      "name": "PlayPause",
+      "doc": "Icons stack in one grid cell, so the skin can cross-fade between states.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#SettingsMenu": {
+      "entry": "react-video-kit",
+      "name": "SettingsMenu",
+      "doc": "A menu of whatever plugins contribute to the `menu` slot. Hidden when empty.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#SettingsMenuProps": {
+      "entry": "react-video-kit",
+      "name": "SettingsMenuProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#Time": {
+      "entry": "react-video-kit",
+      "name": "Time",
+      "doc": "Current time and duration together.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#TimeProps": {
+      "entry": "react-video-kit",
+      "name": "TimeProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimeProps"
+    },
+    "react-video-kit#Volume": {
+      "entry": "react-video-kit",
+      "name": "Volume",
+      "doc": "Mute button and slider, with the slider opening as the pointer arrives.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#VolumeProps": {
+      "entry": "react-video-kit",
+      "name": "VolumeProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "VolumeProps"
+    },
+    "react-video-kit#PlayerContext": {
+      "entry": "react-video-kit",
+      "name": "PlayerContext",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#usePlayer": {
+      "entry": "react-video-kit",
+      "name": "usePlayer",
+      "doc": "",
+      "kind": "hook",
+      "signature": "() => Player"
+    },
+    "react-video-kit#shallow": {
+      "entry": "react-video-kit",
+      "name": "shallow",
+      "doc": "Compares one level deep, for selectors that build arrays or objects.",
+      "kind": "function",
+      "signature": "<Value>(a: Value, b: Value) => boolean"
+    },
+    "react-video-kit#useClock": {
+      "entry": "react-video-kit",
+      "name": "useClock",
+      "doc": "Runs `write` as playback advances, without rendering. Use this for anything that follows time: fills, thumbs, and text written straight to the DOM.",
+      "kind": "hook",
+      "signature": "(write: (time: number) => void, resolution: () => number) => void"
+    },
+    "react-video-kit#useCommands": {
+      "entry": "react-video-kit",
+      "name": "useCommands",
+      "doc": "Core commands, or a plugin's commands when given its factory.",
+      "kind": "hook",
+      "signature": "{ (): CoreCommands; <Factory extends AnyPluginFactory>(plugin: Factory): CommandsOf<Factory>; }"
+    },
+    "react-video-kit#useCurrentTime": {
+      "entry": "react-video-kit",
+      "name": "useCurrentTime",
+      "doc": "Time as React state, for text. Renders once per `resolution` seconds.",
+      "kind": "hook",
+      "signature": "(resolution?: number) => number"
+    },
+    "react-video-kit#useLabel": {
+      "entry": "react-video-kit",
+      "name": "useLabel",
+      "doc": "A localized string from the i18n plugin when it's installed, else `fallback`.",
+      "kind": "hook",
+      "signature": "(key: string, fallback: string) => string"
+    },
+    "react-video-kit#useVideoState": {
+      "entry": "react-video-kit",
+      "name": "useVideoState",
+      "doc": "Subscribes to a plugin's state, typed from the plugin factory. Subscribes to kernel media state, re-rendering only when the result changes.",
+      "kind": "hook",
+      "signature": "{ <Factory extends AnyPluginFactory, Value>(plugin: Factory, select: (state: StateOf<Factory>, media: MediaState) => Value, isEqual?: Equality<Value>): Value; <Value>(select: (media: MediaState) => Value, isEqual?: Equality<Value>): Value; }"
+    },
+    "react-video-kit#Media": {
+      "entry": "react-video-kit",
+      "name": "Media",
+      "doc": "The media element. The active provider owns its source, so this renders no `src` or `<source>` children. Pass `<track>` elements as children.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#MediaProps": {
+      "entry": "react-video-kit",
+      "name": "MediaProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "MediaProps"
+    },
+    "react-video-kit#AsChild": {
+      "entry": "react-video-kit",
+      "name": "AsChild",
+      "doc": "Renders the single child with a part's behaviour, instead of the part's element.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#mergeRefs": {
+      "entry": "react-video-kit",
+      "name": "mergeRefs",
+      "doc": "Forwards a node to several refs.",
+      "kind": "function",
+      "signature": "<Value>(...refs: (Ref<Value> | undefined)[]) => (node: Value | null) => void"
+    },
+    "react-video-kit#BufferingIndicatorProps": {
+      "entry": "react-video-kit",
+      "name": "BufferingIndicatorProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "BufferingIndicatorProps"
+    },
+    "react-video-kit#Button": {
+      "entry": "react-video-kit",
+      "name": "Button",
+      "doc": "A control button. `data-control` is what the skin styles.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#ButtonProps": {
+      "entry": "react-video-kit",
+      "name": "ButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#ControlGroup": {
+      "entry": "react-video-kit",
+      "name": "ControlGroup",
+      "doc": "A pill of related controls.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#ControlGroupProps": {
+      "entry": "react-video-kit",
+      "name": "ControlGroupProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "ControlGroupProps"
+    },
+    "react-video-kit#ControlRow": {
+      "entry": "react-video-kit",
+      "name": "ControlRow",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#ControlRowProps": {
+      "entry": "react-video-kit",
+      "name": "ControlRowProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "ControlRowProps"
+    },
+    "react-video-kit#Controls": {
+      "entry": "react-video-kit",
+      "name": "Controls",
+      "doc": "Holds the controls. Stays mounted while hidden, so Tab can reveal it.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#ControlsProps": {
+      "entry": "react-video-kit",
+      "name": "ControlsProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "ControlsProps"
+    },
+    "react-video-kit#CurrentTime": {
+      "entry": "react-video-kit",
+      "name": "CurrentTime",
+      "doc": "Current position. Writes to the DOM directly, so playback causes no renders.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#CurrentTimeProps": {
+      "entry": "react-video-kit",
+      "name": "CurrentTimeProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimeProps"
+    },
+    "react-video-kit#Duration": {
+      "entry": "react-video-kit",
+      "name": "Duration",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#DurationProps": {
+      "entry": "react-video-kit",
+      "name": "DurationProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimeProps"
+    },
+    "react-video-kit#ErrorOverlay": {
+      "entry": "react-video-kit",
+      "name": "ErrorOverlay",
+      "doc": "Explains a fatal error and offers a retry, in place of an endless spinner.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the default message, with access to the error."
+        }
+      ]
+    },
+    "react-video-kit#ErrorOverlayProps": {
+      "entry": "react-video-kit",
+      "name": "ErrorOverlayProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the default message, with access to the error."
+        }
+      ]
+    },
+    "react-video-kit#Menu": {
+      "entry": "react-video-kit",
+      "name": "Menu",
+      "doc": "A menu that renders inside the player, so it keeps working in fullscreen. Submenus drill down in place rather than opening beside it.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onOpenChange",
+          "type": "((open: boolean) => void) | undefined",
+          "optional": true,
+          "doc": "Called as the menu opens and closes."
+        }
+      ]
+    },
+    "react-video-kit#MenuProps": {
+      "entry": "react-video-kit",
+      "name": "MenuProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onOpenChange",
+          "type": "((open: boolean) => void) | undefined",
+          "optional": true,
+          "doc": "Called as the menu opens and closes."
+        }
+      ]
+    },
+    "react-video-kit#MenuContent": {
+      "entry": "react-video-kit",
+      "name": "MenuContent",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuContentProps": {
+      "entry": "react-video-kit",
+      "name": "MenuContentProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuItem": {
+      "entry": "react-video-kit",
+      "name": "MenuItem",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onSelect",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "doc": "Runs when chosen. The menu closes afterwards unless `keepOpen` is set."
+        },
+        {
+          "name": "keepOpen",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuItemProps": {
+      "entry": "react-video-kit",
+      "name": "MenuItemProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onSelect",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "doc": "Runs when chosen. The menu closes afterwards unless `keepOpen` is set."
+        },
+        {
+          "name": "keepOpen",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuRadioGroup": {
+      "entry": "react-video-kit",
+      "name": "MenuRadioGroup",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "value",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string) => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuRadioGroupProps": {
+      "entry": "react-video-kit",
+      "name": "MenuRadioGroupProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "value",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string) => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuRadioItem": {
+      "entry": "react-video-kit",
+      "name": "MenuRadioItem",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "value",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuRadioItemProps": {
+      "entry": "react-video-kit",
+      "name": "MenuRadioItemProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "value",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#MenuSub": {
+      "entry": "react-video-kit",
+      "name": "MenuSub",
+      "doc": "A row that drills down to a panel of its own.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": "The row's name, which also titles the submenu."
+        },
+        {
+          "name": "value",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The current value, shown at the end of the row."
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown before the title."
+        },
+        {
+          "name": "backLabel",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Labels the back button."
+        }
+      ]
+    },
+    "react-video-kit#MenuSubProps": {
+      "entry": "react-video-kit",
+      "name": "MenuSubProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": "The row's name, which also titles the submenu."
+        },
+        {
+          "name": "value",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The current value, shown at the end of the row."
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown before the title."
+        },
+        {
+          "name": "backLabel",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Labels the back button."
+        }
+      ]
+    },
+    "react-video-kit#MenuTrigger": {
+      "entry": "react-video-kit",
+      "name": "MenuTrigger",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#MenuTriggerProps": {
+      "entry": "react-video-kit",
+      "name": "MenuTriggerProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#MuteProps": {
+      "entry": "react-video-kit",
+      "name": "MuteProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#PlayOverlayProps": {
+      "entry": "react-video-kit",
+      "name": "PlayOverlayProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#PlayPauseProps": {
+      "entry": "react-video-kit",
+      "name": "PlayPauseProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit#RemainingTime": {
+      "entry": "react-video-kit",
+      "name": "RemainingTime",
+      "doc": "Time left, written to the DOM directly like `CurrentTime`.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#RemainingTimeProps": {
+      "entry": "react-video-kit",
+      "name": "RemainingTimeProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimeProps"
+    },
+    "react-video-kit#Timeline": {
+      "entry": "react-video-kit",
+      "name": "Timeline",
+      "doc": "The seek bar. A real range input provides focus, keyboard, and screen reader support, while the visible track takes pointer input over a larger hit area.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the arrow keys."
+        },
+        {
+          "name": "largeStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by Page Up and Page Down."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#TimelineProps": {
+      "entry": "react-video-kit",
+      "name": "TimelineProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the arrow keys."
+        },
+        {
+          "name": "largeStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by Page Up and Page Down."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#TimelineBuffered": {
+      "entry": "react-video-kit",
+      "name": "TimelineBuffered",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#TimelinePartProps": {
+      "entry": "react-video-kit",
+      "name": "TimelinePartProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimelinePartProps"
+    },
+    "react-video-kit#useTimelinePreview": {
+      "entry": "react-video-kit",
+      "name": "useTimelinePreview",
+      "doc": "Calls `listener` with the time under the pointer, or null when there is none.",
+      "kind": "hook",
+      "signature": "(listener: PreviewListener) => void"
+    },
+    "react-video-kit#TimelineFill": {
+      "entry": "react-video-kit",
+      "name": "TimelineFill",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#TimelinePreview": {
+      "entry": "react-video-kit",
+      "name": "TimelinePreview",
+      "doc": "Follows the pointer with the time under it, staying inside the track.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown above the time, such as a thumbnail."
+        }
+      ]
+    },
+    "react-video-kit#TimelinePreviewProps": {
+      "entry": "react-video-kit",
+      "name": "TimelinePreviewProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown above the time, such as a thumbnail."
+        }
+      ]
+    },
+    "react-video-kit#TimelineThumb": {
+      "entry": "react-video-kit",
+      "name": "TimelineThumb",
+      "doc": "The rail spans the track and moves as a whole, so percentages need no measuring.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#TimelineTrack": {
+      "entry": "react-video-kit",
+      "name": "TimelineTrack",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#VolumeSlider": {
+      "entry": "react-video-kit",
+      "name": "VolumeSlider",
+      "doc": "Renders nothing where the platform owns volume, such as iOS.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Change per arrow key press, from 0 to 1."
+        }
+      ]
+    },
+    "react-video-kit#VolumeSliderProps": {
+      "entry": "react-video-kit",
+      "name": "VolumeSliderProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Change per arrow key press, from 0 to 1."
+        }
+      ]
+    },
+    "react-video-kit#Slot": {
+      "entry": "react-video-kit",
+      "name": "Slot",
+      "doc": "Renders what plugins contributed to `name`, in plugin order.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "name",
+          "type": "SlotName",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit#PlayIcon": {
+      "entry": "react-video-kit",
+      "name": "PlayIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#PauseIcon": {
+      "entry": "react-video-kit",
+      "name": "PauseIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#ReplayIcon": {
+      "entry": "react-video-kit",
+      "name": "ReplayIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#VolumeIcon": {
+      "entry": "react-video-kit",
+      "name": "VolumeIcon",
+      "doc": "Each sound wave has a `data-wave`, so the skin can animate the volume level.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#FullscreenEnterIcon": {
+      "entry": "react-video-kit",
+      "name": "FullscreenEnterIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#FullscreenExitIcon": {
+      "entry": "react-video-kit",
+      "name": "FullscreenExitIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#PipIcon": {
+      "entry": "react-video-kit",
+      "name": "PipIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#SettingsIcon": {
+      "entry": "react-video-kit",
+      "name": "SettingsIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#SpinnerIcon": {
+      "entry": "react-video-kit",
+      "name": "SpinnerIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#CaptionsIcon": {
+      "entry": "react-video-kit",
+      "name": "CaptionsIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#NextIcon": {
+      "entry": "react-video-kit",
+      "name": "NextIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#PreviousIcon": {
+      "entry": "react-video-kit",
+      "name": "PreviousIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#AirPlayIcon": {
+      "entry": "react-video-kit",
+      "name": "AirPlayIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#CastIcon": {
+      "entry": "react-video-kit",
+      "name": "CastIcon",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit#IconProps": {
+      "entry": "react-video-kit",
+      "name": "IconProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "IconProps"
+    },
+    "react-video-kit/primitives#PlayerContext": {
+      "entry": "react-video-kit/primitives",
+      "name": "PlayerContext",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#usePlayer": {
+      "entry": "react-video-kit/primitives",
+      "name": "usePlayer",
+      "doc": "",
+      "kind": "hook",
+      "signature": "() => Player"
+    },
+    "react-video-kit/primitives#shallow": {
+      "entry": "react-video-kit/primitives",
+      "name": "shallow",
+      "doc": "Compares one level deep, for selectors that build arrays or objects.",
+      "kind": "function",
+      "signature": "<Value>(a: Value, b: Value) => boolean"
+    },
+    "react-video-kit/primitives#useClock": {
+      "entry": "react-video-kit/primitives",
+      "name": "useClock",
+      "doc": "Runs `write` as playback advances, without rendering. Use this for anything that follows time: fills, thumbs, and text written straight to the DOM.",
+      "kind": "hook",
+      "signature": "(write: (time: number) => void, resolution: () => number) => void"
+    },
+    "react-video-kit/primitives#useCommands": {
+      "entry": "react-video-kit/primitives",
+      "name": "useCommands",
+      "doc": "Core commands, or a plugin's commands when given its factory.",
+      "kind": "hook",
+      "signature": "{ (): CoreCommands; <Factory extends AnyPluginFactory>(plugin: Factory): CommandsOf<Factory>; }"
+    },
+    "react-video-kit/primitives#useCurrentTime": {
+      "entry": "react-video-kit/primitives",
+      "name": "useCurrentTime",
+      "doc": "Time as React state, for text. Renders once per `resolution` seconds.",
+      "kind": "hook",
+      "signature": "(resolution?: number) => number"
+    },
+    "react-video-kit/primitives#useLabel": {
+      "entry": "react-video-kit/primitives",
+      "name": "useLabel",
+      "doc": "A localized string from the i18n plugin when it's installed, else `fallback`.",
+      "kind": "hook",
+      "signature": "(key: string, fallback: string) => string"
+    },
+    "react-video-kit/primitives#useVideoState": {
+      "entry": "react-video-kit/primitives",
+      "name": "useVideoState",
+      "doc": "Subscribes to a plugin's state, typed from the plugin factory. Subscribes to kernel media state, re-rendering only when the result changes.",
+      "kind": "hook",
+      "signature": "{ <Factory extends AnyPluginFactory, Value>(plugin: Factory, select: (state: StateOf<Factory>, media: MediaState) => Value, isEqual?: Equality<Value>): Value; <Value>(select: (media: MediaState) => Value, isEqual?: Equality<Value>): Value; }"
+    },
+    "react-video-kit/primitives#Media": {
+      "entry": "react-video-kit/primitives",
+      "name": "Media",
+      "doc": "The media element. The active provider owns its source, so this renders no `src` or `<source>` children. Pass `<track>` elements as children.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#MediaProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MediaProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "MediaProps"
+    },
+    "react-video-kit/primitives#AsChild": {
+      "entry": "react-video-kit/primitives",
+      "name": "AsChild",
+      "doc": "Renders the single child with a part's behaviour, instead of the part's element.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#mergeRefs": {
+      "entry": "react-video-kit/primitives",
+      "name": "mergeRefs",
+      "doc": "Forwards a node to several refs.",
+      "kind": "function",
+      "signature": "<Value>(...refs: (Ref<Value> | undefined)[]) => (node: Value | null) => void"
+    },
+    "react-video-kit/primitives#BufferingIndicator": {
+      "entry": "react-video-kit/primitives",
+      "name": "BufferingIndicator",
+      "doc": "Sets `data-visible` while stalled. It writes to the DOM directly, with no renders.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#BufferingIndicatorProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "BufferingIndicatorProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "BufferingIndicatorProps"
+    },
+    "react-video-kit/primitives#Button": {
+      "entry": "react-video-kit/primitives",
+      "name": "Button",
+      "doc": "A control button. `data-control` is what the skin styles.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#ButtonProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "ButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#ControlGroup": {
+      "entry": "react-video-kit/primitives",
+      "name": "ControlGroup",
+      "doc": "A pill of related controls.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#ControlGroupProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "ControlGroupProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "ControlGroupProps"
+    },
+    "react-video-kit/primitives#ControlRow": {
+      "entry": "react-video-kit/primitives",
+      "name": "ControlRow",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#ControlRowProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "ControlRowProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "ControlRowProps"
+    },
+    "react-video-kit/primitives#Controls": {
+      "entry": "react-video-kit/primitives",
+      "name": "Controls",
+      "doc": "Holds the controls. Stays mounted while hidden, so Tab can reveal it.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#ControlsProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "ControlsProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "ControlsProps"
+    },
+    "react-video-kit/primitives#CurrentTime": {
+      "entry": "react-video-kit/primitives",
+      "name": "CurrentTime",
+      "doc": "Current position. Writes to the DOM directly, so playback causes no renders.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#CurrentTimeProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "CurrentTimeProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimeProps"
+    },
+    "react-video-kit/primitives#Duration": {
+      "entry": "react-video-kit/primitives",
+      "name": "Duration",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#DurationProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "DurationProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimeProps"
+    },
+    "react-video-kit/primitives#ErrorOverlay": {
+      "entry": "react-video-kit/primitives",
+      "name": "ErrorOverlay",
+      "doc": "Explains a fatal error and offers a retry, in place of an endless spinner.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the default message, with access to the error."
+        }
+      ]
+    },
+    "react-video-kit/primitives#ErrorOverlayProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "ErrorOverlayProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Replaces the default message, with access to the error."
+        }
+      ]
+    },
+    "react-video-kit/primitives#Menu": {
+      "entry": "react-video-kit/primitives",
+      "name": "Menu",
+      "doc": "A menu that renders inside the player, so it keeps working in fullscreen. Submenus drill down in place rather than opening beside it.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onOpenChange",
+          "type": "((open: boolean) => void) | undefined",
+          "optional": true,
+          "doc": "Called as the menu opens and closes."
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onOpenChange",
+          "type": "((open: boolean) => void) | undefined",
+          "optional": true,
+          "doc": "Called as the menu opens and closes."
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuContent": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuContent",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuContentProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuContentProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuItem": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuItem",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onSelect",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "doc": "Runs when chosen. The menu closes afterwards unless `keepOpen` is set."
+        },
+        {
+          "name": "keepOpen",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuItemProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuItemProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "onSelect",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "doc": "Runs when chosen. The menu closes afterwards unless `keepOpen` is set."
+        },
+        {
+          "name": "keepOpen",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuRadioGroup": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuRadioGroup",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "value",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string) => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuRadioGroupProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuRadioGroupProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "value",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string) => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuRadioItem": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuRadioItem",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "value",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuRadioItemProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuRadioItemProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "value",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuSub": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuSub",
+      "doc": "A row that drills down to a panel of its own.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": "The row's name, which also titles the submenu."
+        },
+        {
+          "name": "value",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The current value, shown at the end of the row."
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown before the title."
+        },
+        {
+          "name": "backLabel",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Labels the back button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuSubProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuSubProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": "The row's name, which also titles the submenu."
+        },
+        {
+          "name": "value",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The current value, shown at the end of the row."
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown before the title."
+        },
+        {
+          "name": "backLabel",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Labels the back button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuTrigger": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuTrigger",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#MenuTriggerProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MenuTriggerProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#Mute": {
+      "entry": "react-video-kit/primitives",
+      "name": "Mute",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#MuteProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "MuteProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#PlayOverlay": {
+      "entry": "react-video-kit/primitives",
+      "name": "PlayOverlay",
+      "doc": "The large button over the video, shown before playback starts and after it ends.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#PlayOverlayProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "PlayOverlayProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#PlayPause": {
+      "entry": "react-video-kit/primitives",
+      "name": "PlayPause",
+      "doc": "",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#PlayPauseProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "PlayPauseProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/primitives#RemainingTime": {
+      "entry": "react-video-kit/primitives",
+      "name": "RemainingTime",
+      "doc": "Time left, written to the DOM directly like `CurrentTime`.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#RemainingTimeProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "RemainingTimeProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimeProps"
+    },
+    "react-video-kit/primitives#Timeline": {
+      "entry": "react-video-kit/primitives",
+      "name": "Timeline",
+      "doc": "The seek bar. A real range input provides focus, keyboard, and screen reader support, while the visible track takes pointer input over a larger hit area.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the arrow keys."
+        },
+        {
+          "name": "largeStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by Page Up and Page Down."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#TimelineProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelineProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the arrow keys."
+        },
+        {
+          "name": "largeStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by Page Up and Page Down."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#TimelineBuffered": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelineBuffered",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#TimelinePartProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelinePartProps",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "TimelinePartProps"
+    },
+    "react-video-kit/primitives#useTimelinePreview": {
+      "entry": "react-video-kit/primitives",
+      "name": "useTimelinePreview",
+      "doc": "Calls `listener` with the time under the pointer, or null when there is none.",
+      "kind": "hook",
+      "signature": "(listener: PreviewListener) => void"
+    },
+    "react-video-kit/primitives#TimelineFill": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelineFill",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#TimelinePreview": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelinePreview",
+      "doc": "Follows the pointer with the time under it, staying inside the track.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown above the time, such as a thumbnail."
+        }
+      ]
+    },
+    "react-video-kit/primitives#TimelinePreviewProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelinePreviewProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown above the time, such as a thumbnail."
+        }
+      ]
+    },
+    "react-video-kit/primitives#TimelineThumb": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelineThumb",
+      "doc": "The rail spans the track and moves as a whole, so percentages need no measuring.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#TimelineTrack": {
+      "entry": "react-video-kit/primitives",
+      "name": "TimelineTrack",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/primitives#VolumeSlider": {
+      "entry": "react-video-kit/primitives",
+      "name": "VolumeSlider",
+      "doc": "Renders nothing where the platform owns volume, such as iOS.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Change per arrow key press, from 0 to 1."
+        }
+      ]
+    },
+    "react-video-kit/primitives#VolumeSliderProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "VolumeSliderProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Change per arrow key press, from 0 to 1."
+        }
+      ]
+    },
+    "react-video-kit/primitives#Root": {
+      "entry": "react-video-kit/primitives",
+      "name": "Root",
+      "doc": "Provides the player to its parts. Never re-renders because of playback.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "src",
+          "type": "SourceInput | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "plugins",
+          "type": "readonly AnyPlugin[] | undefined",
+          "optional": true,
+          "doc": "Set once. Define the array outside the component or memoize it."
+        },
+        {
+          "name": "load",
+          "type": "LoadStrategy | undefined",
+          "optional": true,
+          "doc": "When the provider and its engine load. Set once. Defaults to `eager`."
+        },
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "Bring your own player instead of creating one."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#RootProps": {
+      "entry": "react-video-kit/primitives",
+      "name": "RootProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "src",
+          "type": "SourceInput | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "plugins",
+          "type": "readonly AnyPlugin[] | undefined",
+          "optional": true,
+          "doc": "Set once. Define the array outside the component or memoize it."
+        },
+        {
+          "name": "load",
+          "type": "LoadStrategy | undefined",
+          "optional": true,
+          "doc": "When the provider and its engine load. Set once. Defaults to `eager`."
+        },
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "Bring your own player instead of creating one."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/primitives#Slot": {
+      "entry": "react-video-kit/primitives",
+      "name": "Slot",
+      "doc": "Renders what plugins contributed to `name`, in plugin order.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "name",
+          "type": "SlotName",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#createClock": {
+      "entry": "react-video-kit/core",
+      "name": "createClock",
+      "doc": "One shared loop for all time-driven writes. Each binding declares how far time must move before a write is visible, so a long video on a short track wakes rarely, and a paused player does no work at all.",
+      "kind": "function",
+      "signature": "() => OwnedClock"
+    },
+    "react-video-kit/core#Clock": {
+      "entry": "react-video-kit/core",
+      "name": "Clock",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "time",
+          "type": "() => number",
+          "optional": false,
+          "doc": "Current playback position from the active provider. Doesn't allocate."
+        },
+        {
+          "name": "bind",
+          "type": "(write: (time: number, jumped: boolean) => void, resolution: () => number) => () => void",
+          "optional": false,
+          "doc": "Calls `write` with the time whenever it has moved by at least `resolution()` seconds, plus once immediately and after every discontinuity, which `jumped` marks. Returns unbind."
+        },
+        {
+          "name": "sync",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Writes every binding now, for seeks, source changes, and provider swaps."
+        }
+      ]
+    },
+    "react-video-kit/core#definePlugin": {
+      "entry": "react-video-kit/core",
+      "name": "definePlugin",
+      "doc": "Declares a plugin. Calling the result creates an instance for `plugins`, and the factory itself is the typed key for `useVideoState` and `useCommands`. `create` runs once for each player, so it can hold that player's private state.",
+      "kind": "function",
+      "signature": "<Name extends string, Options extends unknown[], State extends object = Record<never, never>, Commands extends object = Record<never, never>>(name: Name, create: (...options: Options) => PluginSpec<State, Commands>) => PluginFactory<Name, Options, State, Commands>"
+    },
+    "react-video-kit/core#createPlayer": {
+      "entry": "react-video-kit/core",
+      "name": "createPlayer",
+      "doc": "Builds a player. Pure: it touches no DOM until `mount` and `attach`.",
+      "kind": "function",
+      "signature": "(options?: PlayerOptions) => Player"
+    },
+    "react-video-kit/core#createScope": {
+      "entry": "react-video-kit/core",
+      "name": "createScope",
+      "doc": "Ownership for everything a lifecycle hook starts. Cleanups run in reverse order.",
+      "kind": "function",
+      "signature": "() => OwnedScope"
+    },
+    "react-video-kit/core#OwnedScope": {
+      "entry": "react-video-kit/core",
+      "name": "OwnedScope",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "dispose",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "signal",
+          "type": "AbortSignal",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "on",
+          "type": "<Listener extends EventListenerOrEventListenerObject>(target: EventTarget, type: string, listener: Listener, options?: AddEventListenerOptions) => void",
+          "optional": false,
+          "doc": "Adds an event listener that is removed when the scope ends."
+        },
+        {
+          "name": "add",
+          "type": "(cleanup: () => void) => void",
+          "optional": false,
+          "doc": "Runs `cleanup` when the scope ends, or immediately if it already has."
+        }
+      ]
+    },
+    "react-video-kit/core#Scope": {
+      "entry": "react-video-kit/core",
+      "name": "Scope",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "signal",
+          "type": "AbortSignal",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "on",
+          "type": "<Listener extends EventListenerOrEventListenerObject>(target: EventTarget, type: string, listener: Listener, options?: AddEventListenerOptions) => void",
+          "optional": false,
+          "doc": "Adds an event listener that is removed when the scope ends."
+        },
+        {
+          "name": "add",
+          "type": "(cleanup: () => void) => void",
+          "optional": false,
+          "doc": "Runs `cleanup` when the scope ends, or immediately if it already has."
+        }
+      ]
+    },
+    "react-video-kit/core#sourceKey": {
+      "entry": "react-video-kit/core",
+      "name": "sourceKey",
+      "doc": "A stable identity for `src`, so re-rendering with equal values doesn't reload.",
+      "kind": "function",
+      "signature": "(input: SourceInput | null | undefined) => string"
+    },
+    "react-video-kit/core#toLoadRequests": {
+      "entry": "react-video-kit/core",
+      "name": "toLoadRequests",
+      "doc": "Expands any accepted `src` shape into the requests to try, in order.",
+      "kind": "function",
+      "signature": "(input: SourceInput | null | undefined) => LoadRequest[]"
+    },
+    "react-video-kit/core#AnyPlugin": {
+      "entry": "react-video-kit/core",
+      "name": "AnyPlugin",
+      "kind": "type",
+      "doc": "A plugin instance with its types erased, as `plugins` accepts them.",
+      "members": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "create",
+          "type": "() => PluginSpec<object, object>",
+          "optional": false,
+          "doc": "Builds the spec. Each player calls this, so an instance can be shared safely."
+        }
+      ]
+    },
+    "react-video-kit/core#AnyPluginFactory": {
+      "entry": "react-video-kit/core",
+      "name": "AnyPluginFactory",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "pluginName",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#Capabilities": {
+      "entry": "react-video-kit/core",
+      "name": "Capabilities",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "seek",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "rate",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "volume",
+          "type": "boolean",
+          "optional": false,
+          "doc": "False where the platform owns volume, such as iOS."
+        }
+      ]
+    },
+    "react-video-kit/core#CommandsOf": {
+      "entry": "react-video-kit/core",
+      "name": "CommandsOf",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "CommandsOf<Factory>"
+    },
+    "react-video-kit/core#CoreCommands": {
+      "entry": "react-video-kit/core",
+      "name": "CoreCommands",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "play",
+          "type": "() => Promise<boolean>",
+          "optional": false,
+          "doc": "Resolves to whether playback started. Never rejects."
+        },
+        {
+          "name": "pause",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "seek",
+          "type": "(time: number) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "scrub",
+          "type": "(active: boolean) => void",
+          "optional": false,
+          "doc": "Holds playback while the viewer drags the timeline, then restores it."
+        },
+        {
+          "name": "setVolume",
+          "type": "(volume: number) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setMuted",
+          "type": "(muted: boolean) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setRate",
+          "type": "(rate: number) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setQuality",
+          "type": "(id: string | \"auto\") => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setAudioTrack",
+          "type": "(id: string) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setTextTrack",
+          "type": "(id: string | null) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setSource",
+          "type": "(source: SourceInput | null) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "reload",
+          "type": "(startTime?: number) => void",
+          "optional": false,
+          "doc": "Loads the current source again, optionally resuming from `startTime`. After a failure it picks up where that interrupted, and plays if the viewer was watching."
+        }
+      ]
+    },
+    "react-video-kit/core#Gate": {
+      "entry": "react-video-kit/core",
+      "name": "Gate",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "(request: Request, next: (request: Request) => void | Promise<void>, context: PluginContext<State>) => void | Promise<void>"
+    },
+    "react-video-kit/core#Gates": {
+      "entry": "react-video-kit/core",
+      "name": "Gates",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "load",
+          "type": "((request: LoadRequest, next: (request: LoadRequest) => void | Promise<void>, context: PluginContext<State>) => void | Promise<void>) | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "play",
+          "type": "((request: void, next: (request: void) => void | Promise<void>, context: PluginContext<State>) => void | Promise<void>) | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "seek",
+          "type": "((request: number, next: (request: number) => void | Promise<void>, context: PluginContext<State>) => void | Promise<void>) | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#LiveState": {
+      "entry": "react-video-kit/core",
+      "name": "LiveState",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "dvr",
+          "type": "boolean",
+          "optional": false,
+          "doc": "Whether the viewer can seek back through a window."
+        },
+        {
+          "name": "start",
+          "type": "number",
+          "optional": false,
+          "doc": "Earliest seekable position."
+        },
+        {
+          "name": "edge",
+          "type": "number",
+          "optional": false,
+          "doc": "Live edge."
+        },
+        {
+          "name": "latency",
+          "type": "number",
+          "optional": false,
+          "doc": "Distance the engine aims to keep from the edge, in seconds."
+        }
+      ]
+    },
+    "react-video-kit/core#LoadRequest": {
+      "entry": "react-video-kit/core",
+      "name": "LoadRequest",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "source",
+          "type": "SourceObject",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "renditions",
+          "type": "readonly Rendition[] | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "initialRendition",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "startTime",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Position to resume from, in seconds."
+        },
+        {
+          "name": "drm",
+          "type": "unknown",
+          "optional": true,
+          "doc": "Set by the DRM plugin's load gate. Providers translate it for their engine."
+        }
+      ]
+    },
+    "react-video-kit/core#LoadStrategy": {
+      "entry": "react-video-kit/core",
+      "name": "LoadStrategy",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "LoadStrategy"
+    },
+    "react-video-kit/core#Lock": {
+      "entry": "react-video-kit/core",
+      "name": "Lock",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "commands",
+          "type": "readonly LockableCommand[]",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#LockableCommand": {
+      "entry": "react-video-kit/core",
+      "name": "LockableCommand",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "LockableCommand"
+    },
+    "react-video-kit/core#MediaErrorInfo": {
+      "entry": "react-video-kit/core",
+      "name": "MediaErrorInfo",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "code",
+          "type": "string | number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "fatal",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "source",
+          "type": "SourceObject | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#MediaState": {
+      "entry": "react-video-kit/core",
+      "name": "MediaState",
+      "kind": "type",
+      "doc": "Everything the kernel knows about playback. Time is on the clock, not here.",
+      "members": [
+        {
+          "name": "status",
+          "type": "MediaStatus",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "source",
+          "type": "SourceObject | null",
+          "optional": false,
+          "doc": "The source that was asked for. Switching rendition doesn't change it."
+        },
+        {
+          "name": "provider",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "paused",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "ended",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "waiting",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "seeking",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "scrubbing",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True while the viewer drags the timeline. `paused` keeps their intent meanwhile."
+        },
+        {
+          "name": "started",
+          "type": "boolean",
+          "optional": false,
+          "doc": "True once playback has begun for the current source."
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "buffered",
+          "type": "readonly (readonly [number, number])[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "volume",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "muted",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "rate",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "qualities",
+          "type": "readonly QualityLevel[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "quality",
+          "type": "{ mode: \"auto\" | \"manual\"; active: string | null; canAuto?: boolean; }",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "audioTracks",
+          "type": "readonly MediaTrackInfo[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "audioTrack",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "textTracks",
+          "type": "readonly MediaTrackInfo[]",
+          "optional": false,
+          "doc": "Text tracks as an engine names them, for those it adds to the video, whose own `label` it can't set. Empty when the video's list says all there is to know."
+        },
+        {
+          "name": "live",
+          "type": "LiveState | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "timeline",
+          "type": "Timeline",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "capabilities",
+          "type": "Capabilities",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "locks",
+          "type": "readonly Lock[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "error",
+          "type": "MediaErrorInfo | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "playRejected",
+          "type": "string | null",
+          "optional": false,
+          "doc": "Set when the browser refused to start playback, usually autoplay policy."
+        }
+      ]
+    },
+    "react-video-kit/core#MediaStatus": {
+      "entry": "react-video-kit/core",
+      "name": "MediaStatus",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "MediaStatus"
+    },
+    "react-video-kit/core#MediaTrackInfo": {
+      "entry": "react-video-kit/core",
+      "name": "MediaTrackInfo",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "language",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "kind",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#Player": {
+      "entry": "react-video-kit/core",
+      "name": "Player",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "commands",
+          "type": "CoreCommands",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "clock",
+          "type": "Clock",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "getState",
+          "type": "() => PlayerState",
+          "optional": false,
+          "doc": "Current state of the whole player."
+        },
+        {
+          "name": "getInitialState",
+          "type": "() => PlayerState",
+          "optional": false,
+          "doc": "State to render on the server and during hydration."
+        },
+        {
+          "name": "subscribe",
+          "type": "(listener: () => void) => () => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "plugin",
+          "type": "<Factory extends AnyPluginFactory>(factory: Factory) => PluginHandle<Factory>",
+          "optional": false,
+          "doc": "Typed access to a plugin's state and commands. Throws if it isn't installed."
+        },
+        {
+          "name": "has",
+          "type": "(name: string) => boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "mount",
+          "type": "(root?: HTMLElement | null) => () => void",
+          "optional": false,
+          "doc": "Runs plugin `setup` hooks. Re-entrant: safe to mount, unmount, and mount again."
+        },
+        {
+          "name": "attach",
+          "type": "(element: HTMLVideoElement) => () => void",
+          "optional": false,
+          "doc": "Connects the media element and begins loading in a microtask."
+        },
+        {
+          "name": "attributes",
+          "type": "(state?: PlayerState) => Record<string, string>",
+          "optional": false,
+          "doc": "Root data attributes for the given state."
+        },
+        {
+          "name": "slot",
+          "type": "(name: SlotName) => readonly ComponentType[]",
+          "optional": false,
+          "doc": "Components that plugins contributed to a slot, in plugin order."
+        },
+        {
+          "name": "video",
+          "type": "() => HTMLVideoElement | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "root",
+          "type": "() => HTMLElement | null",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#PlayerOptions": {
+      "entry": "react-video-kit/core",
+      "name": "PlayerOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "plugins",
+          "type": "readonly AnyPlugin[] | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "src",
+          "type": "SourceInput | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "load",
+          "type": "LoadStrategy | undefined",
+          "optional": true,
+          "doc": "When the provider and its engine load. Defaults to `eager`."
+        }
+      ]
+    },
+    "react-video-kit/core#PlayerState": {
+      "entry": "react-video-kit/core",
+      "name": "PlayerState",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "media",
+          "type": "MediaState",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#PluginContext": {
+      "entry": "react-video-kit/core",
+      "name": "PluginContext",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "player",
+          "type": "Player",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "clock",
+          "type": "Clock",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "commands",
+          "type": "CoreCommands",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "state",
+          "type": "() => State",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "set",
+          "type": "(state: Partial<State>) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "media",
+          "type": "() => MediaState",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "report",
+          "type": "(state: Partial<MediaState>) => void",
+          "optional": false,
+          "doc": "Writes media state, for plugins that normalize something providers can't."
+        },
+        {
+          "name": "video",
+          "type": "() => HTMLVideoElement | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "root",
+          "type": "() => HTMLElement | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "watch",
+          "type": "<Value>(scope: Scope, select: (media: MediaState) => Value, listener: (value: Value, previous: Value) => void) => void",
+          "optional": false,
+          "doc": "Calls `listener` whenever the selected value changes, until `scope` ends."
+        },
+        {
+          "name": "lock",
+          "type": "(id: string, commands: readonly LockableCommand[]) => () => void",
+          "optional": false,
+          "doc": "Blocks commands until the returned function is called."
+        },
+        {
+          "name": "isLocked",
+          "type": "(command: LockableCommand) => boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "registerProvider",
+          "type": "(entry: ProviderEntry) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "pushProvider",
+          "type": "(provider: Provider) => () => void",
+          "optional": false,
+          "doc": "Hands playback to `provider` until the returned function is called."
+        },
+        {
+          "name": "find",
+          "type": "<Factory extends AnyPluginFactory>(name: Factory[\"pluginName\"]) => PluginHandle<Factory> | undefined",
+          "optional": false,
+          "doc": "Reads an optional dependency without importing its code."
+        }
+      ]
+    },
+    "react-video-kit/core#PluginFactory": {
+      "entry": "react-video-kit/core",
+      "name": "PluginFactory",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "pluginName",
+          "type": "Name",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#PluginHandle": {
+      "entry": "react-video-kit/core",
+      "name": "PluginHandle",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "state",
+          "type": "() => StateOf<Factory>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "commands",
+          "type": "CommandsOf<Factory>",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#PluginInstance": {
+      "entry": "react-video-kit/core",
+      "name": "PluginInstance",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "name",
+          "type": "Name",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "create",
+          "type": "() => PluginSpec<State, Commands>",
+          "optional": false,
+          "doc": "Builds the spec. Each player calls this, so an instance can be shared safely."
+        }
+      ]
+    },
+    "react-video-kit/core#PluginSpec": {
+      "entry": "react-video-kit/core",
+      "name": "PluginSpec",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "requires",
+          "type": "readonly string[] | undefined",
+          "optional": true,
+          "doc": "Plugins that must be installed. `createPlayer` throws if one is missing."
+        },
+        {
+          "name": "after",
+          "type": "readonly string[] | undefined",
+          "optional": true,
+          "doc": "Plugins that should run first when present."
+        },
+        {
+          "name": "state",
+          "type": "(() => State) | undefined",
+          "optional": true,
+          "doc": "Pure. Also runs on the server."
+        },
+        {
+          "name": "commands",
+          "type": "((context: PluginContext<State>) => Commands) | undefined",
+          "optional": true,
+          "doc": "Pure. Also runs on the server, so touch the DOM only when a command runs."
+        },
+        {
+          "name": "attrs",
+          "type": "Record<string, (state: State, media: MediaState) => string | number | boolean | null | undefined> | undefined",
+          "optional": true,
+          "doc": "Data attributes written to Root as state changes, with no React render."
+        },
+        {
+          "name": "setup",
+          "type": "((context: PluginContext<State>, scope: Scope) => void) | undefined",
+          "optional": true,
+          "doc": "Runs from mount to unmount."
+        },
+        {
+          "name": "attach",
+          "type": "((context: PluginContext<State>, element: HTMLVideoElement, scope: Scope) => void) | undefined",
+          "optional": true,
+          "doc": "Runs from media attach to detach."
+        },
+        {
+          "name": "source",
+          "type": "((context: PluginContext<State>, source: SourceObject, scope: Scope) => void) | undefined",
+          "optional": true,
+          "doc": "Runs for each source until the next one."
+        },
+        {
+          "name": "gates",
+          "type": "Gates<State> | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "slots",
+          "type": "Partial<Record<SlotName, ComponentType>> | undefined",
+          "optional": true,
+          "doc": "Components rendered by `<Slot name>`."
+        }
+      ]
+    },
+    "react-video-kit/core#Provider": {
+      "entry": "react-video-kit/core",
+      "name": "Provider",
+      "kind": "type",
+      "doc": "A media engine behind the normalized player interface.",
+      "members": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "attach",
+          "type": "(element: HTMLVideoElement | null, sink: Sink, scope: Scope) => void",
+          "optional": false,
+          "doc": "Called once. `element` is null for remote providers such as Cast."
+        },
+        {
+          "name": "load",
+          "type": "(request: LoadRequest, signal: AbortSignal) => Promise<void>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "play",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "pause",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "seek",
+          "type": "(time: number) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setVolume",
+          "type": "(volume: number, muted: boolean) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "setRate",
+          "type": "(rate: number) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "time",
+          "type": "number",
+          "optional": false,
+          "doc": "Hot read used by the clock. Must not allocate."
+        },
+        {
+          "name": "setQuality",
+          "type": "((id: string | \"auto\") => void) | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "setAudioTrack",
+          "type": "((id: string) => void) | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "setTextTrack",
+          "type": "((id: string | null) => void) | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "snapshot",
+          "type": "(() => Partial<MediaState>) | undefined",
+          "optional": true,
+          "doc": "Current state, re-applied when the provider resumes from suspension."
+        },
+        {
+          "name": "destroy",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#ProviderEntry": {
+      "entry": "react-video-kit/core",
+      "name": "ProviderEntry",
+      "kind": "type",
+      "doc": "Registered by plugins. `canPlay` must be synchronous and import no engine.",
+      "members": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "canPlay",
+          "type": "(source: SourceObject, environment: ProviderEnvironment) => boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "load",
+          "type": "() => Promise<new () => Provider>",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#ProviderEnvironment": {
+      "entry": "react-video-kit/core",
+      "name": "ProviderEnvironment",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "element",
+          "type": "HTMLVideoElement | null",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#QualityLevel": {
+      "entry": "react-video-kit/core",
+      "name": "QualityLevel",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "width",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "height",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "bitrate",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#Rendition": {
+      "entry": "react-video-kit/core",
+      "name": "Rendition",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "width",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "height",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "bitrate",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "src",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "type",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#RenditionSet": {
+      "entry": "react-video-kit/core",
+      "name": "RenditionSet",
+      "kind": "type",
+      "doc": "Selects between progressive files of the same content.",
+      "members": [
+        {
+          "name": "renditions",
+          "type": "Rendition[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "initial",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Index of the rendition to start with. Defaults to the first."
+        }
+      ]
+    },
+    "react-video-kit/core#Sink": {
+      "entry": "react-video-kit/core",
+      "name": "Sink",
+      "kind": "type",
+      "doc": "The only way a provider reports state. Ignored while the provider is suspended.",
+      "members": [
+        {
+          "name": "update",
+          "type": "(state: Partial<MediaState>) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "sync",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Reports that time moved discontinuously, so the clock must write now."
+        },
+        {
+          "name": "error",
+          "type": "(error: MediaErrorInfo) => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#SlotName": {
+      "entry": "react-video-kit/core",
+      "name": "SlotName",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "SlotName"
+    },
+    "react-video-kit/core#SourceInput": {
+      "entry": "react-video-kit/core",
+      "name": "SourceInput",
+      "kind": "type",
+      "doc": "A single source, a list of fallbacks tried in order, or the renditions of one video. Fallback lists are not quality levels; use `renditions` for those.",
+      "members": [],
+      "definition": "SourceInput"
+    },
+    "react-video-kit/core#SourceObject": {
+      "entry": "react-video-kit/core",
+      "name": "SourceObject",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "src",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "type",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/core#StateOf": {
+      "entry": "react-video-kit/core",
+      "name": "StateOf",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "StateOf<Factory>"
+    },
+    "react-video-kit/core#Timeline": {
+      "entry": "react-video-kit/core",
+      "name": "Timeline",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "start",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "end",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "kind",
+          "type": "\"vod\" | \"live\" | \"dvr\" | \"ad\"",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/player#defaultPlugins": {
+      "entry": "react-video-kit/player",
+      "name": "defaultPlugins",
+      "doc": "A sensible set for `VideoPlayer`: controls that hide, gestures, keys, and the usual menus.",
+      "kind": "function",
+      "signature": "() => AnyPlugin[]"
+    },
+    "react-video-kit/player#VideoPlayer": {
+      "entry": "react-video-kit/player",
+      "name": "VideoPlayer",
+      "doc": "The complete player layout: every control, styled. Features come from `plugins`, and `defaultPlugins()` is a sensible set. Leaving it out keeps it out of the bundle.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "poster",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "media",
+          "type": "Omit<VideoHTMLAttributes<HTMLVideoElement>, \"src\" | \"controls\" | \"poster\"> | undefined",
+          "optional": true,
+          "doc": "Props for the underlying video element."
+        },
+        {
+          "name": "tracks",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "`<track>` elements for the video."
+        },
+        {
+          "name": "src",
+          "type": "SourceInput | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "plugins",
+          "type": "readonly AnyPlugin[] | undefined",
+          "optional": true,
+          "doc": "Set once. Define the array outside the component or memoize it."
+        },
+        {
+          "name": "load",
+          "type": "LoadStrategy | undefined",
+          "optional": true,
+          "doc": "When the provider and its engine load. Set once. Defaults to `eager`."
+        },
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "Bring your own player instead of creating one."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/player#VideoPlayerProps": {
+      "entry": "react-video-kit/player",
+      "name": "VideoPlayerProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "poster",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "media",
+          "type": "Omit<VideoHTMLAttributes<HTMLVideoElement>, \"src\" | \"controls\" | \"poster\"> | undefined",
+          "optional": true,
+          "doc": "Props for the underlying video element."
+        },
+        {
+          "name": "tracks",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "`<track>` elements for the video."
+        },
+        {
+          "name": "src",
+          "type": "SourceInput | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "plugins",
+          "type": "readonly AnyPlugin[] | undefined",
+          "optional": true,
+          "doc": "Set once. Define the array outside the component or memoize it."
+        },
+        {
+          "name": "load",
+          "type": "LoadStrategy | undefined",
+          "optional": true,
+          "doc": "When the provider and its engine load. Set once. Defaults to `eager`."
+        },
+        {
+          "name": "player",
+          "type": "Player | undefined",
+          "optional": true,
+          "doc": "Bring your own player instead of creating one."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/compat#useVideoContext": {
+      "entry": "react-video-kit/compat",
+      "name": "useVideoContext",
+      "doc": "The v3 context, for moving a custom control over without rewriting it. It renders four times a second, which v4's hooks avoid, so prefer `useVideoState` and `useCommands` for new code. This entry goes away in v5.",
+      "kind": "hook",
+      "signature": "() => { videoRef: { readonly current: HTMLVideoElement | null; }; wrapperRef: { readonly current: HTMLElement | null; }; src: string; isPlaying: boolean; isMuted: boolean; isFullscreen: boolean; isPip: boolean; isLoading: boolean; isLoaded: boolean; duration: number; currentTime: number; volume: number; remainingTime: number; playbackRate: number; handlePlay: () => undefined; handlePause: () => void; handleMute: () => void; handleUnmute: () => void; handleVolumeChange: (value: number) => void; handlePlaybackRateChange: (value: number) => void; handleSeek: (value: number) => void; handleFullScreen: () => void; handleExitFullScreen: () => void; handlePip: () => void; handleExitPip: () => void; backBy: (seconds: number) => void; forwardBy: (seconds: number) => void; }"
+    },
+    "react-video-kit/fullscreen#FullscreenOptions": {
+      "entry": "react-video-kit/fullscreen",
+      "name": "FullscreenOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "lockOrientation",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Lock touch devices to landscape while in fullscreen. Defaults to true."
+        }
+      ]
+    },
+    "react-video-kit/fullscreen#fullscreen": {
+      "entry": "react-video-kit/fullscreen",
+      "name": "fullscreen",
+      "doc": "Fullscreen on the player's root, or the video itself on iPhones, which allow only that.",
+      "kind": "plugin",
+      "pluginName": "fullscreen",
+      "required": false,
+      "optionsType": "FullscreenOptions",
+      "options": [
+        {
+          "name": "lockOrientation",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Lock touch devices to landscape while in fullscreen. Defaults to true."
+        }
+      ],
+      "state": [
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "supported",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "enter",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "exit",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "toggle",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/fullscreen#FullscreenProps": {
+      "entry": "react-video-kit/fullscreen",
+      "name": "FullscreenProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/fullscreen#Fullscreen": {
+      "entry": "react-video-kit/fullscreen",
+      "name": "Fullscreen",
+      "doc": "Renders nothing where fullscreen isn't available.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/pip#pip": {
+      "entry": "react-video-kit/pip",
+      "name": "pip",
+      "doc": "Picture-in-picture, through the standard API or Safari's presentation modes.",
+      "kind": "plugin",
+      "pluginName": "pip",
+      "required": false,
+      "optionsType": null,
+      "options": [],
+      "state": [
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "supported",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "enter",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "exit",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "toggle",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/pip#PipProps": {
+      "entry": "react-video-kit/pip",
+      "name": "PipProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/pip#Pip": {
+      "entry": "react-video-kit/pip",
+      "name": "Pip",
+      "doc": "Renders nothing where picture-in-picture isn't available.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/idle#IdleOptions": {
+      "entry": "react-video-kit/idle",
+      "name": "IdleOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "mouseTimeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Hide this long after the last mouse activity, in milliseconds."
+        },
+        {
+          "name": "touchTimeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Hide this long after a touch reveals the controls, in milliseconds."
+        },
+        {
+          "name": "leaveTimeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Hide this long after the mouse leaves the player, in milliseconds."
+        }
+      ]
+    },
+    "react-video-kit/idle#idle": {
+      "entry": "react-video-kit/idle",
+      "name": "idle",
+      "doc": "Hides the controls when the viewer isn't using them. They stay mounted while hidden, so Tab reveals them, and pinned while paused or in use.",
+      "kind": "plugin",
+      "pluginName": "idle",
+      "required": false,
+      "optionsType": "IdleOptions",
+      "options": [
+        {
+          "name": "mouseTimeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Hide this long after the last mouse activity, in milliseconds."
+        },
+        {
+          "name": "touchTimeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Hide this long after a touch reveals the controls, in milliseconds."
+        },
+        {
+          "name": "leaveTimeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Hide this long after the mouse leaves the player, in milliseconds."
+        }
+      ],
+      "state": [
+        {
+          "name": "visible",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "show",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Reveals the controls, which then hide again as usual."
+        },
+        {
+          "name": "hide",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/gestures#SeekFeedback": {
+      "entry": "react-video-kit/gestures",
+      "name": "SeekFeedback",
+      "doc": "The ripple that confirms a double-tap seek.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/gestures#GesturesOptions": {
+      "entry": "react-video-kit/gestures",
+      "name": "GesturesOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "seekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by a double tap."
+        }
+      ]
+    },
+    "react-video-kit/gestures#gestures": {
+      "entry": "react-video-kit/gestures",
+      "name": "gestures",
+      "doc": "Mouse clicks on the video toggle play and double clicks toggle fullscreen. On touch, the `idle` plugin handles single taps, and a double tap seeks.",
+      "kind": "plugin",
+      "pluginName": "gestures",
+      "required": false,
+      "optionsType": "GesturesOptions",
+      "options": [
+        {
+          "name": "seekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by a double tap."
+        }
+      ],
+      "state": [],
+      "commands": [
+        {
+          "name": "onSeek",
+          "type": "(listener: SeekListener) => () => void",
+          "optional": false,
+          "doc": "Listens for double-tap seeks, to show feedback."
+        }
+      ]
+    },
+    "react-video-kit/hotkeys#HotkeysFeedback": {
+      "entry": "react-video-kit/hotkeys",
+      "name": "HotkeysFeedback",
+      "doc": "Confirms each shortcut in a brief message, also announced to screen readers.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/hotkeys#HotkeysOptions": {
+      "entry": "react-video-kit/hotkeys",
+      "name": "HotkeysOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "seekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the arrow keys."
+        },
+        {
+          "name": "largeSeekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by J and L."
+        },
+        {
+          "name": "volumeStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Change per Up or Down press, from 0 to 1."
+        }
+      ]
+    },
+    "react-video-kit/hotkeys#hotkeys": {
+      "entry": "react-video-kit/hotkeys",
+      "name": "hotkeys",
+      "doc": "Keyboard shortcuts. They work while focus is inside a player, and afterwards for the player last used, until the viewer clicks somewhere else on the page.",
+      "kind": "plugin",
+      "pluginName": "hotkeys",
+      "required": false,
+      "optionsType": "HotkeysOptions",
+      "options": [
+        {
+          "name": "seekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the arrow keys."
+        },
+        {
+          "name": "largeSeekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by J and L."
+        },
+        {
+          "name": "volumeStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Change per Up or Down press, from 0 to 1."
+        }
+      ],
+      "state": [],
+      "commands": [
+        {
+          "name": "onFeedback",
+          "type": "(listener: FeedbackListener) => () => void",
+          "optional": false,
+          "doc": "Listens for the message each shortcut shows."
+        }
+      ]
+    },
+    "react-video-kit/speed#SpeedMenu": {
+      "entry": "react-video-kit/speed",
+      "name": "SpeedMenu",
+      "doc": "Renders nothing while something, like an ad, locks the rate.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/speed#SpeedOptions": {
+      "entry": "react-video-kit/speed",
+      "name": "SpeedOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "rates",
+          "type": "readonly number[] | undefined",
+          "optional": true,
+          "doc": "The rates to offer, in order."
+        }
+      ]
+    },
+    "react-video-kit/speed#speed": {
+      "entry": "react-video-kit/speed",
+      "name": "speed",
+      "doc": "Playback rate choices, and the menu to pick from them.",
+      "kind": "plugin",
+      "pluginName": "speed",
+      "required": false,
+      "optionsType": "SpeedOptions",
+      "options": [
+        {
+          "name": "rates",
+          "type": "readonly number[] | undefined",
+          "optional": true,
+          "doc": "The rates to offer, in order."
+        }
+      ],
+      "state": [
+        {
+          "name": "rates",
+          "type": "readonly number[]",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "set",
+          "type": "(rate: number) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "faster",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "slower",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/quality#QualityMenu": {
+      "entry": "react-video-kit/quality",
+      "name": "QualityMenu",
+      "doc": "Renders nothing unless there's more than one level to choose from.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/quality#quality": {
+      "entry": "react-video-kit/quality",
+      "name": "quality",
+      "doc": "Quality levels from whichever provider is playing: an engine's adaptive levels, or `{ renditions: [...] }` for progressive files.",
+      "kind": "plugin",
+      "pluginName": "quality",
+      "required": false,
+      "optionsType": null,
+      "options": [],
+      "state": [],
+      "commands": [
+        {
+          "name": "select",
+          "type": "(id: string | \"auto\") => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/audio-tracks#AudioMenu": {
+      "entry": "react-video-kit/audio-tracks",
+      "name": "AudioMenu",
+      "doc": "Renders nothing unless there's a choice of audio.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/audio-tracks#audioTracks": {
+      "entry": "react-video-kit/audio-tracks",
+      "name": "audioTracks",
+      "doc": "Picks between audio languages and descriptions. Engines report their own tracks, and Safari's native tracks are read from the element here.",
+      "kind": "plugin",
+      "pluginName": "audio-tracks",
+      "required": false,
+      "optionsType": null,
+      "options": [],
+      "state": [],
+      "commands": [
+        {
+          "name": "select",
+          "type": "(id: string) => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/captions#CaptionsDisplay": {
+      "entry": "react-video-kit/captions",
+      "name": "CaptionsDisplay",
+      "doc": "Draws the active cues. It writes to the DOM directly, with no React renders.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/captions#CaptionsMenu": {
+      "entry": "react-video-kit/captions",
+      "name": "CaptionsMenu",
+      "doc": "Renders nothing until there's a track to show.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/captions#CaptionTrack": {
+      "entry": "react-video-kit/captions",
+      "name": "CaptionTrack",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "src",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "language",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "kind",
+          "type": "\"captions\" | \"subtitles\" | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/captions#CaptionsOptions": {
+      "entry": "react-video-kit/captions",
+      "name": "CaptionsOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "tracks",
+          "type": "readonly CaptionTrack[] | undefined",
+          "optional": true,
+          "doc": "Tracks to add to the video. Tracks from `<track>` or an engine appear too."
+        },
+        {
+          "name": "language",
+          "type": "string | null | undefined",
+          "optional": true,
+          "doc": "A language to turn on as soon as a matching track appears."
+        }
+      ]
+    },
+    "react-video-kit/captions#captions": {
+      "entry": "react-video-kit/captions",
+      "name": "captions",
+      "doc": "Draws captions itself, so they can be styled and move clear of the controls. Native rendering takes over only in iOS fullscreen, where nothing else can draw.",
+      "kind": "plugin",
+      "pluginName": "captions",
+      "required": false,
+      "optionsType": "CaptionsOptions",
+      "options": [
+        {
+          "name": "tracks",
+          "type": "readonly CaptionTrack[] | undefined",
+          "optional": true,
+          "doc": "Tracks to add to the video. Tracks from `<track>` or an engine appear too."
+        },
+        {
+          "name": "language",
+          "type": "string | null | undefined",
+          "optional": true,
+          "doc": "A language to turn on as soon as a matching track appears."
+        }
+      ],
+      "state": [
+        {
+          "name": "tracks",
+          "type": "readonly MediaTrackInfo[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "active",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "language",
+          "type": "string | null",
+          "optional": false,
+          "doc": "The language the viewer wants, which may not have a track yet."
+        }
+      ],
+      "commands": [
+        {
+          "name": "select",
+          "type": "(id: string | null) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "prefer",
+          "type": "(language: string | null) => void",
+          "optional": false,
+          "doc": "Turns a language on now, or as soon as a matching track appears."
+        },
+        {
+          "name": "onCues",
+          "type": "(listener: CueListener) => () => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/captions#CaptionsToggleProps": {
+      "entry": "react-video-kit/captions",
+      "name": "CaptionsToggleProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/captions#CaptionsToggle": {
+      "entry": "react-video-kit/captions",
+      "name": "CaptionsToggle",
+      "doc": "Renders nothing until there's a track to show.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/thumbnails#ThumbnailPreview": {
+      "entry": "react-video-kit/thumbnails",
+      "name": "ThumbnailPreview",
+      "doc": "",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/thumbnails#ThumbnailsOptions": {
+      "entry": "react-video-kit/thumbnails",
+      "name": "ThumbnailsOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "src",
+          "type": "string | ((source: SourceObject) => string | null)",
+          "optional": false,
+          "doc": "A WebVTT file of thumbnails, or a function that picks one for each source."
+        }
+      ]
+    },
+    "react-video-kit/thumbnails#thumbnails": {
+      "entry": "react-video-kit/thumbnails",
+      "name": "thumbnails",
+      "doc": "Shows a frame above the timeline as the pointer moves along it.",
+      "kind": "plugin",
+      "pluginName": "thumbnails",
+      "required": true,
+      "optionsType": "ThumbnailsOptions",
+      "options": [
+        {
+          "name": "src",
+          "type": "string | ((source: SourceObject) => string | null)",
+          "optional": false,
+          "doc": "A WebVTT file of thumbnails, or a function that picks one for each source."
+        }
+      ],
+      "state": [],
+      "commands": [
+        {
+          "name": "at",
+          "type": "(time: number) => Thumbnail | null",
+          "optional": false,
+          "doc": "The thumbnail for `time`, once loaded. Loads on first use, to save bandwidth."
+        },
+        {
+          "name": "whenLoaded",
+          "type": "() => Promise<void> | null",
+          "optional": false,
+          "doc": "Resolves when a load in progress finishes, or null when there's nothing to wait for."
+        },
+        {
+          "name": "prepare",
+          "type": "(image: string) => Promise<void> | null",
+          "optional": false,
+          "doc": "Resolves once the image can paint without a flash."
+        }
+      ]
+    },
+    "react-video-kit/chapters#ChapterGaps": {
+      "entry": "react-video-kit/chapters",
+      "name": "ChapterGaps",
+      "doc": "Cuts gaps in the track with a single mask, so the fill and buffered bars stay one element each and playback still needs no renders.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/chapters#ChapterTitle": {
+      "entry": "react-video-kit/chapters",
+      "name": "ChapterTitle",
+      "doc": "The chapter under the pointer, above the time in the timeline preview.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/chapters#ChaptersMenu": {
+      "entry": "react-video-kit/chapters",
+      "name": "ChaptersMenu",
+      "doc": "Renders nothing without chapters.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/chapters#Chapter": {
+      "entry": "react-video-kit/chapters",
+      "name": "Chapter",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "start",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/chapters#ChaptersOptions": {
+      "entry": "react-video-kit/chapters",
+      "name": "ChaptersOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "src",
+          "type": "string | ((source: SourceObject) => string | null) | undefined",
+          "optional": true,
+          "doc": "A WebVTT file of chapters, or a function that picks one for each source."
+        },
+        {
+          "name": "items",
+          "type": "readonly Chapter[] | undefined",
+          "optional": true,
+          "doc": "Chapters to use directly, instead of a file."
+        }
+      ]
+    },
+    "react-video-kit/chapters#chapters": {
+      "entry": "react-video-kit/chapters",
+      "name": "chapters",
+      "doc": "Splits the timeline into sections, and offers a menu to jump between them.",
+      "kind": "plugin",
+      "pluginName": "chapters",
+      "required": false,
+      "optionsType": "ChaptersOptions",
+      "options": [
+        {
+          "name": "src",
+          "type": "string | ((source: SourceObject) => string | null) | undefined",
+          "optional": true,
+          "doc": "A WebVTT file of chapters, or a function that picks one for each source."
+        },
+        {
+          "name": "items",
+          "type": "readonly Chapter[] | undefined",
+          "optional": true,
+          "doc": "Chapters to use directly, instead of a file."
+        }
+      ],
+      "state": [
+        {
+          "name": "items",
+          "type": "readonly Chapter[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "active",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "at",
+          "type": "(time: number) => number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "select",
+          "type": "(index: number) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "next",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "previous",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/persistence#PersistenceOptions": {
+      "entry": "react-video-kit/persistence",
+      "name": "PersistenceOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "key",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Prefixes every stored key. Change it to keep separate players apart."
+        },
+        {
+          "name": "resume",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Resume each video from where it was left. Defaults to true."
+        },
+        {
+          "name": "preferences",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Remember volume, mute, speed, and caption language. Defaults to true."
+        },
+        {
+          "name": "storage",
+          "type": "Pick<Storage, \"getItem\" | \"setItem\" | \"removeItem\"> | undefined",
+          "optional": true,
+          "doc": "Where to store data. Defaults to localStorage."
+        }
+      ]
+    },
+    "react-video-kit/persistence#persistence": {
+      "entry": "react-video-kit/persistence",
+      "name": "persistence",
+      "doc": "Remembers where the viewer was and what they like. Runs only after hydration, so the server and first client render still match.",
+      "kind": "plugin",
+      "pluginName": "persistence",
+      "required": false,
+      "optionsType": "PersistenceOptions",
+      "options": [
+        {
+          "name": "key",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Prefixes every stored key. Change it to keep separate players apart."
+        },
+        {
+          "name": "resume",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Resume each video from where it was left. Defaults to true."
+        },
+        {
+          "name": "preferences",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Remember volume, mute, speed, and caption language. Defaults to true."
+        },
+        {
+          "name": "storage",
+          "type": "Pick<Storage, \"getItem\" | \"setItem\" | \"removeItem\"> | undefined",
+          "optional": true,
+          "doc": "Where to store data. Defaults to localStorage."
+        }
+      ],
+      "state": [],
+      "commands": []
+    },
+    "react-video-kit/media-session#MediaSessionMetadata": {
+      "entry": "react-video-kit/media-session",
+      "name": "MediaSessionMetadata",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "artist",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "album",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "artwork",
+          "type": "MediaImage[] | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/media-session#MediaSessionOptions": {
+      "entry": "react-video-kit/media-session",
+      "name": "MediaSessionOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "metadata",
+          "type": "MediaSessionMetadata | ((source: SourceObject) => MediaSessionMetadata) | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "seekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the system's skip buttons."
+        }
+      ]
+    },
+    "react-video-kit/media-session#mediaSession": {
+      "entry": "react-video-kit/media-session",
+      "name": "mediaSession",
+      "doc": "Connects the lock screen, notification, and hardware media keys to the player.",
+      "kind": "plugin",
+      "pluginName": "media-session",
+      "required": false,
+      "optionsType": "MediaSessionOptions",
+      "options": [
+        {
+          "name": "metadata",
+          "type": "MediaSessionMetadata | ((source: SourceObject) => MediaSessionMetadata) | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "seekStep",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds moved by the system's skip buttons."
+        }
+      ],
+      "state": [],
+      "commands": []
+    },
+    "react-video-kit/i18n#Strings": {
+      "entry": "react-video-kit/i18n",
+      "name": "Strings",
+      "kind": "type",
+      "doc": "Every string the built-in parts and plugins show or announce.",
+      "members": [
+        {
+          "name": "play",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "pause",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "replay",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "seek",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "of",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "mute",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "unmute",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "muted",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "unmuted",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "volume",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "settings",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "back",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "fullscreen",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "exitFullscreen",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "pip",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "exitPip",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "retry",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "speed",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "normal",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "quality",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "auto",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "captions",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "captionsOff",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "audio",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "chapters",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "tapToUnmute",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "live",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "goLive",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "next",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "previous",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "upNext",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "playNow",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "cancel",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "airplay",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "cast",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "castingTo",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "ad",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "skipAd",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "skipAdIn",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "learnMore",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/i18n#I18nOptions": {
+      "entry": "react-video-kit/i18n",
+      "name": "I18nOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "locale",
+          "type": "string",
+          "optional": false,
+          "doc": "A BCP 47 tag, such as \"ar\" or \"pt-BR\"."
+        },
+        {
+          "name": "strings",
+          "type": "Strings | undefined",
+          "optional": true,
+          "doc": "Strings for that locale. Anything missing falls back to English."
+        },
+        {
+          "name": "dir",
+          "type": "\"ltr\" | \"rtl\" | undefined",
+          "optional": true,
+          "doc": "Text direction. Worked out from `locale` when not given."
+        }
+      ]
+    },
+    "react-video-kit/i18n#i18n": {
+      "entry": "react-video-kit/i18n",
+      "name": "i18n",
+      "doc": "Translates the controls and sets their direction. `dir` is a Root attribute, so it's already right in the server's HTML.",
+      "kind": "plugin",
+      "pluginName": "i18n",
+      "required": true,
+      "optionsType": "I18nOptions",
+      "options": [
+        {
+          "name": "locale",
+          "type": "string",
+          "optional": false,
+          "doc": "A BCP 47 tag, such as \"ar\" or \"pt-BR\"."
+        },
+        {
+          "name": "strings",
+          "type": "Strings | undefined",
+          "optional": true,
+          "doc": "Strings for that locale. Anything missing falls back to English."
+        },
+        {
+          "name": "dir",
+          "type": "\"ltr\" | \"rtl\" | undefined",
+          "optional": true,
+          "doc": "Text direction. Worked out from `locale` when not given."
+        }
+      ],
+      "state": [
+        {
+          "name": "locale",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "strings",
+          "type": "Record<string, string>",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "dir",
+          "type": "\"ltr\" | \"rtl\"",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "setLocale",
+          "type": "(locale: string, strings?: Strings, dir?: \"ltr\" | \"rtl\") => void",
+          "optional": false,
+          "doc": "Switches language while playing."
+        }
+      ]
+    },
+    "react-video-kit/autoplay#UnmuteChip": {
+      "entry": "react-video-kit/autoplay",
+      "name": "UnmuteChip",
+      "doc": "Offers sound after a muted autoplay, until the viewer unmutes in any way.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/autoplay#AutoplayOptions": {
+      "entry": "react-video-kit/autoplay",
+      "name": "AutoplayOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "muted",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Try again muted when the browser refuses sound. Defaults to true."
+        },
+        {
+          "name": "ignoreReducedMotion",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Start even for viewers who prefer reduced motion. Defaults to false."
+        }
+      ]
+    },
+    "react-video-kit/autoplay#autoplay": {
+      "entry": "react-video-kit/autoplay",
+      "name": "autoplay",
+      "doc": "Starts playback on load, with sound if allowed, then muted with a chip offering sound, and otherwise leaves the viewer with the normal play button. Viewers who prefer reduced motion aren't started automatically, unless told otherwise.",
+      "kind": "plugin",
+      "pluginName": "autoplay",
+      "required": false,
+      "optionsType": "AutoplayOptions",
+      "options": [
+        {
+          "name": "muted",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Try again muted when the browser refuses sound. Defaults to true."
+        },
+        {
+          "name": "ignoreReducedMotion",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Start even for viewers who prefer reduced motion. Defaults to false."
+        }
+      ],
+      "state": [
+        {
+          "name": "mutedFallback",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "unmute",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/recovery#RecoveryOptions": {
+      "entry": "react-video-kit/recovery",
+      "name": "RecoveryOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "retries",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How many times to retry a failure before reporting it."
+        },
+        {
+          "name": "delay",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "The first wait in milliseconds, doubling for each retry."
+        },
+        {
+          "name": "retryOn",
+          "type": "((error: MediaErrorInfo) => boolean) | undefined",
+          "optional": true,
+          "doc": "Decides which errors are worth retrying."
+        }
+      ]
+    },
+    "react-video-kit/recovery#recovery": {
+      "entry": "react-video-kit/recovery",
+      "name": "recovery",
+      "doc": "Retries failures that can pass, such as a dropped connection, resuming from the same position. While offline it waits to reconnect instead of using up retries.",
+      "kind": "plugin",
+      "pluginName": "recovery",
+      "required": false,
+      "optionsType": "RecoveryOptions",
+      "options": [
+        {
+          "name": "retries",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How many times to retry a failure before reporting it."
+        },
+        {
+          "name": "delay",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "The first wait in milliseconds, doubling for each retry."
+        },
+        {
+          "name": "retryOn",
+          "type": "((error: MediaErrorInfo) => boolean) | undefined",
+          "optional": true,
+          "doc": "Decides which errors are worth retrying."
+        }
+      ],
+      "state": [
+        {
+          "name": "attempt",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "retrying",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": []
+    },
+    "react-video-kit/analytics#AnalyticsEventType": {
+      "entry": "react-video-kit/analytics",
+      "name": "AnalyticsEventType",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "AnalyticsEventType"
+    },
+    "react-video-kit/analytics#AnalyticsEvent": {
+      "entry": "react-video-kit/analytics",
+      "name": "AnalyticsEvent",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "type",
+          "type": "AnalyticsEventType",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "position",
+          "type": "number",
+          "optional": false,
+          "doc": "Playback position when it happened, in seconds."
+        },
+        {
+          "name": "source",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "startupMs",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Milliseconds from load to ready, on `ready`."
+        },
+        {
+          "name": "stalledMs",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Milliseconds spent stalled, on `rebuffer-end`."
+        },
+        {
+          "name": "quality",
+          "type": "string | null | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "error",
+          "type": "MediaErrorInfo | null | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/analytics#AnalyticsOptions": {
+      "entry": "react-video-kit/analytics",
+      "name": "AnalyticsOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "onEvent",
+          "type": "(event: AnalyticsEvent) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "heartbeat",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds of playback between heartbeats. 0 turns them off."
+        }
+      ]
+    },
+    "react-video-kit/analytics#analytics": {
+      "entry": "react-video-kit/analytics",
+      "name": "analytics",
+      "doc": "Reports playback as events, for whatever analytics service you use.",
+      "kind": "plugin",
+      "pluginName": "analytics",
+      "required": true,
+      "optionsType": "AnalyticsOptions",
+      "options": [
+        {
+          "name": "onEvent",
+          "type": "(event: AnalyticsEvent) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "heartbeat",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Seconds of playback between heartbeats. 0 turns them off."
+        }
+      ],
+      "state": [],
+      "commands": []
+    },
+    "react-video-kit/i18n/ar#ar": {
+      "entry": "react-video-kit/i18n/ar",
+      "name": "ar",
+      "doc": "",
+      "kind": "value",
+      "signature": "Strings"
+    },
+    "react-video-kit/i18n/es#es": {
+      "entry": "react-video-kit/i18n/es",
+      "name": "es",
+      "doc": "",
+      "kind": "value",
+      "signature": "Strings"
+    },
+    "react-video-kit/i18n/fr#fr": {
+      "entry": "react-video-kit/i18n/fr",
+      "name": "fr",
+      "doc": "",
+      "kind": "value",
+      "signature": "Strings"
+    },
+    "react-video-kit/hls#HlsOptions": {
+      "entry": "react-video-kit/hls",
+      "name": "HlsOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "config",
+          "type": "Partial<HlsConfig> | undefined",
+          "optional": true,
+          "doc": "Passed to hls.js."
+        },
+        {
+          "name": "preferEngine",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Use hls.js on Apple devices too. Their native HLS is more efficient and works with AirPlay, but it can't offer a choice of quality."
+        },
+        {
+          "name": "library",
+          "type": "(() => Promise<{ default: typeof Hls; }>) | undefined",
+          "optional": true,
+          "doc": "Where to get hls.js from. Defaults to importing the `hls.js` package."
+        }
+      ]
+    },
+    "react-video-kit/hls#hls": {
+      "entry": "react-video-kit/hls",
+      "name": "hls",
+      "doc": "Plays HLS through hls.js, which loads only when an HLS source does.",
+      "kind": "plugin",
+      "pluginName": "hls",
+      "required": false,
+      "optionsType": "HlsOptions",
+      "options": [
+        {
+          "name": "config",
+          "type": "Partial<HlsConfig> | undefined",
+          "optional": true,
+          "doc": "Passed to hls.js."
+        },
+        {
+          "name": "preferEngine",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Use hls.js on Apple devices too. Their native HLS is more efficient and works with AirPlay, but it can't offer a choice of quality."
+        },
+        {
+          "name": "library",
+          "type": "(() => Promise<{ default: typeof Hls; }>) | undefined",
+          "optional": true,
+          "doc": "Where to get hls.js from. Defaults to importing the `hls.js` package."
+        }
+      ],
+      "state": [],
+      "commands": []
+    },
+    "react-video-kit/dash#DashOptions": {
+      "entry": "react-video-kit/dash",
+      "name": "DashOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "settings",
+          "type": "MediaPlayerSettingClass | undefined",
+          "optional": true,
+          "doc": "Passed to dash.js."
+        },
+        {
+          "name": "library",
+          "type": "(() => Promise<DashLibrary>) | undefined",
+          "optional": true,
+          "doc": "Where to get dash.js from. Defaults to importing the `dashjs` package."
+        }
+      ]
+    },
+    "react-video-kit/dash#dash": {
+      "entry": "react-video-kit/dash",
+      "name": "dash",
+      "doc": "Plays DASH through dash.js, which loads only when a DASH source does.",
+      "kind": "plugin",
+      "pluginName": "dash",
+      "required": false,
+      "optionsType": "DashOptions",
+      "options": [
+        {
+          "name": "settings",
+          "type": "MediaPlayerSettingClass | undefined",
+          "optional": true,
+          "doc": "Passed to dash.js."
+        },
+        {
+          "name": "library",
+          "type": "(() => Promise<DashLibrary>) | undefined",
+          "optional": true,
+          "doc": "Where to get dash.js from. Defaults to importing the `dashjs` package."
+        }
+      ],
+      "state": [],
+      "commands": []
+    },
+    "react-video-kit/live#LiveOptions": {
+      "entry": "react-video-kit/live",
+      "name": "LiveOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "edgeTolerance",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How many seconds behind the edge still counts as live."
+        }
+      ]
+    },
+    "react-video-kit/live#live": {
+      "entry": "react-video-kit/live",
+      "name": "live",
+      "doc": "The live pill, the jump back to the edge, and a window to scrub through when the stream keeps one. Engines report live state themselves, and this reads it from the element for native HLS on Apple devices.",
+      "kind": "plugin",
+      "pluginName": "live",
+      "required": false,
+      "optionsType": "LiveOptions",
+      "options": [
+        {
+          "name": "edgeTolerance",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How many seconds behind the edge still counts as live."
+        }
+      ],
+      "state": [
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "dvr",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "atEdge",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "goLive",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Jumps to the live edge, and plays if paused."
+        }
+      ]
+    },
+    "react-video-kit/live#LiveIndicatorProps": {
+      "entry": "react-video-kit/live",
+      "name": "LiveIndicatorProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/live#LiveIndicator": {
+      "entry": "react-video-kit/live",
+      "name": "LiveIndicator",
+      "doc": "Says when playback is live, and returns there when it isn't. Hidden otherwise.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/playlist#UpNext": {
+      "entry": "react-video-kit/playlist",
+      "name": "UpNext",
+      "doc": "Offers the next item when one finishes, counting down if configured to.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/playlist#PlaylistItem": {
+      "entry": "react-video-kit/playlist",
+      "name": "PlaylistItem",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "src",
+          "type": "SourceInput",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "poster",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/playlist#PlaylistOptions": {
+      "entry": "react-video-kit/playlist",
+      "name": "PlaylistOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "items",
+          "type": "readonly PlaylistItem[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "start",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "The item to start on."
+        },
+        {
+          "name": "loop",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Go back to the first item after the last."
+        },
+        {
+          "name": "countdown",
+          "type": "number | null | undefined",
+          "optional": true,
+          "doc": "Seconds the up-next card counts down. 0 moves on at once, null waits for the viewer."
+        }
+      ]
+    },
+    "react-video-kit/playlist#playlist": {
+      "entry": "react-video-kit/playlist",
+      "name": "playlist",
+      "doc": "A queue of videos. Items share one video element, because a new element wouldn't have permission to autoplay on mobile, and the next one starts in the same tick.",
+      "kind": "plugin",
+      "pluginName": "playlist",
+      "required": true,
+      "optionsType": "PlaylistOptions",
+      "options": [
+        {
+          "name": "items",
+          "type": "readonly PlaylistItem[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "start",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "The item to start on."
+        },
+        {
+          "name": "loop",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Go back to the first item after the last."
+        },
+        {
+          "name": "countdown",
+          "type": "number | null | undefined",
+          "optional": true,
+          "doc": "Seconds the up-next card counts down. 0 moves on at once, null waits for the viewer."
+        }
+      ],
+      "state": [
+        {
+          "name": "items",
+          "type": "readonly PlaylistItem[]",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "index",
+          "type": "number",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "loop",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "remaining",
+          "type": "number | null",
+          "optional": false,
+          "doc": "Seconds until the next item, while counting down."
+        },
+        {
+          "name": "upNext",
+          "type": "boolean",
+          "optional": false,
+          "doc": "Whether the viewer can see what's next, even with no countdown running."
+        }
+      ],
+      "commands": [
+        {
+          "name": "select",
+          "type": "(index: number, play?: boolean) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "next",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "previous",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "cancel",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Stays on the finished video."
+        },
+        {
+          "name": "setItems",
+          "type": "(items: readonly PlaylistItem[], index?: number) => void",
+          "optional": false,
+          "doc": "Replaces the queue, starting from `index`."
+        },
+        {
+          "name": "nextIndex",
+          "type": "() => number | null",
+          "optional": false,
+          "doc": "The next item's position, or null at the end."
+        }
+      ]
+    },
+    "react-video-kit/playlist#PlaylistButtonProps": {
+      "entry": "react-video-kit/playlist",
+      "name": "PlaylistButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/playlist#PlaylistPrevious": {
+      "entry": "react-video-kit/playlist",
+      "name": "PlaylistPrevious",
+      "doc": "Hidden with a single item. Disabled at the start, unless looping wraps it around.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/playlist#PlaylistNext": {
+      "entry": "react-video-kit/playlist",
+      "name": "PlaylistNext",
+      "doc": "Hidden with a single item. Disabled at the end, unless looping wraps it around.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/airplay#airplay": {
+      "entry": "react-video-kit/airplay",
+      "name": "airplay",
+      "doc": "AirPlay through Safari's own picker. Plays natively, so it works with the native HLS that the hls plugin uses on Apple devices but not with `preferEngine`.",
+      "kind": "plugin",
+      "pluginName": "airplay",
+      "required": false,
+      "optionsType": null,
+      "options": [],
+      "state": [
+        {
+          "name": "available",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "prompt",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Opens the picker. Must run from a click or key press."
+        }
+      ]
+    },
+    "react-video-kit/airplay#AirPlayButtonProps": {
+      "entry": "react-video-kit/airplay",
+      "name": "AirPlayButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/airplay#AirPlayButton": {
+      "entry": "react-video-kit/airplay",
+      "name": "AirPlayButton",
+      "doc": "Renders nothing unless Safari has found a device to send to.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/chromecast#CastingOverlay": {
+      "entry": "react-video-kit/chromecast",
+      "name": "CastingOverlay",
+      "doc": "Says where playback went, over the video that's no longer playing.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/chromecast#ChromecastOptions": {
+      "entry": "react-video-kit/chromecast",
+      "name": "ChromecastOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "receiverId",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A custom receiver's ID. Defaults to Google's default receiver."
+        },
+        {
+          "name": "sdkUrl",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Where to load the Cast SDK from."
+        },
+        {
+          "name": "title",
+          "type": "string | ((source: SourceObject) => string | undefined) | undefined",
+          "optional": true,
+          "doc": "The title the receiver shows."
+        }
+      ]
+    },
+    "react-video-kit/chromecast#chromecast": {
+      "entry": "react-video-kit/chromecast",
+      "name": "chromecast",
+      "doc": "Sends playback to a Chromecast. The Cast SDK loads at runtime in Chromium browsers, and the receiver then acts as the top provider. The default receiver can't play DRM content, and captions stay on this device.",
+      "kind": "plugin",
+      "pluginName": "chromecast",
+      "required": false,
+      "optionsType": "ChromecastOptions",
+      "options": [
+        {
+          "name": "receiverId",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "A custom receiver's ID. Defaults to Google's default receiver."
+        },
+        {
+          "name": "sdkUrl",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Where to load the Cast SDK from."
+        },
+        {
+          "name": "title",
+          "type": "string | ((source: SourceObject) => string | undefined) | undefined",
+          "optional": true,
+          "doc": "The title the receiver shows."
+        }
+      ],
+      "state": [
+        {
+          "name": "available",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "device",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "toggle",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Opens the device picker. Must run from a click or key press."
+        }
+      ]
+    },
+    "react-video-kit/chromecast#CastButtonProps": {
+      "entry": "react-video-kit/chromecast",
+      "name": "CastButtonProps",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/chromecast#CastButton": {
+      "entry": "react-video-kit/chromecast",
+      "name": "CastButton",
+      "doc": "Renders nothing until a device is available.",
+      "kind": "component",
+      "props": [
+        {
+          "name": "asChild",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Merges behaviour onto the single child instead of rendering a button."
+        }
+      ]
+    },
+    "react-video-kit/ads#AdOverlay": {
+      "entry": "react-video-kit/ads",
+      "name": "AdOverlay",
+      "doc": "Says it's an ad and how long is left, and offers skip when allowed.",
+      "kind": "component",
+      "props": []
+    },
+    "react-video-kit/ads#AdEngine": {
+      "entry": "react-video-kit/ads",
+      "name": "AdEngine",
+      "kind": "type",
+      "doc": "A source of ads. `ima()` uses Google's SDK, and `vast()` plays VAST tags with none. Anything an engine throws or rejects with means the content simply plays.",
+      "members": [
+        {
+          "name": "ownsUi",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "True when the engine draws its own skip button and countdown, as IMA does."
+        },
+        {
+          "name": "time",
+          "type": "number",
+          "optional": false,
+          "doc": "Position in the current ad, in seconds."
+        },
+        {
+          "name": "prepare",
+          "type": "(host: AdHost) => void",
+          "optional": false,
+          "doc": "Runs inside the first play's gesture, before anything has been awaited, so an SDK can unlock playback. Don't wait for anything here."
+        },
+        {
+          "name": "request",
+          "type": "() => Promise<void>",
+          "optional": false,
+          "doc": "Resolves once a pre-roll has started, or it's known there isn't one."
+        },
+        {
+          "name": "play",
+          "type": "() => Promise<void> | void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "pause",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "skip",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "clicked",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "doc": "The viewer followed the ad's link."
+        },
+        {
+          "name": "setVolume",
+          "type": "(volume: number, muted: boolean) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "contentEnded",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "doc": "The content ended, so any post-roll can play."
+        },
+        {
+          "name": "destroy",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/ads#AdHost": {
+      "entry": "react-video-kit/ads",
+      "name": "AdHost",
+      "kind": "type",
+      "doc": "What the player offers an engine while it runs.",
+      "members": [
+        {
+          "name": "video",
+          "type": "HTMLVideoElement",
+          "optional": false,
+          "doc": "The content's video element."
+        },
+        {
+          "name": "container",
+          "type": "HTMLElement",
+          "optional": false,
+          "doc": "An element over the video, for the engine to draw into."
+        },
+        {
+          "name": "breakStart",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Pauses the content and locks seeking and rate, until `breakEnd`."
+        },
+        {
+          "name": "adStart",
+          "type": "(ad: AdInfo) => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "error",
+          "type": "(error: unknown) => void",
+          "optional": false,
+          "doc": "Reports a failure partway through a break. Ending the break is still the engine's job."
+        },
+        {
+          "name": "breakEnd",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Unlocks and resumes the content."
+        }
+      ]
+    },
+    "react-video-kit/ads#AdInfo": {
+      "entry": "react-video-kit/ads",
+      "name": "AdInfo",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "duration",
+          "type": "number",
+          "optional": false,
+          "doc": "Length in seconds."
+        },
+        {
+          "name": "skipAfter",
+          "type": "number | null",
+          "optional": false,
+          "doc": "Seconds before the viewer may skip, or null when they can't."
+        },
+        {
+          "name": "position",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "This ad's position in its break, from 1."
+        },
+        {
+          "name": "total",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How many ads the break has."
+        },
+        {
+          "name": "clickThrough",
+          "type": "string | null | undefined",
+          "optional": true,
+          "doc": "Where \"Learn more\" goes."
+        }
+      ]
+    },
+    "react-video-kit/ads#AdsOptions": {
+      "entry": "react-video-kit/ads",
+      "name": "AdsOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "engine",
+          "type": "(source: SourceObject) => AdEngine | null",
+          "optional": false,
+          "doc": "Creates an engine for each source, or returns null for no ads on that one."
+        },
+        {
+          "name": "timeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Milliseconds to wait for a pre-roll before playing the content instead."
+        },
+        {
+          "name": "onError",
+          "type": "((error: unknown) => void) | undefined",
+          "optional": true,
+          "doc": "Told about every failure, since the viewer never sees them."
+        }
+      ]
+    },
+    "react-video-kit/ads#ads": {
+      "entry": "react-video-kit/ads",
+      "name": "ads",
+      "doc": "Ad breaks through a pluggable engine. Failing open is the rule: if an ad is blocked, slow, or broken, the content plays and `onError` hears about it.",
+      "kind": "plugin",
+      "pluginName": "ads",
+      "required": true,
+      "optionsType": "AdsOptions",
+      "options": [
+        {
+          "name": "engine",
+          "type": "(source: SourceObject) => AdEngine | null",
+          "optional": false,
+          "doc": "Creates an engine for each source, or returns null for no ads on that one."
+        },
+        {
+          "name": "timeout",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "Milliseconds to wait for a pre-roll before playing the content instead."
+        },
+        {
+          "name": "onError",
+          "type": "((error: unknown) => void) | undefined",
+          "optional": true,
+          "doc": "Told about every failure, since the viewer never sees them."
+        }
+      ],
+      "state": [
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "ad",
+          "type": "AdInfo | null",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "ownsUi",
+          "type": "boolean",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": [
+        {
+          "name": "skip",
+          "type": "() => void",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "clicked",
+          "type": "() => void",
+          "optional": false,
+          "doc": "Tells the engine the viewer followed the ad's link, for its tracking."
+        }
+      ]
+    },
+    "react-video-kit/drm#ClearKeyConfig": {
+      "entry": "react-video-kit/drm",
+      "name": "ClearKeyConfig",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "keys",
+          "type": "Record<string, string>",
+          "optional": false,
+          "doc": "Key IDs mapped to keys, both in hex."
+        }
+      ]
+    },
+    "react-video-kit/drm#DrmConfig": {
+      "entry": "react-video-kit/drm",
+      "name": "DrmConfig",
+      "kind": "type",
+      "doc": "One description of protected playback, translated for whichever engine plays.",
+      "members": [
+        {
+          "name": "widevine",
+          "type": "KeySystemConfig | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "playready",
+          "type": "KeySystemConfig | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "fairplay",
+          "type": "FairPlayConfig | undefined",
+          "optional": true,
+          "doc": ""
+        },
+        {
+          "name": "clearkey",
+          "type": "ClearKeyConfig | undefined",
+          "optional": true,
+          "doc": ""
+        }
+      ]
+    },
+    "react-video-kit/drm#FairPlayConfig": {
+      "entry": "react-video-kit/drm",
+      "name": "FairPlayConfig",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "certificateUrl",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "licenseUrl",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "headers",
+          "type": "Record<string, string> | undefined",
+          "optional": true,
+          "doc": "Sent with each licence request."
+        },
+        {
+          "name": "withCredentials",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Send cookies with licence requests."
+        }
+      ]
+    },
+    "react-video-kit/drm#KeySystemConfig": {
+      "entry": "react-video-kit/drm",
+      "name": "KeySystemConfig",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "licenseUrl",
+          "type": "string",
+          "optional": false,
+          "doc": ""
+        },
+        {
+          "name": "headers",
+          "type": "Record<string, string> | undefined",
+          "optional": true,
+          "doc": "Sent with each licence request."
+        },
+        {
+          "name": "withCredentials",
+          "type": "boolean | undefined",
+          "optional": true,
+          "doc": "Send cookies with licence requests."
+        }
+      ]
+    },
+    "react-video-kit/drm#DrmOptions": {
+      "entry": "react-video-kit/drm",
+      "name": "DrmOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [],
+      "definition": "DrmOptions"
+    },
+    "react-video-kit/drm#drm": {
+      "entry": "react-video-kit/drm",
+      "name": "drm",
+      "doc": "Protected playback from one description. Engines handle their own key systems, and this runs the same exchange for streams the browser plays directly, as FairPlay does in Safari. Systems are tried in a fixed order, Widevine, PlayReady, FairPlay, then Clear Key, whatever order the config lists them in.",
+      "kind": "plugin",
+      "pluginName": "drm",
+      "required": true,
+      "optionsType": "DrmOptions",
+      "options": [],
+      "state": [
+        {
+          "name": "system",
+          "type": "string | null",
+          "optional": false,
+          "doc": ""
+        }
+      ],
+      "commands": []
+    },
+    "react-video-kit/ads/vast#vast": {
+      "entry": "react-video-kit/ads/vast",
+      "name": "vast",
+      "doc": "Plays a VAST tag's linear pre-roll with no SDK, in a second video element over the content. That needs no third-party script, but it does no viewability or verification measurement, so use `ima()` for ad networks that require them.",
+      "kind": "function",
+      "signature": "(options: VastOptions) => () => AdEngine"
+    },
+    "react-video-kit/ads/vast#VastOptions": {
+      "entry": "react-video-kit/ads/vast",
+      "name": "VastOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "tag",
+          "type": "string",
+          "optional": false,
+          "doc": "The VAST tag's URL."
+        },
+        {
+          "name": "maxRedirects",
+          "type": "number | undefined",
+          "optional": true,
+          "doc": "How many wrapper redirects to follow."
+        }
+      ]
+    },
+    "react-video-kit/ads/ima#ima": {
+      "entry": "react-video-kit/ads/ima",
+      "name": "ima",
+      "doc": "Google's Interactive Media Ads SDK, which AdSense and Ad Manager require. It loads with the source, because it must be ready by the first play's gesture, and it draws its own countdown and skip button. If an ad blocker stops it, the content plays.",
+      "kind": "function",
+      "signature": "(options: ImaOptions) => () => AdEngine"
+    },
+    "react-video-kit/ads/ima#ImaOptions": {
+      "entry": "react-video-kit/ads/ima",
+      "name": "ImaOptions",
+      "kind": "type",
+      "doc": "",
+      "members": [
+        {
+          "name": "tag",
+          "type": "string",
+          "optional": false,
+          "doc": "The ad tag's URL."
+        },
+        {
+          "name": "sdkUrl",
+          "type": "string | undefined",
+          "optional": true,
+          "doc": "Where to load the IMA SDK from."
+        }
+      ]
+    }
+  }
+}

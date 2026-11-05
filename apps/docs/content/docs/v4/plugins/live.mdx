@@ -1,0 +1,101 @@
+---
+title: Live
+description: A live pill, a jump back to the edge, and a timeline when the stream keeps a window to scrub through.
+---
+
+<PluginSummary id="live" />
+
+Adds a **LIVE** pill to the control bar. Press play below. This stream keeps about 20 seconds, so there's no timeline, only the pill.
+
+<Demo slug="live" />
+
+## Usage
+
+`live()` doesn't play anything itself, so it goes with [hls](/docs/v4/plugins/hls) or [dash](/docs/v4/plugins/dash):
+
+```tsx
+import { hls } from "react-video-kit/hls";
+import { live } from "react-video-kit/live";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [hls(), live(), ...defaultPlugins()];
+
+<VideoPlayer src="/stream.m3u8" plugins={plugins} />;
+```
+
+It's safe to keep for on-demand video, where it shows nothing.
+
+`edgeTolerance` sets how many seconds behind the edge still counts as live. It defaults to 6:
+
+```tsx
+live({ edgeTolerance: 10 });
+```
+
+## Plain live and DVR
+
+A stream that keeps at least 60 seconds counts as DVR, and the viewer can scrub back through what it keeps. Anything shorter isn't worth a scrubber, so it's plain live. This stream keeps about 100 seconds. Click back along the timeline, then press the pill to return.
+
+<Demo slug="live-dvr" />
+
+| Control | Plain live | DVR |
+| --- | --- | --- |
+| Window | Under 60 seconds | 60 seconds or more |
+| Timeline | Hidden | Shown, and it follows the edge |
+| Speed menu | Hidden | Shown |
+| Elapsed time | Hidden | Hidden |
+| `media.timeline.kind` | `"live"` | `"dvr"` |
+| `media.capabilities.seek` and `rate` | `false` | `true` |
+| Attributes on the root | `data-live` | `data-live`, `data-dvr` |
+
+The window comes from hls.js's playlist duration, dash.js's DVR window, or the element's `seekable` range under native HLS.
+
+## What the viewer sees
+
+- The pill reads **LIVE**, with a coloured dot (`--rv-live`) while playback is running and within `edgeTolerance` of the edge.
+- When the viewer pauses or falls further behind, the dot and the text dim, and the pill's accessible name changes to "Go to live".
+- Pressing the pill jumps to the edge, and plays if paused.
+
+## Build your own control
+
+`useCommands` gives you `goLive`, and `useVideoState` tells you when it's worth offering:
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { live } from "react-video-kit/live";
+
+function BackToLive() {
+  const behind = useVideoState(live, (state) => state.active && !state.atEdge);
+  const { goLive } = useCommands(live);
+  return behind ? <button onClick={() => goLive()}>Back to live</button> : null;
+}
+```
+
+`LiveIndicator` is the pill. When you compose your own layout, place it anywhere inside the player:
+
+```tsx
+import * as Video from "react-video-kit";
+import { LiveIndicator } from "react-video-kit/live";
+
+<Video.ControlRow>
+  <LiveIndicator />
+</Video.ControlRow>;
+```
+
+## Behaviour
+
+- hls.js and dash.js report live state on their own. Without `live()`, the stream still plays and the root still gets `data-live`, but there's no pill, no `goLive`, and no `data-dvr`, so the default skin hides the timeline even on a DVR stream.
+- Under native HLS, `live()` is what recognises the stream: it reads the window from the element.
+- `goLive` seeks to `media.live.edge`. For hls.js that's its `liveSyncPosition` when it has one, and otherwise the end of the playlist.
+- `data-live-edge` on the root only looks at position, while the pill's `data-edge` also needs playback to be running.
+- On plain live, `capabilities.seek` and `capabilities.rate` are false, so the seek and speed keys in the [hotkeys](/docs/v4/plugins/hotkeys) plugin and the double tap in the [gestures](/docs/v4/plugins/gestures) plugin and the system's seek buttons in the [Media Session](/docs/v4/plugins/media-session) plugin do nothing. `seek` and `setRate` still work from your own code, which is how `goLive` reaches the edge.
+- `media.live` holds `dvr`, `start`, `edge`, and `latency`, for anything you want to build around them. `latency` is `0` under native HLS.
+
+<Callout type="warn" title="Not tested on real devices yet">
+  Live has only been tested against a simulated HLS stream, in Chrome, Firefox, and desktop WebKit. DASH live hasn't run against any stream, and its tests use a fake dash.js. Native live on an iPhone or iPad hasn't been run.
+</Callout>
+
+## API
+
+<PluginApi id="live" />

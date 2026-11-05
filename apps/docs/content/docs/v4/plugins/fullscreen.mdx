@@ -1,0 +1,81 @@
+---
+title: Fullscreen
+description: A fullscreen button and commands, with a fallback for iPhones.
+---
+
+<PluginSummary id="fullscreen" />
+
+Adds a fullscreen button to the controls. It takes the whole player fullscreen, so your controls and overlays come with it. Press the button below and the label in the corner changes to active. Press Escape and it follows that too. The [gestures](/docs/v4/plugins/gestures) plugin adds double-click, and the [hotkeys](/docs/v4/plugins/hotkeys) plugin adds `F`.
+
+<Demo slug="fullscreen" />
+
+## Usage
+
+```tsx
+import { fullscreen } from "react-video-kit/fullscreen";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [fullscreen()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+On touch devices, entering fullscreen also tries to lock the screen to landscape. To turn that off:
+
+```tsx
+fullscreen({ lockOrientation: false });
+```
+
+## When the button shows
+
+The button renders nothing while `supported` is false. The plugin works it out in two steps:
+
+1. When the player mounts, `supported` is `document.fullscreenEnabled`. If the browser doesn't define that, it's whether the player's root has `webkitRequestFullscreen`.
+2. When the video attaches, if `supported` is still false, `document.fullscreenEnabled` isn't `false`, and the video has `webkitEnterFullscreen`, it becomes true. This is how an iPhone gets the button.
+
+So the button hides where fullscreen isn't available, such as an iframe whose permissions deny it.
+
+`supported` is false on the server, so the button isn't in the server-rendered HTML. It appears once the player mounts.
+
+## What goes fullscreen
+
+`enter` uses the first of these that exists:
+
+1. `requestFullscreen()` on the player's root.
+2. `webkitRequestFullscreen()` on the player's root.
+3. `webkitEnterFullscreen()` on the video. This is the iPhone path. Only the video goes fullscreen, so the player's controls and overlays aren't part of it. The [captions](/docs/v4/plugins/captions) plugin hands its cues to the browser while this is active.
+
+<Callout type="warn" title="Not tested on real devices yet">
+  The iPhone path has only run in unit tests with a simulated `webkitEnterFullscreen` and its events, not on a real iPhone or iPad. Orientation locking has no tests. The browser tests cover the standard path in desktop Chrome and Firefox. They skip WebKit, which doesn't enter fullscreen headless, so Safari isn't covered either.
+</Callout>
+
+## Build your own control
+
+`enter` and `toggle` return a promise that rejects if the browser refuses, for example outside a click or key press. Catch that in your own control.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { fullscreen } from "react-video-kit/fullscreen";
+
+function FullscreenToggle() {
+  const { toggle } = useCommands(fullscreen);
+  const active = useVideoState(fullscreen, (state) => state.active);
+  const supported = useVideoState(fullscreen, (state) => state.supported);
+  if (!supported) return null;
+  return <button onClick={() => toggle().catch(() => {})}>{active ? "Exit" : "Fullscreen"}</button>;
+}
+```
+
+`Fullscreen` is the button from the controls, which the plugin adds to the `controls-end` [slot](/docs/v4/composition/slots). It catches a refusal itself, and nothing changes. In your own layout, render the slot or the button itself.
+
+## Behaviour
+
+- `active` is true only while this player is the fullscreen element, or while its video is fullscreen on the iPhone path. It follows exits that the browser performs, such as Escape, and ignores another element going fullscreen.
+- The plugin sets `data-fullscreen` on the player's root while `active` is true, for your own CSS.
+- The landscape lock only runs where `(pointer: coarse)` matches, and skips videos taller than they're wide. If the browser has no lock, or refuses it, nothing happens. The lock is released on exit.
+
+## API
+
+<PluginApi id="fullscreen" />

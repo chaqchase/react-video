@@ -1,0 +1,98 @@
+---
+title: Keyboard
+description: Keyboard shortcuts for playback, seeking, volume, and more.
+---
+
+<PluginSummary id="hotkeys" />
+
+Adds keyboard shortcuts, and a brief message over the video that confirms what most of them did. Click the player below, then try the keys listed under it.
+
+<Demo slug="hotkeys" />
+
+## Usage
+
+```tsx
+import { hotkeys } from "react-video-kit/hotkeys";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [hotkeys()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+The options change how far the keys move things. `seekStep` and `largeSeekStep` are in seconds, and `volumeStep` is from 0 to 1.
+
+```tsx
+hotkeys({ seekStep: 10, largeSeekStep: 30, volumeStep: 0.1 });
+```
+
+## Keys
+
+| Key | What it does | Needs |
+|---|---|---|
+| `Space`, `K` | Play or pause | |
+| `←`, `→` | Seek back or forward by `seekStep`, 5 seconds by default | |
+| `J`, `L` | Seek back or forward by `largeSeekStep`, 10 seconds by default | |
+| `↑`, `↓` | Volume up or down by `volumeStep`, 5% by default | |
+| `M` | Mute or unmute | |
+| `0` to `9` | Jump to that tenth of the timeline: `0` is the start and `5` is halfway | |
+| `Home`, `End` | Jump to the start or end of the timeline | |
+| `>`, `<` | Next or previous rate | [speed](/docs/v4/plugins/speed) |
+| `C` | Captions on or off | [captions](/docs/v4/plugins/captions) |
+| `P` | Picture in picture on or off | [pip](/docs/v4/plugins/pip) |
+| `F` | Fullscreen on or off | [fullscreen](/docs/v4/plugins/fullscreen) |
+
+Letters work in either case. A key does nothing if the plugin it needs isn't installed. The keys themselves are fixed, and there's no option to rebind them.
+
+## When keys are ignored
+
+The player leaves a key alone when:
+
+- Ctrl, Cmd, or Alt is held. Shift is fine, since `<` and `>` usually need it.
+- The viewer is typing in an `input`, `textarea`, `select`, or `contenteditable` element.
+- A slider has focus and the key is an arrow, `Home`, `End`, `Page Up`, or `Page Down`. The slider uses those. Other keys still work.
+- A button, link, or `summary` has focus and the key is `Space`. That press belongs to the focused element. `K` still plays or pauses.
+- Something already called `preventDefault()` on it, as an open menu does for the keys it uses. To keep a key for yourself, do the same before the event reaches `document`.
+- The player isn't the one receiving keys, as described below.
+
+## Several players on a page
+
+Each player acts on a key when focus is inside it, or when it's the player the viewer last used.
+
+- A click, a tap, or focus landing inside a player makes it the last used, replacing any other.
+- It stays the last used until the viewer clicks or taps somewhere outside it, or it unmounts. Moving focus away with Tab doesn't end it.
+- Until the viewer uses a player, keys pressed elsewhere on the page don't reach it.
+
+So a key only ever controls one player, the one the viewer used most recently.
+
+## Confirm keys your own way
+
+`HotkeysFeedback` is the message over the video, which the plugin adds to the `overlay` [slot](/docs/v4/composition/slots). It has `role="status"`, so screen readers announce it, and it clears after 700ms. `onFeedback` gives you the same messages, such as `Pause`, `+5s`, `Volume 40%`, or `1.5×`. The [i18n](/docs/v4/plugins/i18n) plugin translates the words.
+
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { useCommands } from "react-video-kit";
+import { hotkeys } from "react-video-kit/hotkeys";
+
+function LastKey() {
+  const { onFeedback } = useCommands(hotkeys);
+  const [message, setMessage] = useState("");
+  useEffect(() => onFeedback(setMessage), [onFeedback]);
+  return <p>{message}</p>;
+}
+```
+
+## Behaviour
+
+- While a player is receiving keys, it takes every key in the table from the page, so the arrows, `Space`, `Home`, and `End` stop scrolling it. A click or tap elsewhere on the page gives them back.
+- `↑` from muted starts at 0, so it unmutes at one step. `↓` to 0 mutes.
+- `C` turns on the track that was last on, or the first track if none was.
+- `0` to `9`, `Home`, `End`, `C`, `P`, and `F` show no message.
+- The seek, jump, and speed keys do nothing and show no message when that isn't possible, such as during an [ad](/docs/v4/plugins/ads) or on a [live stream](/docs/v4/plugins/live) with no DVR window.
+- With the [idle](/docs/v4/plugins/idle) plugin, a key the player acts on brings hidden controls back, wherever focus is.
+
+## API
+
+<PluginApi id="hotkeys" />

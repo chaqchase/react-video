@@ -12,10 +12,33 @@ const SLUGS = [
   "hls",
   "hls-engine",
   "dash",
+  "dash-captions",
   "engine-unused",
   "live",
   "live-dvr",
   "hls-tracks",
+  "compose-ready",
+  "compose-parts",
+  "compose-headless",
+  "speed",
+  "quality",
+  "captions",
+  "chapters",
+  "thumbnails",
+  "idle",
+  "gestures",
+  "hotkeys",
+  "fullscreen",
+  "pip",
+  "recovery",
+  "autoplay",
+  "persistence",
+  "media-session",
+  "analytics",
+  "i18n",
+  "airplay",
+  "chromecast",
+  "custom-plugin",
   "playlist",
   "ads",
   "ads-wrapper",
@@ -41,7 +64,10 @@ for (const slug of SLUGS) {
     test("has no detectable accessibility violations", async ({ page }) => {
       await page.goto(`/examples/${slug}`);
       await expect(page.locator('[data-part="root"]')).toBeVisible();
+      // Legacy mode runs in this page. The default also opens a blank one to report
+      // from, and that's what occasionally hangs when many pages are busy at once.
       const { violations } = await new AxeBuilder({ page })
+        .setLegacyMode(true)
         .include('[data-part="root"]')
         .analyze();
       expect(violations.map(({ id }) => id)).toEqual([]);

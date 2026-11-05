@@ -10,5 +10,5 @@ const keys = { "000102030405060708090a0b0c0d0e0f": "101112131415161718191a1b1c1d
 const plugins = [dash(), drm({ clearkey: { keys } }), ...defaultPlugins()];
 
 export default function Drm() {
-  return <VideoPlayer src="/media/drm/manifest.mpd" poster="/media/poster.jpg" plugins={plugins} />;
+  return <VideoPlayer src="/media/drm/manifest.mpd" poster="/media/poster.jpg" plugins={plugins} load="visible" />;
 }

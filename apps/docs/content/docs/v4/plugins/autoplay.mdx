@@ -1,0 +1,82 @@
+---
+title: Autoplay
+description: Starts playback on load, with sound if the browser allows it, then muted.
+---
+
+<PluginSummary id="autoplay" />
+
+Starts the video when it's ready, and falls back to muted playback with a **Tap to unmute** chip when the browser refuses sound. The demo refuses sound on purpose, so you'll see the chip whatever your browser would have allowed. Press it to turn sound on.
+
+<Demo slug="autoplay" />
+
+## Usage
+
+```tsx
+import { autoplay } from "react-video-kit/autoplay";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [autoplay()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+To stay paused rather than mute when the browser refuses sound:
+
+```tsx
+autoplay({ muted: false });
+```
+
+To start for viewers who prefer reduced motion as well:
+
+```tsx
+autoplay({ ignoreReducedMotion: true });
+```
+
+## What it tries
+
+The browser's autoplay policy decides what's allowed, and your code can't override it. The plugin asks in this order, once the source is ready:
+
+1. **Reduced motion.** If the viewer prefers reduced motion, it stops here and they get the Play button, unless you set `ignoreReducedMotion`.
+2. **With sound.** It calls `play`. If that works, there's nothing more to do.
+3. **Muted.** If the browser refused with `NotAllowedError`, it mutes, calls `play` again, and shows the chip. With `muted: false`, it stops before this step.
+4. **The Play button.** If muted playback is refused too, it restores the mute setting and leaves the viewer with the normal Play button.
+
+## Offer sound from your own control
+
+`UnmuteChip` appears on its own through the `overlay` [slot](/docs/v4/composition/slots). To offer sound somewhere else, read the same state and call `unmute`:
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { autoplay } from "react-video-kit/autoplay";
+
+function TurnSoundOn() {
+  const visible = useVideoState(
+    autoplay,
+    (state, media) => state.mutedFallback && media.muted && !media.paused
+  );
+  const { unmute } = useCommands(autoplay);
+  if (!visible) return null;
+  return <button onClick={() => unmute()}>Turn sound on</button>;
+}
+```
+
+## Behaviour
+
+- It tries once for each source, so every new source starts the same way, including each [playlist](/docs/v4/plugins/playlist) item.
+- It only falls back on `NotAllowedError`. Any other failure leaves the video paused.
+- If the player was already muted, muted playback shows no chip, because there's no sound to offer back.
+- Unmuting any way, with `unmute` or the volume control, clears `mutedFallback`, so muting again later doesn't bring the chip back.
+- The chip only shows while the video is playing.
+- The root has `data-autoplay-muted` while `mutedFallback` is set.
+- It waits for the player to load, so with `load="visible"` it starts when the player scrolls into view.
+- The [persistence](/docs/v4/plugins/persistence) plugin doesn't save the fallback's mute, so the next visit tries sound again.
+
+<Callout type="warn" title="Not tested on real devices yet">
+  The muted fallback hasn't been run against a real browser's refusal, or on an iPhone or iPad. Unit tests cover each step with a fake media element that refuses `play`.
+</Callout>
+
+## API
+
+<PluginApi id="autoplay" />

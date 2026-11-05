@@ -1,0 +1,74 @@
+---
+title: Speed
+description: A menu of playback rates, and commands to change them.
+---
+
+<PluginSummary id="speed" />
+
+Adds a **Speed** row to the settings menu. Open the settings menu below and change it, or use `<` and `>` if the [hotkeys](/docs/v4/plugins/hotkeys) plugin is installed.
+
+<Demo slug="speed" />
+
+## Usage
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { speed } from "react-video-kit/speed";
+
+const plugins = [speed()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+To offer different rates, list them in the order they should appear:
+
+```tsx
+speed({ rates: [1, 1.5, 2, 3] });
+```
+
+## Change the rate from your own control
+
+`useCommands` gives you the plugin's commands, with their types, from anywhere inside the player.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { speed } from "react-video-kit/speed";
+
+function DoubleSpeed() {
+  const { set } = useCommands(speed);
+  const rate = useVideoState((media) => media.rate);
+  return (
+    <button aria-pressed={rate === 2} onClick={() => set(rate === 2 ? 1 : 2)}>
+      2×
+    </button>
+  );
+}
+```
+
+## Place the menu yourself
+
+`SpeedMenu` is the row that appears in the settings menu. When you compose your own layout, put it in any [menu](/docs/v4/composition/parts#menus):
+
+```tsx
+import * as Video from "react-video-kit";
+import { SpeedMenu } from "react-video-kit/speed";
+
+<Video.Menu>
+  <Video.MenuTrigger aria-label="Speed">1×</Video.MenuTrigger>
+  <Video.MenuContent>
+    <SpeedMenu />
+  </Video.MenuContent>
+</Video.Menu>;
+```
+
+## Behaviour
+
+- `SpeedMenu` renders nothing while something locks the rate, such as an [ad](/docs/v4/plugins/ads), or when the current source can't change rate, such as a [live stream](/docs/v4/plugins/live) with no DVR window or while [casting](/docs/v4/plugins/chromecast).
+- `faster` and `slower` move to the next listed rate, and do nothing at either end.
+- The [persistence](/docs/v4/plugins/persistence) plugin can remember the rate between visits.
+
+## API
+
+<PluginApi id="speed" />

@@ -19,7 +19,7 @@ const preroll = `<?xml version="1.0" encoding="UTF-8"?>
               <Tracking event="skip">${track("skip")}</Tracking>
             </TrackingEvents>
             <VideoClicks>
-              <ClickThrough><![CDATA[https://github.com/chaqchase/react-video-kit]]></ClickThrough>
+              <ClickThrough><![CDATA[https://github.com/chaqchase/react-video]]></ClickThrough>
             </VideoClicks>
             <MediaFiles>
               <MediaFile delivery="progressive" type="video/mp4" width="640" height="360" bitrate="300"><![CDATA[/media/ad.mp4]]></MediaFile>

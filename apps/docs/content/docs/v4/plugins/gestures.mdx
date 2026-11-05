@@ -1,0 +1,86 @@
+---
+title: Gestures
+description: Click to play, double-click for fullscreen, and double-tap to seek.
+---
+
+<PluginSummary id="gestures" />
+
+Makes the video itself respond to clicks and taps. Click the video below to play or pause, and double-click it for fullscreen. On a touch screen, double-tap the left or right half to seek, and a ripple confirms it.
+
+<Demo slug="gestures" />
+
+## Usage
+
+```tsx
+import { fullscreen } from "react-video-kit/fullscreen";
+import { gestures } from "react-video-kit/gestures";
+import { idle } from "react-video-kit/idle";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [idle(), gestures(), fullscreen()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Gestures works alone, but double-click needs the [fullscreen](/docs/v4/plugins/fullscreen) plugin, and a single tap needs the [idle](/docs/v4/plugins/idle) plugin.
+
+To change how far a double tap seeks, set `seekStep`, in seconds. The default is 10.
+
+```tsx
+gestures({ seekStep: 5 });
+```
+
+## With a mouse
+
+- **Click** the video to play or pause. A pen counts as a mouse here.
+- **Double-click** the video to toggle fullscreen. Playback doesn't change. Without the fullscreen plugin, a double-click is two clicks, so it plays and pauses.
+
+Only the primary button counts, and a press that moves more than 10px isn't a click.
+
+When the fullscreen plugin is installed, a click waits 200ms before it plays or pauses, so that a double-click can cancel it. Without the plugin, there's no wait. A double-click with more than 200ms between its clicks toggles fullscreen and also plays or pauses once, because the first click has already acted.
+
+## With touch
+
+- **Tap** never plays or pauses. The idle plugin uses it to show or hide the controls, and without that plugin it does nothing.
+- **Double tap** the video, with two taps less than 280ms apart and within 48px of each other, to seek by `seekStep`. The left half of the player seeks back and the right half seeks forward. Browsers can also report this as a double click, which the plugin ignores, so fullscreen doesn't change.
+- **Swipe** doesn't seek or change playback. There are no swipe gestures, and a touch that moves more than 10px isn't a tap, though the idle plugin shows the controls for it. The default skin sets `touch-action: manipulation`, which leaves scrolling to the browser.
+
+<Callout type="warn" title="Not tested on real devices yet">
+  Touch has only run with simulated input, not on a real phone or tablet.
+</Callout>
+
+## Show your own feedback
+
+`onSeek` tells you when a double tap seeks, with `-1` for back and `1` for forward, and how many seconds it moved. It returns a function that stops listening.
+
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { useCommands } from "react-video-kit";
+import { gestures } from "react-video-kit/gestures";
+
+function LastSeek() {
+  const { onSeek } = useCommands(gestures);
+  const [last, setLast] = useState<string | null>(null);
+  useEffect(
+    () => onSeek((direction, seconds) => setLast(`${direction < 0 ? "Back" : "Forward"} ${seconds}s`)),
+    [onSeek]
+  );
+  return last ? <p>{last}</p> : null;
+}
+```
+
+The ripple is `SeekFeedback`, which the plugin adds to the `overlay` [slot](/docs/v4/composition/slots). It shows how far the video moved, such as `+10s` or `-10s`. It sets `data-direction` to `back` or `forward`, and `data-active` while it plays.
+
+## Behaviour
+
+- Only the video counts. Clicks on the controls, the play overlay, or anything else in the player are ignored. If you render something over the video, give it `pointer-events: none` so clicks can reach the video.
+- On touch, starting a paused video takes the play overlay or the play button, since a tap never plays.
+- Each tap of a double tap also reaches the idle plugin, so the controls toggle twice.
+- Taps more than 48px apart, measured across the player, are separate taps, and the second can start a new double tap.
+- A double tap does nothing when seeking isn't possible, such as during an [ad](/docs/v4/plugins/ads) or on a [live stream](/docs/v4/plugins/live) with no DVR window. There's no ripple, and `onSeek` isn't called.
+
+## API
+
+<PluginApi id="gestures" />
