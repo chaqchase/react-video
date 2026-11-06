@@ -2,7 +2,7 @@
 
 ## Setup
 
-You need Node 24 (see `.node-version`) and pnpm 11. Run `corepack enable`, or let pnpm 9.7+ switch itself using the `packageManager` field. `ffmpeg` is only needed to generate test media.
+You need Node 24 (see `.node-version`) and pnpm 11. Run `corepack enable`, or let pnpm 9.7+ switch itself using the `packageManager` field. You only need `ffmpeg`, version 8.1 or newer, to generate test media.
 
 ```bash
 pnpm install

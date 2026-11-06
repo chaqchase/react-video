@@ -215,6 +215,13 @@ ffmpeg(
   "-format_options", `encryption_scheme=cenc-aes-ctr:encryption_key=${CLEAR_KEY.key}:encryption_kid=${CLEAR_KEY.kid}`,
   file("drm", "manifest.mpd")
 );
+// ffmpeg 8.0.1 repeats every earlier sample's encryption data in each later segment, and browsers
+// refuse those. 8.1 doesn't. Nothing else fails until a test plays it, so stop here.
+const segment = readFileSync(file("drm", "chunk-stream0-00002.m4s"));
+const entries = (box) => segment.readUInt32BE(segment.indexOf(box) + 8);
+if (entries("senc") !== entries("trun")) {
+  throw new Error("This ffmpeg writes encrypted segments browsers can't play. Use ffmpeg 8.1 or newer.");
+}
 const defaultKid = CLEAR_KEY.kid.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, "$1-$2-$3-$4-$5");
 writeFileSync(
   file("drm", "manifest.mpd"),
