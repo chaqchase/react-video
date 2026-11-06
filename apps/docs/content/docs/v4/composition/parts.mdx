@@ -114,7 +114,7 @@ Those two slots are where [chapters](/docs/v4/plugins/chapters) and [thumbnails]
 
 ## Menus
 
-`SettingsMenu` holds whatever plugins add to the `menu` slot, and hides itself when that's empty. To build your own, use `Menu`, and put a plugin's menu in it:
+`SettingsMenu` holds whatever plugins add to the `menu` slot, and hides itself when no row is left. A row hides by rendering nothing, so a copy of the rows stays mounted out of sight to notice that. If a row shows something that changes during playback, pass a component that reads it as `value={<Current />}`, because that only mounts in an open menu.
 
 ```tsx
 import * as Video from "react-video-kit";

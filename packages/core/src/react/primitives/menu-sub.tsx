@@ -8,7 +8,10 @@ import { useItemHandlers, useMenu } from "./menu-context";
 export interface MenuSubProps extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
   /** The row's name, which also titles the submenu. */
   title: ReactNode;
-  /** The current value, shown at the end of the row. */
+  /**
+   * The current value, shown at the end of the row. A value that changes during playback should
+   * be a component that reads it, so that nothing renders until the menu is open.
+   */
   value?: ReactNode;
   /** Shown before the title. */
   icon?: ReactNode;
@@ -44,7 +47,8 @@ export const MenuSub = forwardRef<HTMLDivElement, MenuSubProps>(function MenuSub
       >
         {icon}
         <span data-part="menu-item-label">{title}</span>
-        {value !== undefined ? <span data-part="menu-item-value">{value}</span> : null}
+        {/* Only in an open menu, as the settings button also renders rows just to see if any exist. */}
+        {value !== undefined && menu.panelHost ? <span data-part="menu-item-value">{value}</span> : null}
       </div>
       {menu.panelHost
         ? createPortal(
