@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./test";
 
 // Registry import stays out of the browser bundle; only the slugs matter here.
 const SLUGS = [

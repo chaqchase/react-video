@@ -13,6 +13,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
+    // Headless browsers still reach the speakers, so each project is muted without the page knowing.
     // Bundled Chromium lacks proprietary codecs, so CI targets real Chrome. Locally,
     // set E2E_CHROME_CHANNEL=chrome, or E2E_CHROME_PATH to any Chromium browser's binary.
     {
@@ -20,12 +21,20 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         channel: process.env.E2E_CHROME_CHANNEL ?? (process.env.CI ? "chrome" : undefined),
-        launchOptions: process.env.E2E_CHROME_PATH
-          ? { executablePath: process.env.E2E_CHROME_PATH }
-          : {},
+        launchOptions: {
+          args: ["--mute-audio"],
+          ...(process.env.E2E_CHROME_PATH ? { executablePath: process.env.E2E_CHROME_PATH } : {}),
+        },
       },
     },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    {
+      name: "firefox",
+      use: {
+        ...devices["Desktop Firefox"],
+        launchOptions: { firefoxUserPrefs: { "media.volume_scale": "0.0" } },
+      },
+    },
+    // WebKit has no such option, so `e2e/test.ts` silences it.
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
   webServer: {

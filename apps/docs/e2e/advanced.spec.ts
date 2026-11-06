@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./test";
 
 const root = '[data-part="root"]';
 const video = '[data-part="media"]';

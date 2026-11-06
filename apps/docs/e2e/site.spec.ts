@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./test";
 
 const noErrors = (page: Page) => {
   const errors: string[] = [];
@@ -22,6 +22,8 @@ const violations = async (page: Page, exclude: string[] = []) => {
 test.describe("home", () => {
   test("playing the video causes no React commits", async ({ page }) => {
     await page.goto("/");
+    // Before this, the player's own load would abort the play below.
+    await expect(page.locator(".rv-root").first()).toHaveAttribute("data-status", "ready", { timeout: 20_000 });
     const video = page.locator("video").first();
     await video.evaluate((element: HTMLVideoElement) => {
       element.muted = true;

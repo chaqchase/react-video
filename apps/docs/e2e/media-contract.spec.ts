@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createContext, runInContext } from "node:vm";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./test";
 
 // The scenarios the fake media element also runs in unit tests. Passing here, in
 // every browser, is what makes the fake a fair stand-in.

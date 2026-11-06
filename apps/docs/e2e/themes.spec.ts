@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./test";
 
 const root = '[data-part="root"]';
 const group = '[role="group"][aria-label="Theme"]';
@@ -61,8 +61,14 @@ test.describe("themes", () => {
     for (const theme of await themesOn(page)) {
       await choose(page, theme);
       await expect(page.locator(root), theme).toHaveAttribute("data-status", "ready", { timeout: 20_000 });
-      // The large button goes away once it's started, and some themes don't have one at all.
-      const play = page.locator(root).getByRole("button", { name: "Play", exact: true }).locator("visible=true").first();
+      // The large button goes away once it's started, though it's still visible while it fades, and
+      // some themes don't have one at all.
+      const play = page
+        .locator(root)
+        .getByRole("button", { name: "Play", exact: true })
+        .and(page.locator(':not([data-state="started"])'))
+        .locator("visible=true")
+        .first();
       await play.focus();
       await page.keyboard.press("Enter");
       await expect(page.locator(root), theme).toHaveAttribute("data-playing", "");
