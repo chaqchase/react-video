@@ -27,6 +27,21 @@ const nearTheEnd = (page: Page) =>
     element.currentTime = element.duration - 0.4;
   });
 
+const expectCardClear = async (page: Page) => {
+  const box = (await page.getByRole("group", { name: "Up next" }).boundingBox())!;
+  const frame = (await page.locator(root).boundingBox())!;
+  expect(box.x, "the card leaves the player").toBeGreaterThanOrEqual(frame.x - 1);
+  expect(box.y, "the card leaves the player").toBeGreaterThanOrEqual(frame.y - 1);
+  expect(box.x + box.width, "the card leaves the player").toBeLessThanOrEqual(frame.x + frame.width + 1);
+  expect(box.y + box.height, "the card leaves the player").toBeLessThanOrEqual(frame.y + frame.height + 1);
+  const controls = page.locator(`${root} :is([data-control], [data-part="play-overlay"]):not([data-part^="up-next"]):visible`);
+  for (const control of await controls.all()) {
+    const other = (await control.boundingBox())!;
+    const apart = other.x >= box.x + box.width || other.x + other.width <= box.x || other.y >= box.y + box.height || other.y + other.height <= box.y;
+    expect(apart, "the card covers a control").toBe(true);
+  }
+};
+
 test.describe("playlist", () => {
   test("moves through the queue on one element, playing", async ({ page }) => {
     await start(page, "playlist");
@@ -58,11 +73,42 @@ test.describe("playlist", () => {
     await nearTheEnd(page);
     const card = page.getByRole("group", { name: "Up next" });
     await expect(card).toContainText("The long ridge", { timeout: 10_000 });
+    // Rounded even where the player's own corners are square.
+    expect(await card.evaluate((element) => parseFloat(getComputedStyle(element).borderRadius))).toBeGreaterThan(0);
+    await expectCardClear(page);
     await expect.poll(() => videoProperty(page, (element) => element.currentSrc), {
       timeout: 10_000,
     }).toContain("sample-270");
     await expect(card).toHaveCount(0);
     await expectAdvancing(page);
+  });
+
+  for (const theme of ["netflix", "prime", "tiktok"]) {
+    test(`finds room for the card on a phone-sized ${theme} player`, async ({ page }) => {
+      await page.goto(`/playground?t=${theme}&p=playlist&w=phone`);
+      await expect(page.locator(root)).toHaveAttribute("data-status", "ready", { timeout: 20_000 });
+      await videoProperty(page, (element) => {
+        element.muted = true;
+        return element.play();
+      });
+      await expectAdvancing(page);
+      await nearTheEnd(page);
+      await expect(page.getByRole("group", { name: "Up next" })).toBeVisible({ timeout: 10_000 });
+      await expectCardClear(page);
+    });
+  }
+
+  test("keeps keyboard focus when the card replaces the controls", async ({ page }) => {
+    await start(page, "playlist");
+    await expectAdvancing(page);
+    await page.locator('[data-part="play-pause"]').focus();
+    await nearTheEnd(page);
+    await expect(page.getByRole("button", { name: "Play now" })).toBeFocused({ timeout: 10_000 });
+
+    await page.getByRole("button", { name: "Cancel" }).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("group", { name: "Up next" })).toHaveCount(0);
+    await expect(page.locator('[data-part="play-overlay"]')).toBeFocused();
   });
 
   test("stays on the finished video when cancelled", async ({ page }) => {

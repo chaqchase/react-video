@@ -21,7 +21,10 @@ export function useFocusFallback<Part extends HTMLElement>() {
   useLayoutEffect(() => {
     const node = part.current;
     return () => {
-      if (node?.contains(document.activeElement)) focusPlayButton(node.closest('[data-part="root"]'));
+      if (!node?.contains(document.activeElement)) return;
+      const root = node.closest('[data-part="root"]');
+      // Once it's gone, as a layout can hide the play buttons for as long as this part shows.
+      queueMicrotask(() => focusPlayButton(root));
     };
   }, []);
   return part;

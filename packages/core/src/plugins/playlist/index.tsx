@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, type ReactElement } from "react";
+import { forwardRef, useEffect, useRef, type ReactElement } from "react";
 import { definePlugin } from "../../core/plugin";
 import type { SourceInput } from "../../core/types";
 import { usePlayer } from "../../react/context";
@@ -242,10 +242,19 @@ function UpNextCard() {
   const playNow = useLabel("playNow", "Play now");
   const dismiss = useLabel("cancel", "Cancel");
   const card = useFocusFallback<HTMLDivElement>();
+  const first = useRef<HTMLButtonElement>(null);
   const spoken = title ? `${upNext}: ${title}` : upNext;
 
   // Once, rather than a live region on the card, which would speak every second it counts.
   useEffect(() => player.announce(spoken), [player, spoken]);
+
+  // The default look hides the controls behind the card on most players. Focus can't stay on them.
+  useEffect(() => {
+    const focused = document.activeElement;
+    if (focused && player.root()?.contains(focused) && getComputedStyle(focused).visibility === "hidden") {
+      first.current?.focus({ preventScroll: true });
+    }
+  }, [player]);
 
   return (
     <div ref={card} data-part="up-next" role="group" aria-label={upNext}>
@@ -255,7 +264,7 @@ function UpNextCard() {
       </p>
       {title ? <p data-part="up-next-title">{title}</p> : null}
       <div data-part="up-next-actions">
-        <Button data-part="up-next-play" onClick={() => next()}>
+        <Button ref={first} data-part="up-next-play" onClick={() => next()}>
           {playNow}
         </Button>
         <Button data-part="up-next-cancel" onClick={() => cancel()}>

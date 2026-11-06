@@ -128,6 +128,20 @@ test.describe("live", () => {
       .toBeGreaterThan(0);
   });
 
+  test("has no settings button when a stream has nothing to set", async ({ page }) => {
+    await play(page, "live");
+    await expect(page.locator(root)).toHaveAttribute("data-live", "");
+    await expect(page.getByRole("button", { name: "Settings" })).toHaveCount(0);
+  });
+
+  test("keeps the settings button while a DVR window can change speed", async ({ page }) => {
+    await play(page, "live-dvr");
+    await expect(page.locator(root)).toHaveAttribute("data-dvr", "");
+    await page.locator(root).hover();
+    await page.getByRole("button", { name: "Settings" }).click();
+    await expect(page.getByRole("menuitem").first()).toBeVisible();
+  });
+
   test("scrubs back through a DVR window, then returns to the edge", async ({ page }) => {
     await play(page, "live-dvr");
     await expect(page.locator(root)).toHaveAttribute("data-dvr", "");
