@@ -73,6 +73,16 @@ test.describe("home", () => {
       expect(await violations(page)).toEqual([]);
     });
   }
+
+  // A Mac shows ⌘K in the search button, so a run there never sees this label otherwise.
+  test("has no accessibility violations on Windows and Linux", async ({ page }) => {
+    await page.addInitScript(() => Object.defineProperty(navigator, "platform", { value: "Linux x86_64" }));
+    await page.goto("/");
+    await expect(page.locator(".site-search-key")).toHaveText("Ctrl K");
+    await expect(page.locator(".rv-root").first()).toBeVisible();
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    expect(await violations(page)).toEqual([]);
+  });
 });
 
 test.describe("plugin gallery", () => {

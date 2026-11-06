@@ -84,7 +84,7 @@ export function Search() {
         onClick={() => dialog.current?.showModal()}
       >
         <SearchIcon width={14} height={14} />
-        <span className="site-search-label">Search</span>
+        <span className="site-search-label">Search</span>{" "}
         <kbd className="site-search-key">{shortcut}</kbd>
       </button>
       <dialog
