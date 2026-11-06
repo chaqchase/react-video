@@ -203,4 +203,17 @@
       transform: scale(1.08);
     }
   }
+
+  /* The transport is in the middle, as it is in the default look, so the card takes its place. */
+  @container rv (max-width: 1080px) {
+    .rv-root.rv-theme-prime [data-part="up-next"] {
+      inset: 50% auto auto 50%;
+      width: max-content;
+      translate: -50% -50%;
+    }
+
+    .rv-root.rv-theme-prime:has([data-part="up-next"]) :is([data-part="transport"], [data-part="transport"] > *, [data-part="play-overlay"]) {
+      visibility: hidden;
+    }
+  }
 }

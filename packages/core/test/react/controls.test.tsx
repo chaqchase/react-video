@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { Profiler, type ReactNode } from "react";
+import { Profiler, type ReactElement, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { definePlugin } from "../../src/core/plugin";
 import type { Player } from "../../src/core/types";
@@ -22,6 +22,8 @@ import { Mute } from "../../src/react/primitives/mute";
 import { VolumeSlider } from "../../src/react/primitives/volume-slider";
 import { SeekButton } from "../../src/react/primitives/seek-button";
 import { Root } from "../../src/react/root";
+import { useVideoState } from "../../src/react/hooks";
+import { SettingsMenu } from "../../src/ui/parts/settings-menu";
 import { Transport } from "../../src/ui/parts/transport";
 import { advance } from "../helpers/fake-media";
 
@@ -517,6 +519,81 @@ describe("overlays", () => {
     await flush();
     expect(load).toHaveBeenCalled();
     expect(container.querySelector("video")).toBe(video);
+  });
+});
+
+describe("SettingsMenu", () => {
+  // Rows hide themselves at runtime, as speed does on a live stream with nothing to rewind.
+  const row = definePlugin("row", () => ({
+    state: () => ({ shown: false }),
+    commands: (context) => ({ show: (shown: boolean) => context.set({ shown }) }),
+    slots: { menu: Row },
+  }));
+  function Row(): ReactElement | null {
+    const shown = useVideoState(row, (state) => state.shown);
+    return shown ? <MenuItem>A setting</MenuItem> : null;
+  }
+  const button = () => screen.queryByRole("button", { name: "Settings" });
+  let player: Player;
+  const mount = async (plugins = [row()]) => {
+    render(
+      <Root ref={(next) => { if (next) player = next; }} plugins={plugins}>
+        <SettingsMenu />
+      </Root>
+    );
+    await flush();
+  };
+
+  it("has no button while every row hides itself", async () => {
+    await mount();
+    expect(button()).toBeNull();
+    expect(document.querySelector('[data-part="menu-content"]')).toBeNull();
+  });
+
+  it("follows the rows as they come and go", async () => {
+    await mount();
+    act(() => player.plugin(row).commands.show(true));
+    await flush();
+    expect(button()).toBeTruthy();
+    act(() => player.plugin(row).commands.show(false));
+    await flush();
+    expect(button()).toBeNull();
+  });
+
+  it("closes along with its rows, and opens closed when they return", async () => {
+    await mount();
+    act(() => player.plugin(row).commands.show(true));
+    await flush();
+    fireEvent.click(button() as HTMLElement);
+    await flush();
+    expect(screen.getByRole("menuitem", { name: "A setting" })).toBeTruthy();
+    act(() => player.plugin(row).commands.show(false));
+    await flush();
+    expect(document.querySelector('[data-part="menu-content"]')).toBeNull();
+    act(() => player.plugin(row).commands.show(true));
+    await flush();
+    expect(button()?.getAttribute("aria-expanded")).toBe("false");
+    expect(document.querySelector('[data-part="menu-content"]')).toBeNull();
+  });
+
+  it("keeps the rows out of the page, so nothing reads or tabs to them twice", async () => {
+    await mount();
+    act(() => player.plugin(row).commands.show(true));
+    await flush();
+    expect(screen.queryByRole("menuitem")).toBeNull();
+    expect(screen.queryByText("A setting")).toBeNull();
+  });
+
+  it("trusts rows passed as children", async () => {
+    render(
+      <Root plugins={[]}>
+        <SettingsMenu>
+          <MenuItem>Mine</MenuItem>
+        </SettingsMenu>
+      </Root>
+    );
+    await flush();
+    expect(button()).toBeTruthy();
   });
 });
 

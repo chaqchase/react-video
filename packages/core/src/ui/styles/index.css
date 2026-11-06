@@ -1418,8 +1418,42 @@
     z-index: 3;
     max-width: min(320px, 80%);
     padding: 14px 16px;
-    border-radius: var(--rv-radius);
+    border-radius: var(--rv-menu-radius);
     animation: rv-fade var(--rv-duration-out) var(--rv-ease);
+  }
+
+  /* The card can't clear what's centred on most players, so it takes the centre, and Cancel gives it back. */
+  @container rv (max-width: 1080px) {
+    .rv-root:not([class*="rv-theme-"]) [data-part="up-next"] {
+      inset: 50% auto auto 50%;
+      width: max-content;
+      translate: -50% -50%;
+    }
+
+    .rv-root:not([class*="rv-theme-"]):has([data-part="up-next"]) :is([data-part="transport"], [data-part="play-overlay"]) {
+      visibility: hidden;
+    }
+  }
+
+  /* No theme has room beside it on a small player. */
+  @container rv (max-width: 560px) {
+    .rv-root [data-part="up-next"] {
+      inset: 50% auto auto 50%;
+      width: max-content;
+      translate: -50% -50%;
+    }
+
+    .rv-root:has([data-part="up-next"]) :is([data-part="play-overlay"], [data-part="title"]) {
+      visibility: hidden;
+    }
+  }
+
+  /* A theme's bar takes the lower half of a phone-sized player. */
+  @container rv (max-width: 400px) {
+    .rv-root[class*="rv-theme-"] [data-part="up-next"] {
+      inset-block-start: 8px;
+      translate: -50% 0;
+    }
   }
 
   .rv-root [data-part="up-next-label"] {
