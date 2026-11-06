@@ -85,14 +85,15 @@ jobs:
         with:
           path: apps/docs/public/media
           key: media-${{ hashFiles('apps/docs/scripts/gen-media.mjs') }}
+      # Homebrew on Linux too: Ubuntu's ffmpeg 8.0.1 can't write the protected stream.
       - name: Install ffmpeg
         if: steps.media.outputs.cache-hit != 'true'
         run: |
-          if [ "$RUNNER_OS" = "macOS" ]; then
-            brew install ffmpeg
-          else
-            sudo apt-get update && sudo apt-get install -y ffmpeg
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           fi
+          brew install ffmpeg
+          echo "$(brew --prefix ffmpeg)/bin" >> "$GITHUB_PATH"
       - name: Generate media
         if: steps.media.outputs.cache-hit != 'true'
         run: pnpm media
