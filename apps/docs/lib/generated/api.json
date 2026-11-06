@@ -1265,7 +1265,7 @@
           "name": "value",
           "type": "ReactNode",
           "optional": true,
-          "doc": "The current value, shown at the end of the row."
+          "doc": "The current value, shown at the end of the row. A value that changes during playback should be a component that reads it, so that nothing renders until the menu is open."
         },
         {
           "name": "icon",
@@ -1297,7 +1297,7 @@
           "name": "value",
           "type": "ReactNode",
           "optional": true,
-          "doc": "The current value, shown at the end of the row."
+          "doc": "The current value, shown at the end of the row. A value that changes during playback should be a component that reads it, so that nothing renders until the menu is open."
         },
         {
           "name": "icon",
@@ -2157,7 +2157,7 @@
           "name": "value",
           "type": "ReactNode",
           "optional": true,
-          "doc": "The current value, shown at the end of the row."
+          "doc": "The current value, shown at the end of the row. A value that changes during playback should be a component that reads it, so that nothing renders until the menu is open."
         },
         {
           "name": "icon",
@@ -2189,7 +2189,7 @@
           "name": "value",
           "type": "ReactNode",
           "optional": true,
-          "doc": "The current value, shown at the end of the row."
+          "doc": "The current value, shown at the end of the row. A value that changes during playback should be a component that reads it, so that nothing renders until the menu is open."
         },
         {
           "name": "icon",

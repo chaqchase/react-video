@@ -151,24 +151,37 @@ ChapterTitle.displayName = "Video.ChapterTitle";
 
 /** Renders nothing without chapters. */
 export function ChaptersMenu() {
-  const items = useVideoState(chapters, (state) => state.items);
-  const active = useVideoState(chapters, (state) => state.active);
-  const duration = useVideoState((media) => media.duration);
-  const { select } = useCommands(chapters);
+  const empty = useVideoState(chapters, (state) => state.items.length === 0);
   const title = useLabel("chapters", "Chapters");
-  if (items.length === 0) return null;
+  if (empty) return null;
 
   return (
-    <MenuSub title={title} value={items[active]?.title} data-menu="chapters">
-      <MenuRadioGroup value={String(active)} onValueChange={(value) => select(Number(value))}>
-        {items.map((chapter, index) => (
-          <MenuRadioItem key={chapter.start} value={String(index)}>
-            <span data-part="menu-item-label">{chapter.title}</span>
-            <span data-part="menu-item-value">{formatTime(chapter.start, duration)}</span>
-          </MenuRadioItem>
-        ))}
-      </MenuRadioGroup>
+    <MenuSub title={title} value={<ActiveChapter />} data-menu="chapters">
+      <ChapterList />
     </MenuSub>
   );
 }
 ChaptersMenu.displayName = "Video.ChaptersMenu";
+
+// The active chapter changes during playback, so only an open menu reads it.
+function ActiveChapter() {
+  return useVideoState(chapters, ({ items, active }) => items[active]?.title);
+}
+
+function ChapterList() {
+  const items = useVideoState(chapters, (state) => state.items);
+  const active = useVideoState(chapters, (state) => state.active);
+  const duration = useVideoState((media) => media.duration);
+  const { select } = useCommands(chapters);
+
+  return (
+    <MenuRadioGroup value={String(active)} onValueChange={(value) => select(Number(value))}>
+      {items.map((chapter, index) => (
+        <MenuRadioItem key={chapter.start} value={String(index)}>
+          <span data-part="menu-item-label">{chapter.title}</span>
+          <span data-part="menu-item-value">{formatTime(chapter.start, duration)}</span>
+        </MenuRadioItem>
+      ))}
+    </MenuRadioGroup>
+  );
+}

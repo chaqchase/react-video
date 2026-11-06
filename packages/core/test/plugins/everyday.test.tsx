@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { Profiler } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { definePlugin } from "../../src/core/plugin";
 import { createPlayer } from "../../src/core/player";
@@ -25,6 +26,7 @@ import { MenuTrigger } from "../../src/react/primitives/menu-trigger";
 import { Mute } from "../../src/react/primitives/mute";
 import { Timeline } from "../../src/react/primitives/timeline";
 import { Root } from "../../src/react/root";
+import { SettingsMenu } from "../../src/ui/parts/settings-menu";
 import { advance, fakeBehaviour } from "../helpers/fake-media";
 
 const settle = async () => {
@@ -805,6 +807,36 @@ describe("chapters", () => {
     fireEvent.click(radios[1] as HTMLElement);
     await settle();
     expect(player.video()?.currentTime).toBe(20);
+  });
+
+  it("doesn't render across a chapter while the settings menu is closed", async () => {
+    const player = createPlayer({ src: "/video.mp4", plugins: [chapters({ items })] });
+    const commits = vi.fn();
+    render(
+      <Root player={player}>
+        <Media />
+        <Profiler id="settings" onRender={commits}>
+          <SettingsMenu />
+        </Profiler>
+      </Root>
+    );
+    await settle();
+    await act(() => player.commands.play());
+    await settle();
+    commits.mockClear();
+
+    act(() => {
+      advance(player.video() as HTMLVideoElement, 25);
+      player.clock.sync();
+    });
+    await settle();
+    expect(player.plugin(chapters).state().active).toBe(1);
+    expect(commits).not.toHaveBeenCalled();
+
+    // And it's up to date once it opens.
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    await settle();
+    expect(document.querySelector('[data-menu="chapters"]')?.textContent).toContain("Middle");
   });
 });
 

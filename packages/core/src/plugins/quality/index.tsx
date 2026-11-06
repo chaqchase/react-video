@@ -33,35 +33,46 @@ export const quality = definePlugin("quality", () => {
 
 /** Renders nothing unless there's more than one level to choose from. */
 export function QualityMenu() {
-  const levels = useVideoState((media) => media.qualities);
-  const current = useVideoState((media) => media.quality);
-  const { select } = useCommands(quality);
+  const few = useVideoState((media) => media.qualities.length < 2);
   const title = useLabel("quality", "Quality");
-  const auto = useLabel("auto", "Auto");
-  if (levels.length < 2) return null;
-
-  const nameOf = (id: string | null) => {
-    const level = levels.find((candidate) => candidate.id === id);
-    return level?.label ?? level?.id ?? "";
-  };
-  const value =
-    current.mode === "auto" ? `${auto} ${nameOf(current.active)}`.trim() : nameOf(current.active);
-  const sorted = [...levels].sort((a, b) => (b.height ?? 0) - (a.height ?? 0));
+  if (few) return null;
 
   return (
-    <MenuSub title={title} value={value} data-menu="quality">
-      <MenuRadioGroup
-        value={current.mode === "auto" ? "auto" : current.active}
-        onValueChange={select}
-      >
-        {current.canAuto ? <MenuRadioItem value="auto">{auto}</MenuRadioItem> : null}
-        {sorted.map((level) => (
-          <MenuRadioItem key={level.id} value={level.id}>
-            {level.label ?? level.id}
-          </MenuRadioItem>
-        ))}
-      </MenuRadioGroup>
+    <MenuSub title={title} value={<ActiveQuality />} data-menu="quality">
+      <QualityList />
     </MenuSub>
   );
 }
 QualityMenu.displayName = "Video.QualityMenu";
+
+// Adaptive streams switch level during playback, so only an open menu reads it.
+function ActiveQuality() {
+  const levels = useVideoState((media) => media.qualities);
+  const current = useVideoState((media) => media.quality);
+  const auto = useLabel("auto", "Auto");
+  const level = levels.find((candidate) => candidate.id === current.active);
+  const name = level?.label ?? level?.id ?? "";
+  return current.mode === "auto" ? `${auto} ${name}`.trim() : name;
+}
+
+function QualityList() {
+  const levels = useVideoState((media) => media.qualities);
+  const current = useVideoState((media) => media.quality);
+  const { select } = useCommands(quality);
+  const auto = useLabel("auto", "Auto");
+  const sorted = [...levels].sort((a, b) => (b.height ?? 0) - (a.height ?? 0));
+
+  return (
+    <MenuRadioGroup
+      value={current.mode === "auto" ? "auto" : current.active}
+      onValueChange={select}
+    >
+      {current.canAuto ? <MenuRadioItem value="auto">{auto}</MenuRadioItem> : null}
+      {sorted.map((level) => (
+        <MenuRadioItem key={level.id} value={level.id}>
+          {level.label ?? level.id}
+        </MenuRadioItem>
+      ))}
+    </MenuRadioGroup>
+  );
+}
