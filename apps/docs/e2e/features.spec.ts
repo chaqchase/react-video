@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./test";
 
 const root = '[data-part="root"]';
 const video = '[data-part="media"]';
@@ -33,8 +33,14 @@ test("the settings menu sits above its controls, inside the player", async ({ pa
   const menu = page.locator('[data-part="menu-content"]');
   await expect(menu).toHaveCSS("opacity", "1");
   const group = page.locator('[data-part="control-group"]', { has: menu });
-  const [content, controls, player] = await Promise.all([menu.boundingBox(), group.boundingBox(), page.locator(root).boundingBox()]);
-  expect(content!.y + content!.height).toBeLessThanOrEqual(controls!.y);
+  // It's still sliding into place once it's opaque.
+  await expect
+    .poll(async () => {
+      const [content, controls] = await Promise.all([menu.boundingBox(), group.boundingBox()]);
+      return content!.y + content!.height - controls!.y;
+    })
+    .toBeLessThanOrEqual(0);
+  const [content, player] = await Promise.all([menu.boundingBox(), page.locator(root).boundingBox()]);
   expect(content!.y).toBeGreaterThanOrEqual(player!.y);
 });
 
