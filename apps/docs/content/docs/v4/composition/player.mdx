@@ -1,0 +1,94 @@
+---
+title: Ready-made player
+description: VideoPlayer is the complete layout, with features coming from plugins.
+---
+
+`VideoPlayer` arranges every control for you. It has no plugins of its own, so you decide what's in it and what you pay for.
+
+<Demo slug="player" />
+
+## Usage
+
+```tsx
+"use client";
+
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+
+const plugins = defaultPlugins();
+
+export function Player() {
+  return <VideoPlayer src="/video.mp4" poster="/poster.jpg" plugins={plugins} />;
+}
+```
+
+With no plugins at all, it's still a working player with play, volume, time, and a timeline. `defaultPlugins()` adds these:
+
+| Plugin | Adds |
+|---|---|
+| [`idle()`](/docs/v4/plugins/idle) | Controls that hide when idle |
+| [`gestures()`](/docs/v4/plugins/gestures) | Click to play, double-tap to seek |
+| [`hotkeys()`](/docs/v4/plugins/hotkeys) | Keyboard shortcuts |
+| [`recovery()`](/docs/v4/plugins/recovery) | Retries after network errors |
+| [`captions()`](/docs/v4/plugins/captions) | The captions menu |
+| [`speed()`](/docs/v4/plugins/speed) | The speed menu |
+| [`quality()`](/docs/v4/plugins/quality) | The quality menu |
+| [`pip()`](/docs/v4/plugins/pip) | Picture in picture |
+| [`fullscreen()`](/docs/v4/plugins/fullscreen) | Fullscreen |
+
+It's only a function returning an array, so add to it, or list your own instead. A captions list needs its options, so replace the default in that case:
+
+```tsx
+const plugins = [
+  hls(),
+  captions({ tracks: [{ src: "/en.vtt", language: "en", label: "English" }] }),
+  ...defaultPlugins().filter((plugin) => plugin.name !== "captions"),
+];
+```
+
+Importing `defaultPlugins` costs all nine plugins. Listing them yourself means you only pay for the ones you list.
+
+## Give it a title
+
+`title` names the video above the timeline, `eyebrow` adds a smaller line over it, and `description` adds a sentence or two under it. All three fade with the controls, and they hide on small players, where they'd cover the picture.
+
+<Demo slug="player-title" />
+
+```tsx
+<VideoPlayer
+  src="/video.mp4"
+  plugins={plugins}
+  eyebrow="Season 1, Episode 1"
+  title="The Green Coast"
+  description="The swell arrives after a thousand miles of open ocean."
+/>
+```
+
+The description shows while the video is paused and folds away once it plays, so it isn't in the way. It stops at two lines. For longer text, or for artwork and credits, add the [info panel](/docs/v4/plugins/info).
+
+When none of the three is set, the [`title` slot](/docs/v4/composition/slots) takes their place. The [playlist](/docs/v4/plugins/playlist) plugin fills it from the current item, so the title follows the queue.
+
+## Add your own UI
+
+Children render above the media and below the controls, so a custom overlay goes here. Your children can use any [hook](/docs/v4/hooks).
+
+```tsx
+<VideoPlayer src="/video.mp4" plugins={plugins}>
+  <span className="absolute top-3 left-4 text-white">Sponsored</span>
+</VideoPlayer>
+```
+
+## Configure the video element
+
+`media` passes props through to the `<video>`, including its events. `tracks` takes `<track>` elements.
+
+```tsx
+<VideoPlayer
+  src="/video.mp4"
+  media={{ loop: true, crossOrigin: "anonymous", onEnded: () => showNext() }}
+/>
+```
+
+## Props
+
+<Api entry="react-video-kit/player" name="VideoPlayer" />

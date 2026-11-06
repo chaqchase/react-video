@@ -1,86 +1,297 @@
 {
   "name": "react-video-kit",
   "version": "3.0.0",
-  "description": "A video component for react inspired by the ios video player",
+  "description": "A composable, plugin-first React video player inspired by the iOS player",
   "license": "Apache-2.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
   "files": [
-    "dist/**/*",
+    "dist",
     "README.md",
-    "LICENSE"
+    "LICENCE.md"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "module": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    },
+    "./primitives": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "default": "./dist/core/index.js"
+    },
+    "./player": {
+      "types": "./dist/player/index.d.ts",
+      "default": "./dist/player/index.js"
+    },
+    "./compat": {
+      "types": "./dist/compat/index.d.ts",
+      "default": "./dist/compat/index.js"
+    },
+    "./fullscreen": {
+      "types": "./dist/plugins/fullscreen/index.d.ts",
+      "default": "./dist/plugins/fullscreen/index.js"
+    },
+    "./pip": {
+      "types": "./dist/plugins/pip/index.d.ts",
+      "default": "./dist/plugins/pip/index.js"
+    },
+    "./idle": {
+      "types": "./dist/plugins/idle/index.d.ts",
+      "default": "./dist/plugins/idle/index.js"
+    },
+    "./gestures": {
+      "types": "./dist/plugins/gestures/index.d.ts",
+      "default": "./dist/plugins/gestures/index.js"
+    },
+    "./hotkeys": {
+      "types": "./dist/plugins/hotkeys/index.d.ts",
+      "default": "./dist/plugins/hotkeys/index.js"
+    },
+    "./speed": {
+      "types": "./dist/plugins/speed/index.d.ts",
+      "default": "./dist/plugins/speed/index.js"
+    },
+    "./quality": {
+      "types": "./dist/plugins/quality/index.d.ts",
+      "default": "./dist/plugins/quality/index.js"
+    },
+    "./audio-tracks": {
+      "types": "./dist/plugins/audio-tracks/index.d.ts",
+      "default": "./dist/plugins/audio-tracks/index.js"
+    },
+    "./captions": {
+      "types": "./dist/plugins/captions/index.d.ts",
+      "default": "./dist/plugins/captions/index.js"
+    },
+    "./thumbnails": {
+      "types": "./dist/plugins/thumbnails/index.d.ts",
+      "default": "./dist/plugins/thumbnails/index.js"
+    },
+    "./chapters": {
+      "types": "./dist/plugins/chapters/index.d.ts",
+      "default": "./dist/plugins/chapters/index.js"
+    },
+    "./persistence": {
+      "types": "./dist/plugins/persistence/index.d.ts",
+      "default": "./dist/plugins/persistence/index.js"
+    },
+    "./media-session": {
+      "types": "./dist/plugins/media-session/index.d.ts",
+      "default": "./dist/plugins/media-session/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/plugins/i18n/index.d.ts",
+      "default": "./dist/plugins/i18n/index.js"
+    },
+    "./autoplay": {
+      "types": "./dist/plugins/autoplay/index.d.ts",
+      "default": "./dist/plugins/autoplay/index.js"
+    },
+    "./recovery": {
+      "types": "./dist/plugins/recovery/index.d.ts",
+      "default": "./dist/plugins/recovery/index.js"
+    },
+    "./analytics": {
+      "types": "./dist/plugins/analytics/index.d.ts",
+      "default": "./dist/plugins/analytics/index.js"
+    },
+    "./i18n/ar": {
+      "types": "./dist/plugins/i18n/ar.d.ts",
+      "default": "./dist/plugins/i18n/ar.js"
+    },
+    "./i18n/es": {
+      "types": "./dist/plugins/i18n/es.d.ts",
+      "default": "./dist/plugins/i18n/es.js"
+    },
+    "./i18n/fr": {
+      "types": "./dist/plugins/i18n/fr.d.ts",
+      "default": "./dist/plugins/i18n/fr.js"
+    },
+    "./hls": {
+      "types": "./dist/plugins/hls/index.d.ts",
+      "default": "./dist/plugins/hls/index.js"
+    },
+    "./dash": {
+      "types": "./dist/plugins/dash/index.d.ts",
+      "default": "./dist/plugins/dash/index.js"
+    },
+    "./live": {
+      "types": "./dist/plugins/live/index.d.ts",
+      "default": "./dist/plugins/live/index.js"
+    },
+    "./playlist": {
+      "types": "./dist/plugins/playlist/index.d.ts",
+      "default": "./dist/plugins/playlist/index.js"
+    },
+    "./airplay": {
+      "types": "./dist/plugins/airplay/index.d.ts",
+      "default": "./dist/plugins/airplay/index.js"
+    },
+    "./chromecast": {
+      "types": "./dist/plugins/chromecast/index.d.ts",
+      "default": "./dist/plugins/chromecast/index.js"
+    },
+    "./ads": {
+      "types": "./dist/plugins/ads/index.d.ts",
+      "default": "./dist/plugins/ads/index.js"
+    },
+    "./drm": {
+      "types": "./dist/plugins/drm/index.d.ts",
+      "default": "./dist/plugins/drm/index.js"
+    },
+    "./episodes": {
+      "types": "./dist/plugins/episodes/index.d.ts",
+      "default": "./dist/plugins/episodes/index.js"
+    },
+    "./skip": {
+      "types": "./dist/plugins/skip/index.d.ts",
+      "default": "./dist/plugins/skip/index.js"
+    },
+    "./info": {
+      "types": "./dist/plugins/info/index.d.ts",
+      "default": "./dist/plugins/info/index.js"
+    },
+    "./ambient": {
+      "types": "./dist/plugins/ambient/index.d.ts",
+      "default": "./dist/plugins/ambient/index.js"
+    },
+    "./mini-player": {
+      "types": "./dist/plugins/mini-player/index.d.ts",
+      "default": "./dist/plugins/mini-player/index.js"
+    },
+    "./screenshot": {
+      "types": "./dist/plugins/screenshot/index.d.ts",
+      "default": "./dist/plugins/screenshot/index.js"
+    },
+    "./loop": {
+      "types": "./dist/plugins/loop/index.d.ts",
+      "default": "./dist/plugins/loop/index.js"
+    },
+    "./shortcuts": {
+      "types": "./dist/plugins/shortcuts/index.d.ts",
+      "default": "./dist/plugins/shortcuts/index.js"
+    },
+    "./stats": {
+      "types": "./dist/plugins/stats/index.d.ts",
+      "default": "./dist/plugins/stats/index.js"
+    },
+    "./share": {
+      "types": "./dist/plugins/share/index.d.ts",
+      "default": "./dist/plugins/share/index.js"
+    },
+    "./fit": {
+      "types": "./dist/plugins/fit/index.d.ts",
+      "default": "./dist/plugins/fit/index.js"
+    },
+    "./transcript": {
+      "types": "./dist/plugins/transcript/index.d.ts",
+      "default": "./dist/plugins/transcript/index.js"
+    },
+    "./analytics/google": {
+      "types": "./dist/plugins/analytics/google.d.ts",
+      "default": "./dist/plugins/analytics/google.js"
+    },
+    "./orientation": {
+      "types": "./dist/plugins/orientation/index.d.ts",
+      "default": "./dist/plugins/orientation/index.js"
+    },
+    "./errors": {
+      "types": "./dist/core/errors.d.ts",
+      "default": "./dist/core/errors.js"
+    },
+    "./ads/vast": {
+      "types": "./dist/plugins/ads/vast.d.ts",
+      "default": "./dist/plugins/ads/vast.js"
+    },
+    "./ads/ima": {
+      "types": "./dist/plugins/ads/ima.d.ts",
+      "default": "./dist/plugins/ads/ima.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./themes/*": "./dist/themes/*",
+    "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "pnpm build:css && tsup",
-    "build:css": "tailwindcss -i ./src/index.css -o ./src/styles.css --minify",
-    "dev": "pnpm build:css && pnpm dev:watch",
-    "dev:watch": "concurrently \"tailwindcss -i ./src/index.css -o ./src/styles.css --watch\" \"tsup --watch\"",
-    "check-types": "tsc --noEmit"
+    "build": "tsdown && node scripts/build-css.mjs && node scripts/check-dist.mjs",
+    "dev": "tsdown --watch src --no-clean --on-success \"node scripts/build-css.mjs\"",
+    "typecheck": "tsc --noEmit",
+    "test:treeshake": "node scripts/check-treeshake.mjs",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:react18": "REACT_VERSION=18 vitest run",
+    "size": "size-limit",
+    "lint:pkg": "node scripts/check-package.mjs",
+    "test:ssr": "node scripts/check-ssr.mjs"
   },
   "peerDependencies": {
-    "motion": ">=10.0.0",
-    "react": ">=18",
-    "react-dom": ">=18"
+    "dashjs": "^5.0.0",
+    "hls.js": "^1.7.0",
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
   },
-  "dependencies": {
-    "@radix-ui/react-slider": "^1.1.2",
-    "@radix-ui/react-slot": "^1.1.0",
-    "clsx": "^2.0.0",
-    "tailwind-merge": "^2.1.0"
+  "peerDependenciesMeta": {
+    "dashjs": {
+      "optional": true
+    },
+    "hls.js": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/react-18": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/react": "^18.2.45",
-    "@types/react-dom": "18.2.7",
-    "autoprefixer": "^10.4.16",
-    "concurrently": "^8.2.2",
-    "eslint": "^7.32.0",
-    "motion": "^12.23.24",
-    "postcss": "^8.4.32",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^3.3.6",
-    "tsup": "^8.0.1",
-    "typescript": "^4.9.4"
+    "@rollup/plugin-node-resolve": "16.0.3",
+    "@size-limit/preset-small-lib": "14.3.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "happy-dom": "21.0.4",
+    "lightningcss": "1.33.0",
+    "publint": "0.3.25",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "rollup": "4.67.5",
+    "size-limit": "14.3.0",
+    "tsdown": "0.23.5",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0",
+    "webpack": "5.112.2"
   },
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://react-vide-kit.chaqchase.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chaqchase/video-kit.git"
+    "url": "git+https://github.com/chaqchase/react-video.git",
+    "directory": "packages/core"
   },
   "bugs": {
-    "url": "https://github.com/chaqchase/video-kit/issues"
+    "url": "https://github.com/chaqchase/react-video/issues"
   },
   "keywords": [
     "react",
     "video",
     "player",
+    "video-player",
+    "hls",
+    "dash",
+    "headless",
+    "plugins",
     "ios",
-    "component",
-    "ui",
-    "ui-component",
-    "ui-kit",
-    "ui-library",
-    "react-video-kit",
-    "react-video",
-    "react-ios-video",
-    "video component",
-    "video kit"
+    "react-video-kit"
   ]
 }

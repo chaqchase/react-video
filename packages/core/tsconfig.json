@@ -1,19 +1,22 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
   "include": [
-    "."
+    "src",
+    "test",
+    "tsdown.config.ts",
+    "vitest.config.ts"
   ],
   "exclude": [
     "dist",
-    "build",
-    "node_modules"
+    "node_modules",
+    "test/fixtures"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [
+      "node"
+    ],
+    "declarationMap": false
   }
 }

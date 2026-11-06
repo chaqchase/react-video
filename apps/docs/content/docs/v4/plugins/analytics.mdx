@@ -1,0 +1,169 @@
+---
+title: Analytics
+description: Reports playback as events, for whatever analytics service you use.
+---
+
+<PluginSummary id="analytics" />
+
+Calls one function with an event each time something happens in playback. Play, seek, and pause the demo, and watch the events appear under it.
+
+<Demo slug="analytics" />
+
+## Usage
+
+```tsx
+import { analytics } from "react-video-kit/analytics";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [analytics({ onEvent: (event) => console.log(event) })];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+`heartbeat` sets the seconds of playback between `heartbeat` events, and defaults to 30. `0` turns them off. `progress` sets the percentages that send a `progress` event, and defaults to 10, 25, 50, and 75:
+
+```tsx
+analytics({ onEvent: (event) => console.log(event), heartbeat: 10, progress: [25, 50, 75, 90] });
+```
+
+## Send events to a service
+
+```tsx
+analytics({
+  onEvent(event) {
+    navigator.sendBeacon("/api/video-events", JSON.stringify(event));
+  },
+});
+```
+
+## Google Analytics
+
+`googleAnalytics` turns these events into the ones Google Analytics 4 uses for video, with the same names and parameters as its own measurement of embedded YouTube videos, so the two line up in your reports. Play this demo, and watch what would be sent. It contacts nobody, because `send` replaces the real call.
+
+<Demo slug="google-analytics" />
+
+```tsx
+import { analytics } from "react-video-kit/analytics";
+import { googleAnalytics } from "react-video-kit/analytics/google";
+
+const plugins = [analytics({ onEvent: googleAnalytics({ title: "My video" }) })];
+```
+
+| Event | When it's sent |
+| --- | --- |
+| `video_start` | Playback first begins for this video. |
+| `video_progress` | Playback passes 10, 25, 50, and 75 percent, once each. Seeking past a mark doesn't count. |
+| `video_complete` | The video ends, after playback carried it past the last mark. Seeking to the end doesn't count. |
+
+Each has `video_current_time`, `video_duration`, `video_percent`, `video_provider`, `video_title`, `video_url`, and `visible`, which says whether the page was showing. Analytics already has dimensions for `video_provider`, `video_title`, `video_url`, and `visible`. To report on the other three, register them as custom dimensions or metrics.
+
+### With gtag.js
+
+Keep Google's usual snippet on the page. The plugin finds `window.gtag`, and never loads Google's script itself:
+
+```html
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "G-XXXXXXXXXX");
+</script>
+```
+
+On a page with more than one Google tag, `measurementId` sends these events only to yours:
+
+```tsx
+googleAnalytics({ measurementId: "G-XXXXXXXXXX", title: "My video" });
+```
+
+### With Tag Manager
+
+Without `gtag`, each event goes to `window.dataLayer`, as `{ event: "video_start", video_percent: 0, ... }`. In Tag Manager, add a Custom Event trigger matching `video_start|video_progress|video_complete` as a regular expression, Data Layer Variables for the parameters you want, and a Google Analytics event tag using them.
+
+If Tag Manager's own YouTube trigger or enhanced measurement also covers this page, that only watches embedded YouTube players, so it won't count these videos twice.
+
+### More events
+
+Google has no names for these, so they're custom events, and off until you ask:
+
+```tsx
+googleAnalytics({ events: ["pause", "seek", "rebuffer", "quality-change", "error"] });
+```
+
+| In `events` | The event | Its extra parameter |
+| --- | --- | --- |
+| `pause` | `video_pause` | |
+| `seek` | `video_seek` | |
+| `rebuffer` | `video_rebuffer` | `stalled_ms` |
+| `quality-change` | `video_quality_change` | `video_quality` |
+| `error` | `video_error` | `error_code`, `error_fatal` |
+
+`error_code` is one of the [error codes](/docs/v4/concepts/errors). Google counts each parameter's value up to 100 characters, and each event up to 25 parameters, which these stay within apart from a long `video_url`.
+
+### Privacy and consent
+
+- **`video_url` has no query string or hash.** Signed URLs carry tokens there. Change that with `url`, which can also leave the URL out:
+
+  ```tsx
+  googleAnalytics({ url: (source) => new URL(source, location.href).pathname });
+  googleAnalytics({ url: () => undefined });
+  ```
+
+- **`video_error` sends only the code**, because a browser's message can include a URL.
+- **Nothing here sets or reads consent.** That stays with your site and your consent banner. With [Consent Mode](https://developers.google.com/tag-platform/security/guides/consent), set your defaults before the Google tag loads, and these events follow them like any others:
+
+  ```js
+  gtag("consent", "default", { analytics_storage: "denied" });
+  // Once the viewer chooses:
+  gtag("consent", "update", { analytics_storage: "granted" });
+  ```
+
+To send to something else that takes these names, give it `send`:
+
+```tsx
+googleAnalytics({ send: (name, params) => myAnalytics.track(name, params) });
+```
+
+## Events
+
+| `type` | When it fires | Extra field |
+| --- | --- | --- |
+| `load` | A source starts loading. | |
+| `ready` | The source moves from loading to ready. | `startupMs` |
+| `start` | Playback really begins for this video. Retrying it doesn't send this again, and neither does an ad. | |
+| `play` | Playback starts or resumes. | |
+| `pause` | Playback pauses, except when the video ended. | |
+| `seek` | A seek finishes. | |
+| `progress` | Playback passes one of the `progress` marks, once each for this video. | `percent` |
+| `rebuffer-start` | Playback stalls after it has started, while not paused or recovering from a seek. | |
+| `rebuffer-end` | That stall stops, including because the viewer paused or started a seek. | `stalledMs` |
+| `quality-change` | The active quality level changes to a known one. | `quality` |
+| `ended` | The video ends. | `complete` |
+| `error` | Anything `onError` hears, fatal or not. See [the error codes](/docs/v4/concepts/errors). | `error` |
+| `heartbeat` | Every `heartbeat` seconds of video played. | |
+
+Every event has `type`, `position`, `duration`, `percent`, and `source`.
+
+<Api entry="react-video-kit/analytics" name="AnalyticsEvent" />
+
+## Behaviour
+
+- Heartbeats count video played. Seeks and source changes add nothing and don't reset the count, so adding heartbeats up gives a close measure of how much was watched. It counts video time, so playing at 2× reaches the next heartbeat twice as fast.
+- `position` comes from the player's clock when the event is sent, so `seek` reports where the seek landed.
+- Dragging the timeline can send several `seek` events, one for each seek that finishes.
+- A stall caused by a seek isn't counted as a rebuffer, including the moment after the seek finishes while playback picks back up.
+- The end of the video sends `ended` without a `pause`.
+- `progress` and `complete` follow playback, not position. Seeking past a mark doesn't send it, though playing through it later does. `complete` is true on `ended` when playback carried the video past its last mark, and has to be earned again on a second viewing.
+- Progress reads the clock about once a second, and never writes to the store, so it adds no renders.
+- `onEvent` runs inside the player's store update. Keep it quick, and don't let it throw, because that would stop the other subscribers in that update.
+
+## API
+
+<PluginApi id="analytics" />
+
+## Google Analytics API
+
+<ApiEntry entry="react-video-kit/analytics/google" />

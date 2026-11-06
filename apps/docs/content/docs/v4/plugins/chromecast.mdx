@@ -1,0 +1,94 @@
+---
+title: Chromecast
+description: Sends playback to a Chromecast, with the player's controls driving the receiver.
+---
+
+<PluginSummary id="chromecast" />
+
+Adds a Cast button to the controls once the Cast SDK reports a device. While casting, the player's controls drive the receiver. Most readers won't have a device, so the demo says what you'd need and shows the current status.
+
+<Demo slug="chromecast" />
+
+## Usage
+
+```tsx
+import { chromecast } from "react-video-kit/chromecast";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [chromecast({ title: "First light" })];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+`title` is what the receiver shows. It can be a function of the source. `receiverId` picks a custom receiver app instead of Google's default one:
+
+```tsx
+chromecast({
+  receiverId: "ABCD1234",
+  title: (source) => source.src.split("/").pop(),
+});
+```
+
+## How the Cast SDK loads
+
+The SDK isn't in your bundle. When the player mounts in a Chromium browser, the plugin adds a script tag for `https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1`, unless that script or `cast.framework` is already on the page. `load="visible"` doesn't delay it.
+
+Chromium browsers, which are the ones with `window.chrome`, request the script whether or not the viewer ever casts. Other browsers make no request. If the SDK reports that Cast isn't available, or never loads, the plugin goes no further and the button never appears. To load the SDK from somewhere else, such as a proxy, set `sdkUrl`:
+
+```tsx
+chromecast({ sdkUrl: "/vendor/cast_sender.js" });
+```
+
+## Build your own control
+
+`toggle` opens the device picker, or ends the session if there is one. It has to run from a click or key press.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { chromecast } from "react-video-kit/chromecast";
+
+function CastControl() {
+  const available = useVideoState(chromecast, (state) => state.available);
+  const active = useVideoState(chromecast, (state) => state.active);
+  const device = useVideoState(chromecast, (state) => state.device);
+  const { toggle } = useCommands(chromecast);
+  if (!available && !active) return null;
+  return <button onClick={() => toggle()}>{active ? `Stop casting to ${device}` : "Cast"}</button>;
+}
+```
+
+`VideoPlayer` places `CastButton` and `CastingOverlay` through [slots](/docs/v4/composition/slots). In your own layout, render them yourself.
+
+## What the receiver gets
+
+When a session starts, the plugin sends:
+
+- The source's URL, made absolute. The receiver fetches it directly, so it has to be reachable from the device.
+- A content type: the source's `type`, or one worked out from `.m3u8` or `.mpd`, or else `video/mp4`.
+- The `title`, if there is one.
+- The current position, so playback carries on from there, with autoplay on.
+
+It doesn't send DRM configuration, caption tracks, or speed.
+
+## DRM
+
+The default receiver can't play DRM content. The plugin never passes your [drm](/docs/v4/plugins/drm) configuration to the receiver, so a custom receiver has to get its licences some other way.
+
+## Behaviour
+
+- The button renders while a device is available or a session is active. `available` starts from the SDK's current cast state, so devices found before the player mounted count, and follows its events after that.
+- When a session starts, the local video pauses, the player's `provider` becomes `chromecast`, and the root has `data-casting`. `CastingOverlay` names the device, or says "Chromecast" if it has no name.
+- Play, pause, seek, volume, and mute go to the receiver. Time, duration, and buffering come back from it.
+- The receiver can't change speed, so `capabilities.rate` is false while casting and the [speed](/docs/v4/plugins/speed) menu disappears until the session ends. Captions stay on this device.
+- The player reports whatever's casting as on-demand, including live streams.
+- A new source during a session goes to the receiver with its own `title`, and the session stays connected.
+- When the session ends, the player returns to the local video at the receiver's position, paused.
+- If the first load fails on the receiver, the plugin ends the session. A failed load after a source change is ignored.
+- The SDK's auto-join policy is `ORIGIN_SCOPED`. A resumed session gets the same handover as a new one.
+- The Cast context belongs to the page, so every player with this plugin reacts to the same session. Use it on one player per page.
+
+## API
+
+<PluginApi id="chromecast" />

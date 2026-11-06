@@ -1,0 +1,193 @@
+/* After Netflix's web player: the time beside a red timeline, large plain icons, and the title in the middle. */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-netflix {
+    --rv-accent: #e50914;
+    --rv-focus: #fff;
+    --rv-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-glass-strong: #262626;
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.55);
+    --rv-radius: 0;
+    --rv-menu-radius: 0;
+    --rv-control-size: 46px;
+    --rv-icon-size: 28px;
+    --rv-inset: 18px;
+    --rv-bar-track: 3px;
+    --rv-bar-track-active: 5px;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="controls"]::before,
+  .rv-root.rv-theme-netflix [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.4), transparent 18%, transparent 62%, rgb(0 0 0 / 0.7));
+  }
+
+  /* Exactly the rest of the line, so the buttons all start on the next one. */
+  .rv-root.rv-theme-netflix [data-part="timeline"] {
+    flex: 0 0 calc(100% - 64px);
+  }
+
+  .rv-root.rv-theme-netflix[data-live] [data-part="timeline"] {
+    flex-basis: 100%;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="remaining-time"] {
+    display: block;
+    flex: 0 0 64px;
+    order: 0;
+    margin: 0;
+    color: var(--rv-foreground);
+    font-size: 14px;
+    text-align: end;
+  }
+
+  /* The timeline never mirrors, so the time left stays at its far end. */
+  .rv-root.rv-theme-netflix[dir="rtl"] [data-part="remaining-time"] {
+    order: -1;
+  }
+
+  /* The time left has no minus sign here, and this hides it without touching the text. */
+  .rv-root.rv-theme-netflix [data-part="remaining-time"]::first-letter {
+    font-size: 0;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="current-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="timeline-thumb"] {
+    opacity: var(--rv-shown, 1);
+    transform: none;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="transport"] > [data-part="seek-button"] {
+    display: inline-grid;
+    order: 2;
+    margin-inline-start: 6px;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="play-pause"] + [data-part="seek-button"] {
+    order: 3;
+  }
+
+  /* The row mirrors, but time still runs the same way, so back stays on the left of forward. */
+  .rv-root.rv-theme-netflix[dir="rtl"] [data-part="transport"] > [data-part="seek-button"] {
+    order: 3;
+  }
+
+  .rv-root.rv-theme-netflix[dir="rtl"] [data-part="play-pause"] + [data-part="seek-button"] {
+    order: 2;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="transport"] > [data-part="playlist-next"] {
+    order: 10;
+    margin-inline-start: 6px;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="volume"] {
+    margin-inline-start: 6px;
+  }
+
+  .rv-root.rv-theme-netflix [data-position="details"] > [data-part="control-group"]:last-child > *,
+  .rv-root.rv-theme-netflix [data-position="top"] > [data-part="control-group"]:first-child > * {
+    margin-inline-start: 6px;
+  }
+
+  /* With room for it, the name and episode sit on one line in the middle of the row, doing the spacer's job. */
+  @container rv (min-width: 720px) {
+    .rv-root.rv-theme-netflix [data-part="title"] {
+      position: static;
+      flex: 1 1 0;
+      flex-direction: row;
+      order: 9;
+      align-items: baseline;
+      justify-content: center;
+      gap: 7px;
+      min-width: 0;
+      padding-inline: 12px;
+    }
+
+    .rv-root.rv-theme-netflix [data-part="controls"]:has([data-part="title"])::after {
+      display: none;
+    }
+  }
+
+  .rv-root.rv-theme-netflix [data-part="title-text"] {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="title-eyebrow"] {
+    flex: none;
+    order: 1;
+    color: var(--rv-foreground);
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  @container rv (max-width: 719px) {
+    .rv-root.rv-theme-netflix [data-part="title-eyebrow"] {
+      font-size: 13px;
+    }
+  }
+
+  .rv-root.rv-theme-netflix [data-part="title-description"] {
+    display: none;
+  }
+
+  /* This player has no large button, so the bar is up before playback and its play button does the job. */
+  .rv-root.rv-theme-netflix [data-part="play-overlay"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-netflix:not([data-started]) [data-part="controls"] {
+    --rv-shown: 1;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="menu-content"] [role^="menuitem"] {
+    border-radius: 0;
+  }
+
+  .rv-root.rv-theme-netflix [data-part="captions-toggle"][aria-pressed="true"] {
+    color: var(--rv-foreground);
+  }
+
+  /* Lifted clear of the timeline and the time beside it. */
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-netflix [data-part="control-group"] [data-part="menu-content"] {
+      bottom: calc(var(--rv-bar) + 34px);
+    }
+  }
+
+  @container rv (max-width: 479px) {
+    /* The controls sit higher at this size, so the shade has to start higher too. */
+    .rv-root.rv-theme-netflix [data-part="controls"]::before,
+    .rv-root.rv-theme-netflix [data-part="controls"]:has([data-part="title"])::before {
+      background: linear-gradient(rgb(0 0 0 / 0.4), transparent 18%, transparent 44%, rgb(0 0 0 / 0.78));
+    }
+
+    .rv-root.rv-theme-netflix [data-part="timeline"] {
+      flex-basis: calc(100% - 48px);
+    }
+
+    .rv-root.rv-theme-netflix [data-part="remaining-time"] {
+      display: block;
+      flex-basis: 48px;
+      font-size: 12px;
+    }
+
+    .rv-root.rv-theme-netflix [data-part="transport"] > [data-part="seek-button"] {
+      display: none;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-netflix [data-control]:hover,
+    .rv-root.rv-theme-netflix [data-part="transport"] > [data-control]:hover {
+      transform: scale(1.2);
+    }
+  }
+}

@@ -1,0 +1,246 @@
+---
+title: Ads
+description: Plays a pre-roll before the content, and plays the content if the ad fails.
+---
+
+<PluginSummary id="ads" />
+
+Plays an ad before the first play of each source, through an engine you choose. Press play below. **Skip ad** becomes available after 3 seconds, and the content starts when the ad ends or the viewer skips it.
+
+<Demo slug="ads" />
+
+## Usage
+
+```tsx
+import { ads } from "react-video-kit/ads";
+import { vast } from "react-video-kit/ads/vast";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [ads({ engine: vast({ tag: "https://ads.example.com/tag.xml" }) })];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+`timeout` is how long to wait for a pre-roll before playing the content, 3000 milliseconds by default. `onError` hears about failures, since the viewer never sees them. It receives the same [error object](/docs/v4/concepts/errors#ads) as `onError` on the player, with the engine's own error as `cause`:
+
+```tsx
+ads({
+  engine: vast({ tag: "https://ads.example.com/tag.xml" }),
+  timeout: 5000,
+  onError: (error) => console.warn("No ad played", error.code, error.message),
+});
+```
+
+To skip ads on some sources, return `null` from `engine`:
+
+```tsx
+const tag = "https://ads.example.com/tag.xml";
+
+ads({ engine: (source) => (source.src.includes("/free/") ? null : vast({ tag })()) });
+```
+
+Each engine is its own import, so you only ship the one you use.
+
+## Play VAST tags with `vast()`
+
+`vast()` reads the tag itself and plays the ad in a second video element over the content. It needs no third-party script.
+
+- Every `<Ad>` in the tag plays in order, and the overlay counts them.
+- From each ad's `<MediaFiles>`, it picks the highest bitrate the browser can play, leaving out `delivery="streaming"` files. An ad with nothing playable is skipped.
+- It follows `<Wrapper>` redirects up to `maxRedirects`, 5 by default. Every wrapper in a chain adds its impressions, tracking, and click tracking to the ad it leads to.
+- It pings `<Impression>`, and the `start`, `firstQuartile`, `midpoint`, `thirdQuartile`, `complete`, and `skip` tracking events, by loading each URL as an image.
+- `<ClickThrough>` becomes the **Learn more** link, and following it pings `<ClickTracking>`.
+- The tag is read with `fetch`, so a tag on another origin must allow it through CORS.
+
+This tag is a wrapper around the one in the first demo:
+
+<Demo slug="ads-wrapper" />
+
+`vast()` does no viewability or verification measurement, so use `ima()` for ad networks that require them.
+
+## Use Google's SDK with `ima()`
+
+`ima()` runs Google's Interactive Media Ads SDK, which AdSense and Ad Manager require.
+
+```tsx
+import { ads } from "react-video-kit/ads";
+import { ima } from "react-video-kit/ads/ima";
+
+const plugins = [ads({ engine: ima({ tag: "https://ads.example.com/ima-tag" }) })];
+```
+
+- The SDK loads from Google when the source does, because it has to be ready by the first play. Set `sdkUrl` to load it from somewhere else.
+- If the viewer presses play before it's ready, `ads` skips the pre-roll for that source and tells `onError`. With `load="play"` the SDK only starts loading on that press, so use `"eager"` or `"visible"` with `ima()`.
+- The SDK draws its own countdown and skip button, so `AdOverlay` stays out of the way.
+- When the content ends, the plugin tells the SDK, which decides whether anything else plays.
+
+## When an ad fails or is blocked
+
+The content plays, and the viewer doesn't see an error.
+
+| What happens | What the player does | `onError` |
+| --- | --- | --- |
+| The tag is blocked, or returns an error | Plays the content | Called |
+| No break starts within `timeout` | Plays the content, and a late ad can't interrupt it | Called |
+| The IMA SDK is blocked or hasn't loaded | Plays the content | Called |
+| The IMA SDK reports an error before a break | Plays the content | Called |
+| The IMA SDK reports an error during a break | Plays the content | Called |
+| The tag has no ads | Plays the content | Not called |
+| A VAST ad's file won't play | Moves to the next ad, then the content | Called |
+| The browser refuses to play a VAST ad | Moves to the next ad, then the content | Called |
+
+`timeout` only covers the wait for a break to start. Once `vast()` has the tag it starts the break, so a slow ad file doesn't count.
+
+This tag has nothing to show, so the content starts straight away:
+
+<Demo slug="ads-empty" />
+
+## During an ad
+
+- Seeking and the playback rate are locked. The timeline is disabled and the [speed](/docs/v4/plugins/speed) menu disappears.
+- Pause and volume work, and control the ad.
+- The content stays paused, and `media.provider` is `"ad"`. The timeline and clock follow the ad, so `Timeline` and `Time` show its progress.
+- The root gets `data-ad`, and the plugin's state holds the current ad.
+- `AdOverlay` shows the time left, **Learn more** when the ad has a link, and a skip button when the ad allows one.
+
+## What's supported
+
+`vast()` supports:
+
+- Linear pre-rolls, and several of them in one break.
+- Wrappers.
+- Skipping, from a `skipoffset` written as a time or a percentage.
+- Impression, start, quartile, complete, skip, and click tracking.
+
+`vast()` doesn't support:
+
+- Mid-rolls and post-rolls.
+- Non-linear and companion ads.
+- Files delivered as streams, or VPAID.
+- `<Error>`, and any other tracking event.
+
+The plugin asks for ads on the first play and tells the engine when the content ends. Anything beyond the pre-roll is up to the engine.
+
+## Build your own skip button
+
+`useVideoState` gives you the current ad, and `useCommands` gives you `skip`. The command doesn't check the ad's offset, so your control has to:
+
+```tsx
+"use client";
+
+import { useCommands, useCurrentTime, useVideoState } from "react-video-kit";
+import { ads } from "react-video-kit/ads";
+
+function SkipAd() {
+  const ad = useVideoState(ads, (state) => state.ad);
+  return ad ? <SkipWhenAllowed after={ad.skipAfter} /> : null;
+}
+
+// Mounted only during ads, since following time renders once a second.
+function SkipWhenAllowed({ after }: { after: number | null }) {
+  const time = useCurrentTime();
+  const { skip } = useCommands(ads);
+  if (after === null || time < after) return null;
+  return <button onClick={() => skip()}>Skip ad</button>;
+}
+```
+
+For your own link to the advertiser, render `ad.clickThrough` and call `clicked` from the same commands when it's followed, so the engine can report it.
+
+## Write your own engine
+
+An engine is an object the plugin creates for each source. `prepare` runs inside the viewer's click, so it's where to unlock playback. `request` starts the break, and `host` tells the player what's going on:
+
+```tsx
+import { ads, type AdEngine, type AdHost } from "react-video-kit/ads";
+
+const houseAd = (src: string) => (): AdEngine => {
+  const video = document.createElement("video");
+  video.setAttribute("data-part", "ad-media");
+  video.playsInline = true;
+  video.hidden = true;
+  let host: AdHost | null = null;
+
+  const finish = () => {
+    video.pause();
+    video.hidden = true;
+    host?.breakEnd();
+  };
+  const fail = (error: unknown) => {
+    host?.error(error);
+    finish();
+  };
+
+  return {
+    get time() {
+      return video.currentTime;
+    },
+    prepare(next) {
+      host = next;
+      next.container.append(video);
+      video.play().catch(() => {});
+    },
+    async request() {
+      if (!host) return;
+      video.muted = host.video.muted;
+      video.volume = host.video.volume;
+      video.hidden = false;
+      host.breakStart();
+      host.adStart({ duration: 15, skipAfter: 5 });
+      video.addEventListener("ended", finish, { once: true });
+      video.addEventListener("error", () => fail(new Error("The ad won't play.")), { once: true });
+      video.src = src;
+      video.play().catch(fail);
+    },
+    play: () => video.play(),
+    pause: () => video.pause(),
+    skip: finish,
+    setVolume(volume, muted) {
+      video.volume = volume;
+      video.muted = muted;
+    },
+    destroy() {
+      video.remove();
+    },
+  };
+};
+
+const plugins = [ads({ engine: houseAd("/ad.mp4") })];
+```
+
+Anything `prepare` throws or `request` rejects with goes to `onError`, and the content plays. Once a break has started, report a failure with `host.error`, which reaches `onError`, and end the break yourself. An engine can also define `clicked`, which runs when the viewer follows the ad's link.
+
+## Behaviour
+
+- Each source asks for a pre-roll once. A reload from the [recovery](/docs/v4/plugins/recovery) plugin or the **Try again** button doesn't show it again. It can play again after a different source has loaded.
+- With `load="play"`, the source starts loading inside the viewer's first play, so `vast()` and engines of your own run their pre-roll first.
+- The default skin positions the ad. In a [headless](/docs/v4/composition/headless) layout, style `[data-part="ad-container"]` and `[data-part="ad-media"]` yourself.
+- The overlay's labels come from the [i18n](/docs/v4/plugins/i18n) plugin when it's installed.
+
+## API
+
+<PluginApi id="ads" />
+
+### `vast()`
+
+<Api entry="react-video-kit/ads/vast" name="vast" />
+
+<Api entry="react-video-kit/ads/vast" name="VastOptions" />
+
+### `ima()`
+
+<Api entry="react-video-kit/ads/ima" name="ima" />
+
+<Api entry="react-video-kit/ads/ima" name="ImaOptions" />
+
+### `AdEngine`
+
+<Api entry="react-video-kit/ads" name="AdEngine" />
+
+### `AdHost`
+
+<Api entry="react-video-kit/ads" name="AdHost" />
+
+### `AdInfo`
+
+<Api entry="react-video-kit/ads" name="AdInfo" />

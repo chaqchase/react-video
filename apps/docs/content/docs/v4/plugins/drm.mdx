@@ -1,0 +1,136 @@
+---
+title: DRM
+description: Plays protected streams from one description of your key systems.
+---
+
+<PluginSummary id="drm" />
+
+You describe your key systems once, and the plugin passes that to whichever engine plays the stream. Press play below. This stream is really encrypted, and it's decrypted with a Clear Key that sits in the page.
+
+<Demo slug="drm" />
+
+This is the same stream with no key, so the player reports that it can't play it:
+
+<Demo slug="drm-missing" />
+
+## Usage
+
+`drm()` doesn't play anything itself, so it goes with an engine such as [dash](/docs/v4/plugins/dash):
+
+```tsx
+import { dash } from "react-video-kit/dash";
+import { drm } from "react-video-kit/drm";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [
+  dash(),
+  drm({ widevine: { licenseUrl: "https://licence.example.com/widevine" } }),
+  ...defaultPlugins(),
+];
+
+<VideoPlayer src="/stream.mpd" plugins={plugins} />;
+```
+
+## Describe your key systems
+
+List each key system your stream is packaged for:
+
+```tsx
+import { drm } from "react-video-kit/drm";
+
+drm({
+  widevine: {
+    licenseUrl: "https://licence.example.com/widevine",
+    headers: { authorization: "Bearer <token>" },
+    withCredentials: true,
+  },
+  playready: {
+    licenseUrl: "https://licence.example.com/playready",
+  },
+  fairplay: {
+    licenseUrl: "https://licence.example.com/fairplay",
+    certificateUrl: "https://licence.example.com/fairplay.cer",
+  },
+  clearkey: {
+    keys: { "000102030405060708090a0b0c0d0e0f": "101112131415161718191a1b1c1d1e1f" },
+  },
+});
+```
+
+`headers` go with each licence request, and `withCredentials` sends cookies with it. Clear Key's `keys` map key IDs to keys, both in hex.
+
+Not every system reaches every engine:
+
+| Key system | dash.js | hls.js | Native playback |
+| --- | --- | --- | --- |
+| Widevine | Yes | Yes | Yes |
+| PlayReady | Yes | Yes | Yes |
+| FairPlay | No | Yes | Yes |
+| Clear Key | Yes | No | Yes |
+
+## What you need in production
+
+Clear Key only proves that decryption works. Its keys are in the page, so it protects nothing. To protect a stream you need:
+
+- A stream packaged for the key systems you list.
+- A licence server for each of them, as `licenseUrl`. For FairPlay, also your certificate, as `certificateUrl`.
+
+## Use a different config for each source
+
+Pass a function, and return `null` for sources that aren't protected. It runs each time a source loads, so it's also where a per-source token goes:
+
+```tsx
+import { drm } from "react-video-kit/drm";
+
+drm((source) =>
+  source.src.includes("/premium/")
+    ? { widevine: { licenseUrl: "https://licence.example.com/widevine" } }
+    : null
+);
+```
+
+## Native playback
+
+The browser plays a stream directly when no engine claims it, as Safari does with HLS under the [hls](/docs/v4/plugins/hls) plugin. The plugin then runs the key exchange itself:
+
+- It tries your systems in a fixed order: Widevine, PlayReady, FairPlay, then Clear Key. The order you write them in doesn't matter.
+- For FairPlay, it fetches `certificateUrl` first.
+- It posts the browser's licence message to `licenseUrl` as the raw body, and hands the raw response to the browser. There's no hook to reformat either one.
+- Clear Key has no request. The plugin answers from your `keys`.
+
+## Casting
+
+Google's default Cast receiver can't play DRM content, so protected playback over [Chromecast](/docs/v4/plugins/chromecast) needs a custom receiver, set with `receiverId`. The chromecast plugin doesn't send your DRM config to the receiver, so the receiver needs its own way to get a licence.
+
+## Behaviour
+
+- Failures are fatal errors with one of the [`drm-` codes](/docs/v4/concepts/errors#drm), the same under native playback and under an engine. A refused licence is `drm-denied`, which tells the viewer they don't have access. `errorMessages` on `VideoPlayer` can say something more useful.
+- The [recovery](/docs/v4/plugins/recovery) plugin retries a licence server or certificate it couldn't reach, and nothing else here.
+- Under native playback, an expired or restricted key stops playback once no key can play. A key that's only restricted while another still works doesn't.
+- The plugin's `system` state is only set under native playback. It stays `null` while dash.js or hls.js plays.
+- hls.js gets one set of licence headers, so the headers from each system are merged, and PlayReady's override Widevine's, then FairPlay's override both. It sends cookies if any system asks for them.
+- Under hls.js, this plugin replaces any `emeEnabled`, `drmSystems`, and `licenseXhrSetup` in the [hls](/docs/v4/plugins/hls) plugin's `config`.
+
+## API
+
+<PluginApi id="drm" />
+
+`drm()` takes a `DrmConfig`, or a function from the source to a `DrmConfig` or `null`.
+
+### `DrmConfig`
+
+<Api entry="react-video-kit/drm" name="DrmConfig" />
+
+### `KeySystemConfig`
+
+Widevine and PlayReady use this.
+
+<Api entry="react-video-kit/drm" name="KeySystemConfig" />
+
+### `FairPlayConfig`
+
+<Api entry="react-video-kit/drm" name="FairPlayConfig" />
+
+### `ClearKeyConfig`
+
+<Api entry="react-video-kit/drm" name="ClearKeyConfig" />

@@ -1,0 +1,129 @@
+---
+title: Hooks
+description: Read state, call commands, and follow time from any component inside the player.
+---
+
+All of these work inside `Root` or `VideoPlayer`, and are exported from both `react-video-kit` and `react-video-kit/primitives`. Outside the player, use a [`ref`](/docs/v4/getting-started#control-it-from-code).
+
+## useVideoState
+
+Subscribes to a value, and re-renders only when that value changes.
+
+```tsx
+const paused = useVideoState((media) => media.paused);
+```
+
+Pass a plugin first to read its state too, with its types inferred:
+
+```tsx
+import { fullscreen } from "react-video-kit/fullscreen";
+
+const active = useVideoState(fullscreen, (state) => state.active);
+```
+
+A selector that builds a new object each time needs an equality check, or it would re-render on every change to any state. `shallow` covers most cases:
+
+```tsx
+import { shallow, useVideoState } from "react-video-kit";
+
+const { volume, muted } = useVideoState((media) => ({ volume: media.volume, muted: media.muted }), shallow);
+```
+
+Current time isn't in this state. See [`useClock`](#useclock) and [`useCurrentTime`](#usecurrenttime).
+
+<Api name="useVideoState" />
+
+## useCommands
+
+Returns the core commands, or a plugin's commands when given its factory. Calling it never causes a render.
+
+```tsx
+const { play, seek, setVolume } = useCommands();
+const { toggle } = useCommands(fullscreen);
+```
+
+<Api entry="react-video-kit/core" name="CoreCommands" />
+
+## useClock
+
+Calls a function as playback advances, with no render. Use this for anything that moves.
+
+```tsx
+"use client";
+
+import { useCallback, useRef } from "react";
+import { useClock, useVideoState } from "react-video-kit";
+
+function Progress() {
+  const bar = useRef<HTMLDivElement>(null);
+  const duration = useVideoState((media) => media.duration);
+  const write = useCallback(
+    (time: number) => {
+      if (bar.current && duration) bar.current.style.transform = `scaleX(${time / duration})`;
+    },
+    [duration]
+  );
+  const resolution = useCallback(() => duration / 1000, [duration]);
+
+  useClock(write, resolution);
+  return <div ref={bar} className="h-1 origin-left bg-white" />;
+}
+```
+
+`resolution` returns how many seconds must pass before an update is visible. It's a function so that it can depend on something that changes, such as the element's width. Both arguments should be stable, so wrap them in `useCallback`.
+
+<Api name="useClock" />
+
+## useCurrentTime
+
+Time as React state. It renders once per `resolution` seconds, with a default of 1. It's simpler than `useClock`, and good for text and conditions.
+
+```tsx
+const time = useCurrentTime();
+return time < 10 ? <p>Welcome back</p> : null;
+```
+
+<Api name="useCurrentTime" />
+
+## usePlayer
+
+Returns the [`Player`](/docs/v4/reference/core), for whatever the other hooks don't cover. It never causes a render.
+
+```tsx
+const player = usePlayer();
+const position = player.clock.time();
+const element = player.video();
+```
+
+<Api name="usePlayer" />
+
+## useLabel
+
+Returns a translated string from the [i18n](/docs/v4/plugins/i18n) plugin when it's installed, or your fallback when it isn't. Use it for text in your own controls.
+
+```tsx
+const label = useLabel("settings", "Settings");
+```
+
+<Api name="useLabel" />
+
+## useTimelinePreview
+
+Calls your function with the time under the pointer, or `null` when there is none. It works inside `Timeline`, and it's how [thumbnails](/docs/v4/plugins/thumbnails) follows the pointer without rendering.
+
+```tsx
+"use client";
+
+import { useRef } from "react";
+import { useTimelinePreview } from "react-video-kit";
+
+function PreviewLabel() {
+  const element = useRef<HTMLSpanElement>(null);
+  useTimelinePreview((time) => {
+    if (element.current) element.current.textContent = time === null ? "" : `${Math.round(time)}s`;
+  });
+  return <span ref={element} />;
+}
+```
+
+<Api name="useTimelinePreview" />

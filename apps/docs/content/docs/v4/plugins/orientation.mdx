@@ -1,0 +1,97 @@
+---
+title: Orientation
+description: Gives the player the shape of its video, so vertical video needs no setup.
+---
+
+<PluginSummary id="orientation" />
+
+The player reads the video's size as soon as it's known and takes that shape. A vertical video gets a vertical player, centred, with its height capped so it fits on the screen. It's in `defaultPlugins()`, so `VideoPlayer` already does this.
+
+<Demo slug="vertical" />
+
+## Usage
+
+```tsx
+import { orientation } from "react-video-kit/orientation";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [orientation()];
+
+<VideoPlayer src="/vertical.mp4" plugins={plugins} />;
+```
+
+## Keep the page still
+
+The player can't know the video's shape until its metadata loads, and it's 16:9 until then. If you know the video is vertical, say so, and the player starts that shape, including in the server's HTML.
+
+```tsx
+orientation({ initial: "portrait" });
+```
+
+`initial` takes `"portrait"` (9:16), `"square"`, or `"landscape"`. The video's exact shape replaces it once it's known.
+
+To reserve some other shape, set `--rv-aspect` yourself:
+
+```tsx
+<VideoPlayer
+  src="/feed.mp4"
+  plugins={plugins}
+  style={{ "--rv-aspect": "4 / 5" } as React.CSSProperties}
+/>
+```
+
+## Limit the height
+
+A tall player sizes itself from its height, up to 85% of the screen. Change that with `--rv-max-height`, in any CSS length.
+
+```css
+.my-player {
+  --rv-max-height: 560px;
+}
+```
+
+A landscape player ignores this token, and fills its container as usual.
+
+## Keep the player's shape
+
+To keep a fixed frame and only learn what shape the video is, turn resizing off. Use the [Fit](/docs/v4/plugins/fit) plugin to choose between black bars and cropping.
+
+```tsx
+orientation({ resize: false });
+```
+
+## Build your own layout
+
+`orientation` holds `"portrait"`, `"landscape"`, or `"square"`, and `ratio` is the video's width divided by its height. Both are `null` until the video's size is known, unless you set `initial`.
+
+```tsx
+"use client";
+
+import { useVideoState } from "react-video-kit";
+import { orientation } from "react-video-kit/orientation";
+
+function Layout({ children }: { children: React.ReactNode }) {
+  const shape = useVideoState(orientation, (state) => state.orientation);
+  return <div className={shape === "portrait" ? "two-columns" : "stacked"}>{children}</div>;
+}
+```
+
+The root also has a `data-orientation` attribute, for styling with no JavaScript:
+
+```css
+.my-player[data-orientation="portrait"] [data-part="title-text"] {
+  font-size: 22px;
+}
+```
+
+## Behaviour
+
+- It covers every shape, not only vertical ones: a 4:3 or 21:9 video gets a player of that shape as well.
+- In a playlist the player keeps the last video's shape until the next one's size arrives, then changes once.
+- An ad playing through the same video element doesn't change the player's shape.
+- In fullscreen the player fills the screen, and the video keeps its shape inside it. On touch devices, the [Fullscreen](/docs/v4/plugins/fullscreen) plugin locks the screen upright for a tall video.
+- The controls size themselves from the player's width, so a narrow vertical player gets the compact layout automatically.
+
+## API
+
+<PluginApi id="orientation" />

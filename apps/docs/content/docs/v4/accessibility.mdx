@@ -1,0 +1,167 @@
+---
+title: Accessibility
+description: What the player does for keyboards, screen readers, and viewer preferences, and what's left to you.
+---
+
+The controls are native buttons and range inputs, and their names and values follow the player's state. This page covers what the player does by itself, the keys it answers to, and the parts only you can provide.
+
+## What you provide
+
+- **A name for the player.** Set `aria-label`, or give `VideoPlayer` a text `title`. Otherwise the player is called "Video player", which you can translate through the `player` string.
+- **Captions.** The player shows them, but the files are yours. Add them through the [captions](/docs/v4/plugins/captions) plugin, and consider the [transcript](/docs/v4/plugins/transcript) plugin for a version anyone can read at their own pace.
+- **Translated labels.** The [i18n](/docs/v4/plugins/i18n) plugin covers every built-in label, and also sets `lang` and `dir` on the player.
+- **The page around it.** A heading for the video, and a `lang` on the page.
+- **Names for your own controls.** A custom button needs an `aria-label`, and anything it changes out of sight needs an [announcement](#announcing-your-own-changes).
+
+```tsx
+<VideoPlayer src="/coast.mp4" aria-label="The long coast, a short film" />
+```
+
+## Keyboard
+
+Tab reaches every control, and hidden controls come back when they take focus. Tab never gets stuck: it moves through an open panel and then on out of the player.
+
+Tab follows the order of the DOM. In the default look and the TikTok and Instagram themes, that's also the order on screen. Other [themes](/docs/v4/themes) rearrange their controls with CSS, so Tab can move in a different order from the one you see.
+
+### Player shortcuts
+
+These come from the [hotkeys](/docs/v4/plugins/hotkeys) plugin. They work while focus is in the player, and afterwards for the player last used, until the viewer clicks somewhere else on the page.
+
+| Keys | Action | Needs |
+| --- | --- | --- |
+| `Space` or `K` | Play or pause | |
+| `←`, `→` | Seek 5 seconds | |
+| `J`, `L` | Seek 10 seconds | |
+| `↑`, `↓` | Change the volume by 5% | |
+| `M` | Mute or unmute | |
+| `Home`, `End` | Go to the start or the end | |
+| `0` to `9` | Go to that tenth of the video | |
+| `F` | Fullscreen | `fullscreen` |
+| `P` | Picture in picture | `pip` |
+| `C` | Captions on or off | `captions` |
+| `>`, `<` | Faster or slower | `speed` |
+| `?` | Show the shortcuts | `shortcuts` |
+
+### Controls
+
+| Where | Keys | Action |
+| --- | --- | --- |
+| Timeline | `←`, `→`, `↑`, `↓` | Seek a step |
+| Timeline | `Page Up`, `Page Down` | Seek a larger step |
+| Timeline | `Home`, `End` | Go to the start or the end |
+| Volume | Arrow keys | Change the volume |
+| Menu button | `Enter`, `Space`, `↑`, or `↓` | Open the menu |
+| Menu | `↑`, `↓`, `Home`, `End` | Move between rows |
+| Menu | `→` | Open a submenu, or `←` in right-to-left languages |
+| Menu | `←` | Go back a level, or `→` in right-to-left languages |
+| Menu | `Esc` | Go back a level, then close |
+| Menu | `Tab` | Close and move on |
+| Menu | Any letter | Jump to the row that starts with it |
+| Episodes | `←`, `→`, `Home`, `End` | Move between episodes, mirrored in right-to-left languages |
+| Panels | `Esc` | Close |
+| Transcript | `Enter` on a line | Seek to it |
+| Transcript | `↑`, `↓`, `Page Up`, `Page Down`, `Home`, `End` | Scroll, which stops following along until "Back to the current line" |
+
+Every other plugin's control is a button, pressed with `Enter` or `Space`: skip, up next, unmute, skip ad, cast, AirPlay, share, screenshot, loop, and the mini player's close. Double-clicking and double-tapping the video only repeat what these keys and buttons already do.
+
+### Where focus goes
+
+- **After Play:** focus moves from the big play button to the one in the controls, and they're free to hide, so you can watch. Any key brings them back. Every other control keeps them up for as long as it has focus.
+- **At the end:** focus moves to Replay.
+- **Menus and panels:** closing one returns focus to where it was when it opened.
+- **Controls that go away:** when a skip button, an up next card, an unmute chip, or an ad's controls disappear with focus inside them, focus moves to the play button rather than being lost.
+- **Clicks:** a pointer doesn't draw the focus ring, only the keyboard does.
+
+## Screen readers
+
+The player is a named group. Each control's name follows its state, such as Play becoming Pause, and the timeline and volume report a readable value in the viewer's language, such as "0:12 of 1:30".
+
+### What's announced
+
+These are said without moving focus, because a sighted viewer sees them change on screen.
+
+| What changes | When it's said |
+| --- | --- |
+| Buffering | Once a stall has lasted 2.5 seconds |
+| A shortcut's result | Each press, such as "+5s" or "Volume 40%" |
+| A skip button | When it appears |
+| Up next | When the card appears, not with each second of its countdown |
+| The next item in a playlist | When it starts |
+| The unmute chip | When autoplay falls back to muted |
+| An ad | When each one starts, and when it can be skipped |
+| Casting | When a session starts |
+| An error | At once, through `role="alert"` |
+
+Time isn't announced during playback. The live region is only there for changes like these.
+
+Captions are hidden from screen readers, so that they don't talk over the video's own sound. The [transcript](/docs/v4/plugins/transcript) is a named list that marks the current line with `aria-current`, for anyone who wants to read the words.
+
+### Announcing your own changes
+
+When a part of yours changes something the viewer can see without moving focus, say so with `player.announce`. It speaks through the player's polite live region, and it's safe to repeat the same message.
+
+```tsx
+import { usePlayer } from "react-video-kit";
+
+function BookmarkButton() {
+  const player = usePlayer();
+  return (
+    <button
+      aria-label="Bookmark this moment"
+      onClick={() => {
+        saveBookmark(player.clock.time());
+        player.announce("Bookmarked");
+      }}
+    />
+  );
+}
+```
+
+## Viewer preferences
+
+The skin follows the viewer's system settings, with no setup.
+
+| Setting | What changes |
+| --- | --- |
+| `prefers-reduced-motion` | Controls, menus, panels, and tooltips fade instead of moving. Lists jump rather than scroll smoothly. The buffering spinner slows down, and [ambient](/docs/v4/plugins/ambient) light updates once a second. The [autoplay](/docs/v4/plugins/autoplay) plugin doesn't start the video. |
+| `prefers-reduced-transparency` | Sheets and controls are solid, with no blur. |
+| `prefers-contrast: more` | Scrims and text get stronger, and the focus ring is thicker. |
+| `forced-colors: active` | Sliders draw their tracks, fill, and thumbs in system colours, buttons get an outline, and the focus ring uses `Highlight`. |
+
+Nothing plays until the viewer asks, unless you add the autoplay plugin.
+
+## Visual details
+
+- **Focus ring:** two tones, a ring in `--rv-focus` around a dark band, so one of them shows on any picture. Change the ring's colour with the `--rv-focus` token.
+- **Text and icons:** these sit on a scrim and carry a shadow, so they hold up over a bright frame.
+- **Target size:** buttons take clicks across up to 44px where there's room, and neighbours share the space where there isn't. At 360px wide, the smallest controls in any theme are 24px across.
+- **Captions:** they move up when the controls show, and stay on top of anything they still reach, with clicks passing through them. Set their look with `--rv-caption-size`, `--rv-caption-color`, and `--rv-caption-background`. To offer viewers a choice of size, set the token from a control of your own.
+- **Zoom and text spacing:** menus and panels grow or scroll with larger text and wider spacing.
+
+## Testing your player
+
+Most of what matters is quick to try by hand:
+
+1. Put the mouse aside, and use the whole player with the keyboard: start it, seek, open each menu and panel, and leave.
+2. Check that you can always see where focus is, on bright frames as well as dark ones.
+3. Turn on a screen reader, and listen to what each control says and what's announced as things change.
+4. Zoom to 200%, and try your system's contrast, motion, and transparency settings.
+
+Automated tools can cover part of this, using [axe](https://github.com/dequelabs/axe-core-npm/tree/develop/packages/playwright) with Playwright. Open your menus and panels first, because axe can only check what's on the page.
+
+```ts
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+
+test("the player has no detectable violations", async ({ page }) => {
+  await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+  await page.goto("/watch");
+  await page.locator('[data-part="root"]').hover();
+  await page.locator('[data-part="menu-trigger"]').click();
+
+  const { violations } = await new AxeBuilder({ page }).include('[data-part="root"]').analyze();
+  expect(violations).toEqual([]);
+});
+```
+
+Passing means axe found nothing it can detect, not that the player works well for everyone, so keep trying it by hand too.

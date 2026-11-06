@@ -1,0 +1,70 @@
+---
+title: Headless
+description: Behaviour and accessibility, with no CSS and no icons.
+---
+
+`react-video-kit/primitives` has the same parts as `react-video-kit`, but with no skin. You bring the design, and it brings the things that are hard to get right: a timeline that seeks without stutter, keyboard support, focus handling, and screen reader labels.
+
+<Demo slug="compose-headless" />
+
+This player doesn't import any CSS from the package.
+
+## Style with state
+
+Each part has a `data-part` attribute, and parts with state expose it as attributes. Use them from CSS or Tailwind.
+
+```tsx
+<Video.PlayPause className="group">
+  <span className="group-data-[state=playing]:hidden">Play</span>
+  <span className="hidden group-data-[state=playing]:inline">Pause</span>
+</Video.PlayPause>
+```
+
+The root has [state attributes](/docs/v4/concepts/state-and-time#styling-from-state) too, so a child can style itself from what the whole player is doing.
+
+## What's written to the DOM
+
+`TimelineFill` and `TimelineThumb` move through `transform`, written directly by the clock, so don't set your own `transform` on them. This also applies to Tailwind 4's `translate-*` and `scale-*` utilities, which use properties that combine with it.
+
+For the fill, set the origin and let it stretch across its track:
+
+```tsx
+<Video.Timeline className="relative h-8 cursor-pointer">
+  <Video.TimelineTrack className="absolute inset-x-0 top-1/2 h-1 bg-white/30">
+    <Video.TimelineFill className="absolute inset-0 origin-left bg-white" />
+  </Video.TimelineTrack>
+</Video.Timeline>
+```
+
+## Sliders are real inputs
+
+`Timeline` and `VolumeSlider` each render a range input stretched invisibly over the part, which gives them focus, keyboard support, and screen reader announcements with no work from you. It's styled inline, so this works with no CSS.
+
+To show a focus ring, style from `:has(:focus-visible)` on the part:
+
+```css
+[data-part="timeline"]:has(:focus-visible) {
+  outline: 2px solid currentColor;
+}
+```
+
+## Using plugins
+
+Plugins work the same here, and their state, commands, and root attributes are all available. Their visual parts, such as `Fullscreen`, include icons and expect the skin. Their state and commands don't, so for a headless design, build your control from those:
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit/primitives";
+import { fullscreen } from "react-video-kit/fullscreen";
+
+function FullscreenButton() {
+  const active = useVideoState(fullscreen, (state) => state.active);
+  const { toggle } = useCommands(fullscreen);
+  return <button onClick={() => void toggle()}>{active ? "Exit" : "Enter"} fullscreen</button>;
+}
+```
+
+## All parts
+
+See [Primitives](/docs/v4/reference/primitives) for each part and its props.

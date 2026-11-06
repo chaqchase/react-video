@@ -1,0 +1,95 @@
+---
+title: Transcript
+description: The captions as text beside the video, following along as it plays.
+---
+
+<PluginSummary id="transcript" />
+
+Lists the lines of a captions track. The current line stays highlighted, the list scrolls to keep it in view, and pressing a line seeks there. It can go anywhere on the page. Press play below, or press a line.
+
+<Demo slug="transcript" />
+
+## Usage
+
+This plugin needs [`captions`](/docs/v4/plugins/captions), which provides the tracks.
+
+A transcript usually sits outside the video frame, so it needs a way to reach the player. Make the player yourself with `createPlayer`, and give the same one to both:
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { captions } from "react-video-kit/captions";
+import { createPlayer } from "react-video-kit/core";
+import { VideoPlayer } from "react-video-kit/player";
+import { transcript, Transcript } from "react-video-kit/transcript";
+
+export function Lesson() {
+  const [player] = useState(() =>
+    createPlayer({
+      src: "/video.mp4",
+      plugins: [
+        captions({
+          tracks: [{ src: "/captions.en.vtt", language: "en", label: "English" }],
+        }),
+        transcript(),
+      ],
+    })
+  );
+
+  return (
+    <>
+      <VideoPlayer player={player} />
+      <Transcript player={player} />
+    </>
+  );
+}
+```
+
+The `player` prop works anywhere in the React tree. Inside the player, as a child of `VideoPlayer` or `Root`, leave it off.
+
+## Which track it shows
+
+The transcript follows the captions track that's on, so choosing another language in the menu changes it. While captions are off, it shows the track in the `language` you ask for, or else in the captions plugin's language, or else the first track.
+
+```tsx
+transcript({ language: "fr" });
+```
+
+## Style it
+
+The list is 320px tall at most. Change it with `--rv-transcript-height`, on the transcript or a parent.
+
+```css
+.lesson-transcript {
+  --rv-transcript-height: 60vh;
+}
+```
+
+The transcript takes its colours from the page. Its parts are `transcript`, `transcript-list`, `transcript-cue`, `transcript-time`, `transcript-text`, and `transcript-resume`, and the current line has `aria-current="true"`.
+
+```css
+[data-part="transcript-cue"][aria-current="true"] {
+  background: rgb(10 132 255 / 0.16);
+}
+```
+
+## Build your own list
+
+The `cues` state holds the lines, each with a `start` and its `text`.
+
+```tsx
+const cues = useVideoState(transcript, (state) => state.cues);
+```
+
+## Behaviour
+
+- The highlight moves through the player's clock, straight to the DOM, so the list doesn't re-render during playback.
+- It only scrolls the list, never the page.
+- When the viewer scrolls the list away, it stops following and offers a button to go back. Pressing a line starts it following again.
+- Each line reads in its own direction, so an Arabic track lays out right to left on any page.
+- Tracks listed in `captions({ tracks })` are fetched by the plugin, so a file on another origin needs CORS. Tracks inside an HLS or DASH stream come from the browser, which only delivers their lines while captions are on.
+
+## API
+
+<PluginApi id="transcript" />

@@ -1,0 +1,90 @@
+---
+title: TanStack Start
+description: Server-render the player from a file route, or turn that off per route.
+---
+
+<Install />
+
+## Add the player
+
+```tsx title="src/components/player.tsx"
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+
+const plugins = defaultPlugins();
+
+export function Player({ src, poster }: { src: string; poster?: string }) {
+  return <VideoPlayer src={src} poster={poster} plugins={plugins} />;
+}
+```
+
+```tsx title="src/routes/index.tsx"
+import { createFileRoute } from "@tanstack/react-router";
+import { Player } from "#/components/player";
+
+export const Route = createFileRoute("/")({ component: Home });
+
+function Home() {
+  return <Player src="/video.mp4" poster="/poster.jpg" />;
+}
+```
+
+The starter from `npx @tanstack/cli create` maps `#/` to `src/`. Importing the skin from a component works here: Start finds the stylesheet and links it in the server's HTML, so the player doesn't flash unstyled.
+
+## Server rendering
+
+Start renders routes on the server by default, and the player renders with them, so its video element and controls are in the HTML. You don't need a client-only wrapper or a `"use client"` directive.
+
+To load the source in a route, return it from a `loader`:
+
+```tsx title="src/routes/watch/$id.tsx"
+import { createFileRoute } from "@tanstack/react-router";
+import { Player } from "#/components/player";
+
+export const Route = createFileRoute("/watch/$id")({
+  loader: ({ params }) => ({
+    src: `/videos/${params.id}.mp4`,
+    poster: `/videos/${params.id}.jpg`,
+  }),
+  component: Watch,
+});
+
+function Watch() {
+  const { src, poster } = Route.useLoaderData();
+  return <Player src={src} poster={poster} />;
+}
+```
+
+Going from `/watch/a` to `/watch/b` keeps the route mounted, so the player changes source on the same video element.
+
+To leave a route out of server rendering, set `ssr: false`. The server's HTML then has no player, and it mounts in the browser:
+
+```tsx title="src/routes/browser/$id.tsx"
+import { createFileRoute } from "@tanstack/react-router";
+import { Player } from "#/components/player";
+
+export const Route = createFileRoute("/browser/$id")({
+  ssr: false,
+  component: Watch,
+});
+
+function Watch() {
+  const { id } = Route.useParams();
+  return <Player src={`/videos/${id}.mp4`} poster={`/videos/${id}.jpg`} />;
+}
+```
+
+## Use it with Tailwind 4
+
+The starter already includes Tailwind 4, and its root route links `src/styles.css`. Put the skin there, after a line that declares the layer order. The skin lives in the `rv` layer, so placing `rv` before `utilities` lets a class like `rounded-none` override it. Without that line, the skin wins.
+
+```css title="src/styles.css"
+@layer theme, base, rv, components, utilities;
+
+@import "tailwindcss";
+@import "react-video-kit/styles.css";
+```
+
+Remove the skin's import from `src/components/player.tsx`. [Theming](/docs/v4/theming) has the details.
+
+Last built against TanStack Start 1.169.4, TanStack Router 1.170.46, Vite 8.3.5, React 19.3.1, and Tailwind CSS 4.3.4, and run with `vite preview`.

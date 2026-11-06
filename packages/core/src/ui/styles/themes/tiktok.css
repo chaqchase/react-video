@@ -1,0 +1,18 @@
+/* After TikTok: a bare column of icons, the name and caption in the corner, and a white edge timeline. */
+@import "./_column.css";
+
+@layer rv {
+  .rv-root.rv-theme-tiktok {
+    --rv-focus: #fe2c55;
+    --rv-font: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-glass-strong: rgb(30 30 30 / 0.96);
+    --rv-radius: 16px;
+    --rv-menu-radius: 12px;
+    --rv-control-size: 44px;
+    --rv-icon-size: 25px;
+  }
+
+  .rv-root.rv-theme-tiktok [data-part="title-eyebrow"] {
+    font-size: 16px;
+  }
+}

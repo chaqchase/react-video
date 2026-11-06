@@ -1,0 +1,83 @@
+---
+title: AirPlay
+description: A button that sends the video to an AirPlay device, through Safari's own picker.
+---
+
+<PluginSummary id="airplay" />
+
+Adds an AirPlay button to the controls once Safari finds a device. Most browsers won't ever show it, so the demo says what you'd need and whether a device has been found.
+
+<Demo slug="airplay" />
+
+## Usage
+
+```tsx
+import { airplay } from "react-video-kit/airplay";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [airplay()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+It takes no options.
+
+## Build your own control
+
+`prompt` opens Safari's picker. It has to run from a click or key press.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { airplay } from "react-video-kit/airplay";
+
+function SendToTv() {
+  const available = useVideoState(airplay, (state) => state.available);
+  const active = useVideoState(airplay, (state) => state.active);
+  const { prompt } = useCommands(airplay);
+  if (!available) return null;
+  return (
+    <button aria-pressed={active} onClick={() => prompt()}>
+      Send to TV
+    </button>
+  );
+}
+```
+
+## Place the button yourself
+
+`VideoPlayer` places `AirPlayButton` through the `top-start` [slot](/docs/v4/composition/slots). In your own layout, put it in the controls, and it still renders nothing until a device is found:
+
+```tsx
+import * as Video from "react-video-kit";
+import { AirPlayButton } from "react-video-kit/airplay";
+
+<Video.Controls>
+  <AirPlayButton />
+</Video.Controls>;
+```
+
+## Stream types
+
+AirPlay uses Safari's native playback. It's meant to work with the native HLS that the [hls](/docs/v4/plugins/hls) plugin uses on Apple devices, but not when that plugin plays through hls.js:
+
+```tsx
+import { hls } from "react-video-kit/hls";
+
+hls(); // Native HLS on Apple devices, which AirPlay can use.
+hls({ preferEngine: true }); // hls.js everywhere, which AirPlay can't use.
+```
+
+## Behaviour
+
+- Where the video element has no `webkitShowPlaybackTargetPicker`, the plugin does nothing. `available` stays `false`, and `prompt` is safe to call.
+- `available` and `active` follow Safari's `webkitplaybacktargetavailabilitychanged` and `webkitcurrentplaybacktargetiswirelesschanged` events.
+- The button has `aria-pressed` set while connected, and the root has `data-airplay`.
+- The button hides whenever `available` is `false`, even while connected.
+- The plugin only opens the picker and tracks state. Unlike [chromecast](/docs/v4/plugins/chromecast), it adds no provider, so the player's commands keep going to the video element.
+- It has no DRM handling of its own. Whether protected content can be sent is up to Safari.
+
+## API
+
+<PluginApi id="airplay" />

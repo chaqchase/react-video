@@ -1,0 +1,68 @@
+---
+title: Picture in picture
+description: A picture-in-picture button and commands.
+---
+
+<PluginSummary id="pip" />
+
+Adds a picture-in-picture button to the controls, so the video can keep playing in a small window. Press the button below and the label in the corner changes to active. Close the window and it follows that too. The [hotkeys](/docs/v4/plugins/hotkeys) plugin adds `P`.
+
+<Demo slug="pip" />
+
+## Usage
+
+```tsx
+import { pip } from "react-video-kit/pip";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [pip()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+## When the button shows
+
+The button renders nothing while `supported` is false. The plugin sets it when the video attaches. It's true if the video doesn't have `disablePictureInPicture` set, and either of these is:
+
+- `document.pictureInPictureEnabled` is true.
+- `video.webkitSupportsPresentationMode("picture-in-picture")` returns true. This is Safari's own API.
+
+`supported` is false on the server and until the video attaches, so the button isn't in the server-rendered HTML. The plugin doesn't check again later, so setting `disablePictureInPicture` after that has no effect on the button.
+
+To hide the button for one player, set the attribute through `media`:
+
+```tsx
+<VideoPlayer src="/video.mp4" plugins={plugins} media={{ disablePictureInPicture: true }} />;
+```
+
+## Build your own control
+
+`enter` and `toggle` return a promise that rejects if the browser refuses, for example outside a click or key press. Catch that in your own control.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { pip } from "react-video-kit/pip";
+
+function PipToggle() {
+  const { toggle } = useCommands(pip);
+  const active = useVideoState(pip, (state) => state.active);
+  const supported = useVideoState(pip, (state) => state.supported);
+  if (!supported) return null;
+  return <button onClick={() => toggle().catch(() => {})}>{active ? "Bring back" : "Pop out"}</button>;
+}
+```
+
+`Pip` is the button from the controls, which the plugin adds to the `top-start` [slot](/docs/v4/composition/slots). It catches a refusal itself, and nothing changes. In your own layout, render the slot or the button itself.
+
+## Behaviour
+
+- `enter` uses the standard `requestPictureInPicture()` where `document.pictureInPictureEnabled` is true, and falls back to `webkitSetPresentationMode` otherwise.
+- `active` follows the browser's events, so it also changes when the viewer closes the window.
+- The plugin sets `data-pip` on the player's root while `active` is true, for your own CSS. The default skin doesn't use it.
+- When the video detaches, such as when the player unmounts, an open window for that video closes.
+
+## API
+
+<PluginApi id="pip" />

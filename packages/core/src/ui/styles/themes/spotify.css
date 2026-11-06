@@ -1,0 +1,232 @@
+/*
+ * After Spotify's full-screen video: a large title, the times either side of the timeline,
+ * a white circular play button in the middle, and a volume slider that's always out.
+ */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-spotify {
+    --rv-accent: #fff;
+    --rv-focus: #fff;
+    --rv-font: "Circular Std", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-muted: #b3b3b3;
+    --rv-glass-strong: #282828;
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.3);
+    --rv-radius: 0;
+    --rv-menu-radius: 6px;
+    --rv-control-size: 32px;
+    --rv-icon-size: 18px;
+    --rv-inset: 24px;
+    --rv-bar-track: 4px;
+    --rv-bar-track-active: 4px;
+    --rv-bar-play-order: 0;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="controls"] {
+    padding-block-end: var(--rv-inset-scaled);
+  }
+
+  .rv-root.rv-theme-spotify [data-part="controls"]::before,
+  .rv-root.rv-theme-spotify [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.4), transparent 20%, transparent 48%, rgb(0 0 0 / 0.86));
+  }
+
+  /* First line: the title. */
+  .rv-root.rv-theme-spotify [data-part="title"] {
+    position: static;
+    flex: 0 0 100%;
+    order: -4;
+    gap: 4px;
+    margin-block-end: 8px;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="title-text"] {
+    order: 0;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="title-eyebrow"] {
+    order: 1;
+    color: var(--rv-muted);
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="title-description"] {
+    display: none;
+  }
+
+  /* Second line: the times bracket the timeline, and together they fill it exactly. */
+  .rv-root.rv-theme-spotify [data-part="current-time"] {
+    flex: 0 0 42px;
+    order: -3;
+    margin: 0;
+    color: var(--rv-foreground);
+    font-size: 12px;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="timeline"] {
+    flex: 0 0 calc(100% - 84px);
+    order: -2;
+  }
+
+  .rv-root.rv-theme-spotify[data-live] [data-part="timeline"] {
+    flex-basis: 100%;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="remaining-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-spotify [data-position="scrubber"] > [data-part="duration"] {
+    display: inline;
+    flex: 0 0 42px;
+    order: -1;
+    color: var(--rv-foreground);
+    text-align: end;
+  }
+
+  /* The timeline never mirrors, so each time stays at its own end of it. */
+  .rv-root.rv-theme-spotify[dir="rtl"] [data-part="current-time"] {
+    order: -1;
+  }
+
+  .rv-root.rv-theme-spotify[dir="rtl"] [data-position="scrubber"] > [data-part="duration"] {
+    order: -3;
+  }
+
+  /* The fill turns green under the pointer. */
+  .rv-root.rv-theme-spotify [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-fill"] {
+    background: #1ed760;
+  }
+
+  /* Third line: the transport in a box of its own, since it never mirrors. */
+  .rv-root.rv-theme-spotify [data-part="transport"] {
+    position: static;
+    display: flex;
+    flex: none;
+    gap: 12px;
+    translate: none;
+  }
+
+  /* With room to spare it centres on the whole player, whatever sits beside it. */
+  @container rv (min-width: 720px) {
+    .rv-root.rv-theme-spotify [data-part="transport"] {
+      position: absolute;
+      inset-inline: 0;
+      inset-block: auto var(--rv-inset-scaled);
+      pointer-events: none;
+    }
+
+    .rv-root.rv-theme-spotify [data-part="transport"] > [data-part="play-pause"] {
+      margin-block-end: -5px;
+    }
+  }
+
+  /* More buttons take more room to centre without running into each other. */
+  @container rv (max-width: 1099px) {
+    .rv-root.rv-theme-spotify:has([data-position="details"] > [data-part="control-group"]:last-child > :nth-child(3), [data-part="transport"] > :nth-child(4)) [data-part="transport"] {
+      position: static;
+    }
+  }
+
+  .rv-root.rv-theme-spotify [data-part="transport"] > [data-part="seek-button"] {
+    display: inline-grid;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="transport"] > [data-part="play-pause"] {
+    width: 42px;
+    height: 42px;
+    background: #fff;
+    color: #000;
+    font-size: 20px;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="volume"] {
+    order: 10;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="volume-slider"] {
+    overflow: visible;
+    width: 76px;
+    opacity: 1;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="volume"],
+  .rv-root.rv-theme-spotify [data-part="volume"]:hover,
+  .rv-root.rv-theme-spotify [data-part="volume"]:focus-within {
+    padding-inline-end: 8px;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="play-overlay"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-spotify:not([data-started]) [data-part="controls"] {
+    --rv-shown: 1;
+  }
+
+  .rv-root.rv-theme-spotify [data-part="captions-toggle"][aria-pressed="true"] {
+    background: transparent;
+    color: #1ed760;
+  }
+
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-spotify [data-part="control-group"] [data-part="menu-content"] {
+      bottom: calc(var(--rv-bar) + 34px);
+    }
+  }
+
+  @container rv (max-width: 479px) {
+    /* The controls sit higher at this size, so the shade has to start higher too. */
+    .rv-root.rv-theme-spotify [data-part="controls"]::before,
+    .rv-root.rv-theme-spotify [data-part="controls"]:has([data-part="title"])::before {
+      background: linear-gradient(rgb(0 0 0 / 0.4), transparent 20%, transparent 32%, rgb(0 0 0 / 0.86));
+    }
+
+    .rv-root.rv-theme-spotify [data-part="title"] {
+      display: none;
+    }
+
+    .rv-root.rv-theme-spotify [data-part="transport"] > [data-part="play-pause"] {
+      width: 36px;
+      height: 36px;
+      font-size: 17px;
+    }
+
+    .rv-root.rv-theme-spotify [data-part="transport"] > [data-part="seek-button"] {
+      display: none;
+    }
+
+    /* Folded away, but still there for the keyboard, which opens it. */
+    .rv-root.rv-theme-spotify [data-part="volume-slider"] {
+      overflow: hidden;
+      width: 0;
+      opacity: 0;
+    }
+
+    .rv-root.rv-theme-spotify [data-part="volume"],
+    .rv-root.rv-theme-spotify [data-part="volume"]:hover,
+    .rv-root.rv-theme-spotify [data-part="volume"]:focus-within {
+      padding-inline-end: 0;
+    }
+
+    .rv-root.rv-theme-spotify [data-position="scrubber"] > [data-part="duration"] {
+      display: inline;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-spotify [data-part="transport"] > [data-part="play-pause"]:hover {
+      background: #fff;
+      transform: scale(1.06);
+    }
+
+    .rv-root.rv-theme-spotify [data-control]:hover {
+      color: var(--rv-foreground);
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "v4 (alpha)",
+  "root": true,
+  "pages": [
+    "index",
+    "getting-started",
+    "migration",
+    "---Concepts---",
+    "...concepts",
+    "---Composition---",
+    "...composition",
+    "theming",
+    "themes",
+    "accessibility",
+    "---Plugins---",
+    "...plugins",
+    "---Recipes---",
+    "...recipes",
+    "---Reference---",
+    "components",
+    "hooks",
+    "...reference"
+  ]
+}

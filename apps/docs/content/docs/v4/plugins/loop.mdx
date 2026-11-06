@@ -1,0 +1,74 @@
+---
+title: Loop
+description: Repeats the whole video, or one section of it.
+---
+
+<PluginSummary id="loop" />
+
+Adds a **Loop** row to the settings menu, for the whole video or a section between two points. Below, open the settings menu, choose **Loop**, and mark a start and an end. The section shows on the timeline.
+
+<Demo slug="loop" />
+
+## Usage
+
+```tsx
+import { loop } from "react-video-kit/loop";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [loop()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+To start with the whole video repeating:
+
+```tsx
+loop({ enabled: true });
+```
+
+## Repeat a section from your own control
+
+`setRange` takes a start and an end in seconds, and returns false if the section is shorter than half a second or outside the video.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { loop } from "react-video-kit/loop";
+
+function PracticeChorus() {
+  const { setRange, clear } = useCommands(loop);
+  const looping = useVideoState(loop, (state) => state.range !== null);
+  return (
+    <button aria-pressed={looping} onClick={() => (looping ? clear() : setRange(48, 72))}>
+      Repeat the chorus
+    </button>
+  );
+}
+```
+
+`markStart` and `markEnd` do the same from the current position, as the menu does.
+
+## Style the section
+
+The section is an element in the timeline, in the `loop-range` part, placed with percentages. Change its colour with a variable:
+
+```css
+.rv-root {
+  --rv-loop-range: rgb(10 132 255);
+}
+```
+
+The root's `data-loop` attribute is `video` or `section` while something repeats.
+
+## Behaviour
+
+- A section takes priority over repeating the whole video. `set`, `toggle`, and `clear` all remove it.
+- Only playback reaching the end of a section goes back to its start, so a viewer can still seek out of it.
+- The position is checked through the player's clock, so nothing re-renders during playback, and it's only checked while there's a section.
+- A new source clears the section, and keeps the choice to repeat the whole video.
+- The row doesn't appear for a [live stream](/docs/v4/plugins/live).
+
+## API
+
+<PluginApi id="loop" />

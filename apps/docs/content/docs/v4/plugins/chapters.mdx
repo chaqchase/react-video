@@ -1,0 +1,151 @@
+---
+title: Chapters
+description: Splits the timeline into sections, and adds a menu to jump between them.
+---
+
+<PluginSummary id="chapters" />
+
+Cuts gaps in the timeline at each chapter, names the chapter under the pointer, and adds a **Chapters** row to the settings menu. Hover the timeline in the demo to see the titles, then jump to a chapter from the settings menu.
+
+<Demo slug="chapters" />
+
+## Usage
+
+```tsx
+import { chapters } from "react-video-kit/chapters";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [chapters({ src: "/chapters.vtt" })];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Chapters isn't in `defaultPlugins()`, so add it to the list if you use those.
+
+To pick a file for each source, pass a function. Return `null` for a source with no chapters:
+
+```tsx
+import { chapters } from "react-video-kit/chapters";
+
+const files: Record<string, string> = { "/film.mp4": "/film.chapters.vtt" };
+
+chapters({ src: ({ src }) => files[src] ?? null });
+```
+
+To skip the file, list the chapters in order with `items`. If you pass `src` as well, the file replaces them:
+
+```tsx
+import { chapters } from "react-video-kit/chapters";
+
+chapters({
+  items: [
+    { start: 0, title: "Opening" },
+    { start: 10, title: "Middle" },
+    { start: 20, title: "Closing" },
+  ],
+});
+```
+
+## The WebVTT file
+
+Each cue is a chapter, and its text is the title:
+
+```text
+WEBVTT
+
+00:00.000 --> 00:10.000
+Opening
+
+00:10.000 --> 00:20.000
+Middle
+
+00:20.000 --> 00:30.000
+Closing
+```
+
+- Times can be `mm:ss.mmm` or `hh:mm:ss.mmm`.
+- Header lines such as `Kind: chapters`, `NOTE` blocks, cue identifiers, and cue settings are all ignored.
+- List the cues in order. The plugin looks up the current chapter assuming they are.
+- The file loads with `fetch` as soon as the source starts loading, so a file on another origin needs CORS headers. If the file can't load, there are no chapters and no error.
+
+## The segmented timeline
+
+`ChapterGaps` cuts a 3px gap in the timeline track at the start of each chapter, except one that starts at or before the start of the timeline. It's a single CSS mask on the track, so the fill and buffered bars stay one element each and playback still needs no renders.
+
+`ChapterTitle` shows the chapter under the pointer, above the time in the timeline preview. A long title is cut off with an ellipsis at 200px.
+
+## The menu
+
+`ChaptersMenu` lists each chapter with its start time and marks the active one. Picking a chapter seeks to its start. The row shows the title of the active chapter.
+
+When you compose your own layout, put it in any [menu](/docs/v4/composition/parts#menus):
+
+```tsx
+import * as Video from "react-video-kit";
+import { ChaptersMenu } from "react-video-kit/chapters";
+
+<Video.Menu>
+  <Video.MenuTrigger aria-label="Chapters">Chapters</Video.MenuTrigger>
+  <Video.MenuContent>
+    <ChaptersMenu />
+  </Video.MenuContent>
+</Video.Menu>;
+```
+
+## Build your own control
+
+`useCommands` gives you `next`, `previous`, and `select`, and `useVideoState` gives you the chapters and the active index.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { chapters } from "react-video-kit/chapters";
+
+function ChapterButtons() {
+  const { next, previous } = useCommands(chapters);
+  const title = useVideoState(chapters, (state) => state.items[state.active]?.title);
+  return (
+    <>
+      <button onClick={previous}>Previous chapter</button>
+      <span>{title}</span>
+      <button onClick={next}>Next chapter</button>
+    </>
+  );
+}
+```
+
+## Place the timeline parts yourself
+
+`<Video.Timeline />` with no children includes these parts through its slots. If you give it children, add them yourself. `ChapterGaps` has to be a direct child of the track, because it applies the mask to its parent.
+
+```tsx
+import * as Video from "react-video-kit";
+import { ChapterGaps, ChapterTitle } from "react-video-kit/chapters";
+
+<Video.Timeline>
+  <Video.TimelineTrack>
+    <Video.TimelineBuffered />
+    <Video.TimelineFill />
+    <ChapterGaps />
+  </Video.TimelineTrack>
+  <Video.TimelineThumb />
+  <Video.TimelinePreview>
+    <ChapterTitle />
+  </Video.TimelinePreview>
+</Video.Timeline>;
+```
+
+## Behaviour
+
+- `ChaptersMenu` renders nothing without chapters.
+- `previous` goes to the chapter before the current one, not back to the start of the current one.
+- `next` does nothing on the last chapter, and `previous` does nothing on the first.
+- A chapter lasts until the next one starts. Cue end times aren't used.
+- `active` is `-1` before the first chapter starts. It's checked about once a second during playback and after each seek, and the store is only written when it changes.
+- A new source clears chapters that came from a file, and cancels a fetch still in progress. Chapters from `items` stay.
+- With the [thumbnails](/docs/v4/plugins/thumbnails) plugin, the title and the frame stack in plugin order.
+
+## API
+
+<PluginApi id="chapters" />

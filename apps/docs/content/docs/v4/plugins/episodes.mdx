@@ -1,0 +1,124 @@
+---
+title: Episodes
+description: A shelf for browsing a playlist by season, with thumbnails, running times, and progress.
+---
+
+<PluginSummary id="episodes" />
+
+Adds a button beside the settings menu, which opens a shelf of everything in the queue. Press play, press the stack button, and pick another episode. In this demo the last four seconds of each one also offer **Next Episode**, through the [skip](/docs/v4/plugins/skip) plugin, and the **i** button opens the [info panel](/docs/v4/plugins/info).
+
+<Demo slug="episodes" />
+
+## Usage
+
+Episodes come from the [playlist](/docs/v4/plugins/playlist) plugin, so install that as well. Each item describes itself:
+
+```tsx
+import { episodes } from "react-video-kit/episodes";
+import { VideoPlayer } from "react-video-kit/player";
+import { playlist } from "react-video-kit/playlist";
+
+const plugins = [
+  playlist({
+    items: [
+      {
+        src: "/s1e1.mp4",
+        thumbnail: "/s1e1.jpg",
+        season: "Season 1",
+        eyebrow: "Season 1, Episode 1",
+        title: "The Green Coast",
+        description: "The swell meets the first land it has seen in days.",
+        duration: 2520,
+      },
+      // And so on, in play order.
+    ],
+  }),
+  episodes(),
+];
+
+<VideoPlayer plugins={plugins} />;
+```
+
+| Field | On the shelf |
+|---|---|
+| `thumbnail` | The image, or `poster` if there's no thumbnail |
+| `title` | The name, on one line |
+| `duration` | The running time, given in seconds and shown in the player's language, such as `42 min` |
+| `eyebrow` | Shown in place of the running time when there's no `duration` |
+| `description` | Two lines under the name, on large players |
+| `season` | Which season it's listed under |
+
+The same fields fill the [title above the timeline](/docs/v4/composition/player#give-it-a-title) as each episode plays.
+
+## Seasons
+
+Items with the same `season` are listed together, and a button for each season appears when there are two or more. The shelf always opens on the season that's playing. Give every item a season, or none of them. With none, they all share one row.
+
+## Show progress
+
+`progress` returns how far through an episode the viewer is, from 0 to 1, and the shelf draws a bar on its thumbnail. Return nothing for no bar.
+
+```tsx
+episodes({
+  progress: (item) => watched.get(item.title),
+});
+```
+
+The episode that's playing always shows its real position instead. `progress` only runs as the shelf renders, which happens when it opens or something on it changes, not during playback.
+
+## Open it yourself
+
+```tsx
+"use client";
+
+import { useCommands } from "react-video-kit";
+import { episodes } from "react-video-kit/episodes";
+
+function BrowseSeason2() {
+  const { open, setSeason } = useCommands(episodes);
+  return (
+    <button
+      onClick={() => {
+        open();
+        setSeason("Season 2");
+      }}
+    >
+      Season 2
+    </button>
+  );
+}
+```
+
+## Place the parts yourself
+
+`VideoPlayer` places the button and the shelf through [slots](/docs/v4/composition/slots). When you compose your own layout, put them wherever you like:
+
+```tsx
+import * as Video from "react-video-kit";
+import { EpisodesButton, EpisodesShelf } from "react-video-kit/episodes";
+
+<Video.Root plugins={plugins}>
+  <Video.Media />
+  <EpisodesShelf />
+  <Video.Controls>
+    <Video.PlayPause />
+    <EpisodesButton />
+  </Video.Controls>
+</Video.Root>;
+```
+
+## Behaviour
+
+- Playback carries on behind the shelf, and the other controls step aside until it closes.
+- Choosing an episode closes the shelf and plays it. Choosing the one that's already playing only closes the shelf.
+- Focus moves to the episode that's playing. The left and right arrows move between episodes, in reading order for the language, and **Home** and **End** go to the ends. **Tab** reaches the season buttons and the close button.
+- **Esc**, the close button, and a click above the shelf all close it, and focus goes back to the button that opened it.
+- The [hotkeys](/docs/v4/plugins/hotkeys) plugin ignores keys pressed inside the shelf, and the [idle](/docs/v4/plugins/idle) plugin doesn't hide anything while it's open.
+- With a mouse, buttons at the ends of the row page through it when there's more to see.
+- With a single item in the queue, the button doesn't render.
+- Nothing renders until the shelf first opens, and thumbnails load as they scroll into view.
+- The root has `data-episodes-open` while it's open.
+
+## API
+
+<PluginApi id="episodes" />

@@ -1,0 +1,108 @@
+---
+title: Skip intro
+description: A button that skips an intro, a recap, or credits while one is playing.
+---
+
+<PluginSummary id="skip" />
+
+Shows a button while part of the video can be skipped. Press play below. **Skip Intro** appears at 3 seconds and skips to 12, and **Skip Credits** appears at 24.
+
+<Demo slug="skip" />
+
+## Usage
+
+List the parts, in seconds:
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { skip } from "react-video-kit/skip";
+
+const plugins = [
+  skip({
+    segments: [
+      { kind: "recap", start: 0, end: 62 },
+      { kind: "intro", start: 62, end: 95 },
+      { kind: "credits", start: 2510, end: 2580 },
+    ],
+  }),
+];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+`kind` picks the button's text:
+
+| `kind` | Text |
+|---|---|
+| `intro` | Skip Intro |
+| `recap` | Skip Recap |
+| `credits` | Skip Credits, or Next Episode when a playlist has another item |
+| `custom`, or left out | Skip |
+
+`label` replaces that text:
+
+```tsx
+{ start: 340, end: 372, label: "Skip the song" }
+```
+
+The text goes through the [i18n](/docs/v4/plugins/i18n) plugin, under `skipIntro`, `skipRecap`, `skipCredits`, `nextEpisode`, and `skip`.
+
+## Different parts for each video
+
+`segments` also takes a function, which gets each source as it loads. This suits a [playlist](/docs/v4/plugins/playlist), where every episode has its own timings:
+
+```tsx
+const timings = {
+  "/s1e1.mp4": [{ kind: "intro", start: 62, end: 95 }],
+  "/s1e2.mp4": [{ kind: "intro", start: 48, end: 81 }],
+};
+
+skip({ segments: (source) => timings[source.src] });
+```
+
+If your timings arrive later, from an API for example, replace them with `setSegments`:
+
+```tsx
+player.plugin(skip).commands.setSegments(parts);
+```
+
+## Skip automatically
+
+`auto` skips each part as playback reaches it, and shows no button:
+
+```tsx
+skip({ segments, auto: true });
+```
+
+Each part is skipped once per video, so someone who seeks back into it can watch it.
+
+## Place the button yourself
+
+`VideoPlayer` places the button through the `overlay` [slot](/docs/v4/composition/slots). When you compose your own layout, put it wherever you like:
+
+```tsx
+import * as Video from "react-video-kit";
+import { SkipButton } from "react-video-kit/skip";
+
+<Video.Root src="/video.mp4" plugins={plugins}>
+  <Video.Media />
+  <SkipButton />
+  <Video.Controls>{/* ... */}</Video.Controls>
+</Video.Root>;
+```
+
+## Behaviour
+
+- The button stays while the other controls are hidden, moving down into the space they leave.
+- A part runs from `start` up to, but not including, `end`.
+- On a small player the button sits level with the settings button, on the opposite side, clear of the centre buttons.
+- Credits with another item in a playlist move on to that item, in place of seeking.
+- It appears without taking focus, so whatever the viewer is doing isn't interrupted.
+- It waits for the first play, so it doesn't sit on the poster of a video with an intro at the start.
+- During an [ad](/docs/v4/plugins/ads), no part is active.
+- Time isn't kept in state. The plugin checks the clock four times a second, and writes to the store only when the active part changes.
+- The root has `data-skip` while a part can be skipped.
+
+## API
+
+<PluginApi id="skip" />
