@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ChevronIcon } from "@/components/site/icons";
 import { Install } from "@/components/site/install";
-import { ALPHA_PUBLISHED } from "@/lib/site";
 
 export function Closing() {
   return (
@@ -18,9 +17,6 @@ export function Closing() {
           </Link>
         </div>
         <Install hero className="mt-10" />
-        <p className="text-dim mt-5 text-[14px] leading-[1.45] tracking-[-0.008em]">
-          Version 4 is in alpha, and its API can still change.{ALPHA_PUBLISHED ? null : " It isn't on npm yet."}
-        </p>
       </div>
     </section>
   );

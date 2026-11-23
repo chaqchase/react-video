@@ -25,7 +25,7 @@ export function Hero({ kernel }: { kernel: string }) {
     <section id="intro" className="relative isolate overflow-x-clip pt-12 pb-14 text-center sm:pt-16 sm:pb-20">
       <div className="site-wrap flex flex-col items-center">
         <p className="text-[clamp(1.125rem,2vw,1.5rem)] font-semibold tracking-[-0.018em]">
-          React Video Kit <span className="text-dim font-normal">4 alpha</span>
+          React Video Kit <span className="text-dim font-normal">4</span>
         </p>
         <h1 className="site-display mt-2">
           Beautiful video.

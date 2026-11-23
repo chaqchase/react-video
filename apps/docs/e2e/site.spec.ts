@@ -229,13 +229,6 @@ test.describe("docs", () => {
     await expect(page).toHaveURL(/\/docs\/v4\/plugins\/captions/);
   });
 
-  test("the alpha notice appears on version 4 only", async ({ page }) => {
-    await page.goto("/docs/v4");
-    await expect(page.getByText(/can still change between/)).toBeVisible();
-    await page.goto("/docs/v3");
-    await expect(page.getByText(/can still change between/)).toHaveCount(0);
-  });
-
   for (const path of ["/docs/v4", "/docs/v4/getting-started", "/docs/v4/plugins", "/docs/v4/plugins/captions", "/docs/v4/theming", "/docs/v4/migration", "/docs/v3"]) {
     test(`${path} has no accessibility violations`, async ({ page }) => {
       await page.goto(path);

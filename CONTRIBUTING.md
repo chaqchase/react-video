@@ -53,7 +53,6 @@ CI can't reach hardware or real services, so nothing below has run yet. The publ
 
 Changesets drives releases, and `release.yml` publishes with npm trusted publishing from the `npm` environment.
 
-- `main` is v4. Once in pre mode it publishes `4.0.0-alpha.N` to the `alpha` dist-tag.
-- `v3` maintains 3.x. Cherry-pick between branches; never merge them.
-- Don't use `--tag` in pre mode, because Changesets rejects it.
-- Consumed changesets move to `.changeset/pre` and feed the stable changelog, so keep them accurate.
+- `main` is v4, and publishes to `latest`. There's no pre-release mode.
+- `v3` maintains 3.x. Publish from it with `--tag v3`, so a patch never takes `latest` from v4.
+- Cherry-pick between branches; never merge them.

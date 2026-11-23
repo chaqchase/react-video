@@ -8,12 +8,12 @@ A React video player you compose from a small kernel and the plugins you pick.
 - **Compose at any level:** a ready-made player, styled parts, or headless primitives.
 - **Accessible:** real range inputs, keyboard menus, RTL, and reduced motion.
 
-> **Version 4 is in alpha,** on the `alpha` npm tag, and its APIs can still change. `npm install react-video-kit` installs version 3.
+> Coming from version 3? Read the [migration guide](https://react-video-kit.chaqchase.com/docs/v4/migration). Version 3 stays on the `v3` branch and its own docs.
 
 ## Install
 
 ```bash
-npm install react-video-kit@alpha
+npm install react-video-kit
 ```
 
 ## Use it
