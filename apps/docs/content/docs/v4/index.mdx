@@ -1,0 +1,41 @@
+---
+title: Introduction
+description: A React video player you compose from a small kernel and the plugins you pick.
+---
+
+React Video Kit is a video player built from parts. The kernel plays a video and keeps state. Everything else, from fullscreen to HLS to ads, is a plugin you add by importing it, so anything you don't use isn't in your bundle.
+
+<Demo slug="compose-ready" />
+
+## What's different
+
+**It costs what you use.** The kernel is about 5 KB, and a complete player is about 17 KB, both brotli and without React. [Every plugin page](/docs/v4/plugins) lists what that plugin adds, measured from the built package. hls.js and dash.js load only when a source needs them.
+
+**Playback doesn't render React.** Time never enters the store. The timeline and clock write straight to the DOM, so a playing video causes no React commits at all. [How that works](/docs/v4/concepts/state-and-time).
+
+**You choose how much you compose.** Use the ready-made player, arrange the styled parts yourself, or take the unstyled primitives and bring your own design. [Compare the three](/docs/v4/composition).
+
+**It's built for everyone watching.** Sliders are real range inputs, menus support the keyboard, and the layout responds to the player's own size rather than the window's. Right-to-left layouts mirror, and reduced motion is respected.
+
+## Where to go next
+
+<Cards>
+  <Card title="Getting started" href="/docs/v4/getting-started">
+    Install it and play a video in a few minutes.
+  </Card>
+  <Card title="Plugins" href="/docs/v4/plugins">
+    Everything optional, from captions to casting.
+  </Card>
+  <Card title="Playground" href="/playground">
+    Build a player, and copy the code it generates.
+  </Card>
+  <Card title="Moving from version 3" href="/docs/v4/migration">
+    What changed, and a bridge for custom controls.
+  </Card>
+</Cards>
+
+## How it's tested
+
+Unit tests run on React 18 and 19. Browser tests play real video on Chromium, Firefox, and WebKit, including HLS, DASH, simulated live streams, VAST ads, and Clear Key encrypted media.
+
+If something misbehaves on your device or service, please [open an issue](https://github.com/chaqchase/react-video/issues).

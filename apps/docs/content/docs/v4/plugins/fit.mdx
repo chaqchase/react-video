@@ -1,0 +1,57 @@
+---
+title: Fit
+description: Switches between showing the whole picture and filling the frame.
+---
+
+<PluginSummary id="fit" />
+
+Adds a button to the top row that switches between the whole picture, with black bars, and filling the frame, cropping the edges. The player below is wider than its video, so the button is there. Press it.
+
+<Demo slug="fit" />
+
+## Usage
+
+```tsx
+import { fit } from "react-video-kit/fit";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [fit()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+To start filled, set `mode`:
+
+```tsx
+fit({ mode: "cover" });
+```
+
+## Use your own button
+
+`available` says whether switching would show a change, and `toggle` makes the switch.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { fit } from "react-video-kit/fit";
+
+function FillButton() {
+  const available = useVideoState(fit, (state) => state.available);
+  const mode = useVideoState(fit, (state) => state.mode);
+  const { toggle } = useCommands(fit);
+  if (!available) return null;
+  return <button onClick={toggle}>{mode === "cover" ? "Show all" : "Fill"}</button>;
+}
+```
+
+## Behaviour
+
+- The button only shows when the picture and the player have different shapes. A 16:9 video in a 16:9 player has nothing to switch.
+- It checks again whenever the player or the video changes size, so it appears when a phone rotates or the player goes fullscreen.
+- The root's `data-fit` attribute holds the mode, and the stylesheet sets `object-fit` on the video from it.
+- The mode carries over from one source to the next.
+
+## API
+
+<PluginApi id="fit" />

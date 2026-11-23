@@ -1,0 +1,122 @@
+/* After Udemy's course player: a purple timeline over a dense row built for studying, with the time in bold. */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-udemy {
+    --rv-accent: #a435f0;
+    --rv-focus: #fff;
+    --rv-font: "Udemy Sans", "SF Pro Text", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --rv-glass-strong: #1c1d1f;
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.4);
+    --rv-buffered: rgb(255 255 255 / 0.55);
+    --rv-radius: 0;
+    --rv-menu-radius: 0;
+    --rv-control-size: 32px;
+    --rv-icon-size: 18px;
+    --rv-inset: 12px;
+    --rv-bar-track: 5px;
+    --rv-bar-track-active: 7px;
+  }
+
+  .rv-root.rv-theme-udemy [data-part="controls"]::before,
+  .rv-root.rv-theme-udemy [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(transparent calc(100% - 96px), rgb(0 0 0 / 0.82));
+  }
+
+  .rv-root.rv-theme-udemy [data-part="timeline-track"] {
+    border-radius: 0;
+  }
+
+  .rv-root.rv-theme-udemy [data-part="timeline-thumb"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-udemy [data-part="transport"] > [data-part="seek-button"] {
+    display: inline-grid;
+    order: 2;
+  }
+
+  .rv-root.rv-theme-udemy [data-part="play-pause"] + [data-part="seek-button"] {
+    order: 3;
+  }
+
+  /* The row mirrors, but time still runs the same way, so back stays on the left of forward. */
+  .rv-root.rv-theme-udemy[dir="rtl"] [data-part="transport"] > [data-part="seek-button"] {
+    order: 3;
+  }
+
+  .rv-root.rv-theme-udemy[dir="rtl"] [data-part="play-pause"] + [data-part="seek-button"] {
+    order: 2;
+  }
+
+  .rv-root.rv-theme-udemy [data-part="current-time"] {
+    order: 4;
+    margin-inline-start: 6px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .rv-root.rv-theme-udemy [data-part="remaining-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-udemy [data-position="scrubber"] > [data-part="duration"] {
+    display: inline;
+    order: 5;
+    margin-inline-start: 4px;
+    color: var(--rv-foreground);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .rv-root.rv-theme-udemy [data-position="scrubber"] > [data-part="duration"]::before {
+    content: "/ ";
+  }
+
+  /* The two times swap sides when the row mirrors, so the slash has to change ends to stay between them. */
+  .rv-root.rv-theme-udemy[dir="rtl"] [data-position="scrubber"] > [data-part="duration"]::before {
+    content: none;
+  }
+
+  .rv-root.rv-theme-udemy[dir="rtl"] [data-position="scrubber"] > [data-part="duration"]::after {
+    content: " /";
+  }
+
+  /* The volume goes to the right here, as the first of the study tools. */
+  .rv-root.rv-theme-udemy [data-part="volume"] {
+    order: 10;
+  }
+
+  /* A course has no use for a name over the picture, since its page already says. */
+  .rv-root.rv-theme-udemy [data-part="title"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-udemy [data-part="play-overlay"] {
+    border-radius: 0;
+    background: rgb(0 0 0 / 0.75);
+  }
+
+  .rv-root.rv-theme-udemy [data-part="captions-toggle"][aria-pressed="true"] {
+    background: transparent;
+    color: var(--rv-foreground);
+    box-shadow: inset 0 -3px 0 -1px var(--rv-accent);
+  }
+
+  .rv-root.rv-theme-udemy [data-part="menu-content"] {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(255 255 255 / 0.12);
+  }
+
+  @container rv (max-width: 479px) {
+    .rv-root.rv-theme-udemy [data-part="transport"] > [data-part="seek-button"] {
+      display: none;
+    }
+  }
+
+  @media (hover: hover) {
+    .rv-root.rv-theme-udemy [data-part="play-overlay"]:hover {
+      background: var(--rv-accent);
+    }
+  }
+}

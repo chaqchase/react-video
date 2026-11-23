@@ -1,0 +1,136 @@
+---
+title: Quality
+description: A menu of quality levels, from your own files or from an HLS or DASH engine.
+---
+
+<PluginSummary id="quality" />
+
+Adds a **Quality** row to the settings menu. Play the demo, open the settings menu, and pick another level. The time carries on from the same place, and the picture size under the player changes.
+
+<Demo slug="quality" />
+
+## Usage
+
+`quality()` takes no options. What it offers depends on the source. For progressive files, pass `{ renditions: [...] }` as `src`:
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { quality } from "react-video-kit/quality";
+
+const plugins = [quality()];
+
+const source = {
+  renditions: [
+    { src: "/video-1080.mp4", type: "video/mp4", label: "1080p", height: 1080 },
+    { src: "/video-720.mp4", type: "video/mp4", label: "720p", height: 720 },
+  ],
+  initial: 1,
+};
+
+<VideoPlayer src={source} plugins={plugins} />;
+```
+
+- `label` is the name in the menu. Without one, the menu shows the `height` as `720p`, and without either, the rendition's position in the list.
+- `height` sets the order. The menu lists the tallest first, and renditions with no height last.
+- `initial` is the index of the rendition to start on. It defaults to the first.
+
+For HLS and DASH, add the engine's plugin and pass the manifest. `defaultPlugins()` already includes `quality()`:
+
+```tsx
+import { hls } from "react-video-kit/hls";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [hls(), ...defaultPlugins()];
+
+<VideoPlayer src="/video.m3u8" plugins={plugins} />;
+```
+
+## Progressive files
+
+Each rendition is a separate file, so the viewer does the choosing. The menu lists every rendition, with no **Auto**, and the row shows the one that's playing.
+
+Picking one loads the new file into the same video element. The player restores the position and rate once the file's metadata arrives, then resumes if it was playing as soon as the file can play. The row changes at that point.
+
+If the new file fails, the player goes back to the previous rendition at the same position, and sets a non-fatal error with the code `"quality-switch"` on `media.error`. The error overlay stays hidden, because it only shows fatal errors, and `onError` hears about it.
+
+A plain array of sources isn't a list of renditions. It's a list of fallbacks, tried in order, and it gives no menu.
+
+## HLS and DASH
+
+The engine reports the levels in the manifest. The menu lists **Auto**, then each level, tallest first and named by height, such as `720p`.
+
+<Demo slug="hls-engine" />
+
+- **Auto:** the engine picks the level. The row reads `Auto 720p`, naming the level it's on.
+- **Manual:** picking a level turns auto off, and the row shows that level alone. Pick **Auto** to hand control back.
+
+The engines switch differently. hls.js keeps what's already buffered, so playback doesn't stall. dash.js replaces what's buffered, so the viewer's choice shows right away.
+
+## Safari's native HLS
+
+On Apple browsers, `hls()` leaves HLS to the browser unless you ask otherwise. The browser reports no levels, so the **Quality** row doesn't appear and the browser picks the level itself. To offer a choice there, use hls.js:
+
+```tsx
+import { hls } from "react-video-kit/hls";
+
+hls({ preferEngine: true });
+```
+
+This needs Media Source support. Where there isn't any, the browser's native HLS plays instead.
+
+## Build your own control
+
+Levels are part of the player's media state, so read them with `useVideoState`, and change them with the plugin's `select`.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { quality } from "react-video-kit/quality";
+
+function QualityButtons() {
+  const levels = useVideoState((media) => media.qualities);
+  const active = useVideoState((media) => media.quality.active);
+  const canAuto = useVideoState((media) => media.quality.canAuto);
+  const { select } = useCommands(quality);
+  return (
+    <>
+      {canAuto ? <button onClick={() => select("auto")}>Auto</button> : null}
+      {levels.map((level) => (
+        <button key={level.id} aria-pressed={level.id === active} onClick={() => select(level.id)}>
+          {level.label ?? level.id}
+        </button>
+      ))}
+    </>
+  );
+}
+```
+
+## Place the menu yourself
+
+`QualityMenu` is the row that appears in the settings menu. When you compose your own layout, put it in any [menu](/docs/v4/composition/parts#menus):
+
+```tsx
+import * as Video from "react-video-kit";
+import { QualityMenu } from "react-video-kit/quality";
+
+<Video.Menu>
+  <Video.MenuTrigger aria-label="Quality">HD</Video.MenuTrigger>
+  <Video.MenuContent>
+    <QualityMenu />
+  </Video.MenuContent>
+</Video.Menu>;
+```
+
+## Behaviour
+
+- `QualityMenu` renders nothing with fewer than two levels, such as for a plain MP4 or a stream with one level.
+- A `renditions` source still plays without this plugin, on its `initial` rendition, with no way to switch.
+- Give each rendition its own `label` or `height`. They double as its ID, so two with the same name can't be told apart.
+- `select("auto")` does nothing for renditions, and neither does picking the rendition that's playing.
+- Levels reset with each new source.
+- The [analytics](/docs/v4/plugins/analytics) plugin reports each change as a `quality-change` event. The [persistence](/docs/v4/plugins/persistence) plugin doesn't remember the level.
+
+## API
+
+<PluginApi id="quality" />

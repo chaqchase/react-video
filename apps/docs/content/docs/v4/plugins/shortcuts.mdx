@@ -1,0 +1,69 @@
+---
+title: Shortcuts
+description: A sheet that lists the player's keyboard shortcuts.
+---
+
+<PluginSummary id="shortcuts" />
+
+Press `?` while the player has focus, or use the row in the settings menu, to see every key the player answers to. The list comes from the [hotkeys](/docs/v4/plugins/hotkeys) plugin, so it's always the keys that really work. Click the player below and press `?`.
+
+<Demo slug="shortcuts" />
+
+## Usage
+
+This plugin needs `hotkeys`, listed anywhere in `plugins`.
+
+```tsx
+import { hotkeys } from "react-video-kit/hotkeys";
+import { VideoPlayer } from "react-video-kit/player";
+import { shortcuts } from "react-video-kit/shortcuts";
+
+const plugins = [hotkeys(), shortcuts()];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+## Add a key of your own
+
+The `bind` command on `hotkeys` adds a key, and returns a function that removes it. The sheet lists it with the rest, under the name you give it, so pass the name in the viewer's language.
+
+```tsx
+"use client";
+
+import { useEffect } from "react";
+import { useCommands } from "react-video-kit";
+import { hotkeys } from "react-video-kit/hotkeys";
+
+function BookmarkKey({ onBookmark }: { onBookmark(): void }) {
+  const { bind } = useCommands(hotkeys);
+  useEffect(() => bind("b", "Add a bookmark", onBookmark), [bind, onBookmark]);
+  return null;
+}
+```
+
+## Open it from your own control
+
+```tsx
+"use client";
+
+import { useCommands } from "react-video-kit";
+import { shortcuts } from "react-video-kit/shortcuts";
+
+function ShowKeys() {
+  const { show } = useCommands(shortcuts);
+  return <button onClick={show}>Keyboard shortcuts</button>;
+}
+```
+
+`bindings` returns the same list as data, for showing it somewhere else.
+
+## Behaviour
+
+- A key only appears when the plugin it needs is installed.
+- Focus moves into the sheet when it opens, and the arrow keys scroll it. Escape closes it and returns focus to the settings button.
+- The controls stay on screen while it's open, and other shortcuts wait until it closes.
+- Key caps stay left to right in Arabic and Hebrew, so `0–9` still reads as it does on the keyboard.
+
+## API
+
+<PluginApi id="shortcuts" />

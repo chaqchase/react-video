@@ -1,0 +1,83 @@
+---
+title: Vite
+description: Add the player to a client-rendered React app.
+---
+
+<Install />
+
+## Add the player
+
+Import the skin next to the component. Vite renders in the browser, so there's no server boundary to think about, and the package's `"use client"` directives have no effect here.
+
+```tsx title="src/Player.tsx"
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+import "react-video-kit/styles.css";
+
+const plugins = defaultPlugins();
+
+export function Player() {
+  return <VideoPlayer src="/video.mp4" poster="/poster.jpg" plugins={plugins} />;
+}
+```
+
+```tsx title="src/App.tsx"
+import { Player } from "./Player";
+
+export default function App() {
+  return <Player />;
+}
+```
+
+Files in `public/` are served from the site's root, so `public/video.mp4` is `/video.mp4`.
+
+## Play HLS
+
+Install the engine as well, and add the plugin:
+
+<Install extra="hls.js" />
+
+```tsx
+import { hls } from "react-video-kit/hls";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [hls(), ...defaultPlugins()];
+
+export function Player() {
+  return <VideoPlayer src="/stream.m3u8" plugins={plugins} />;
+}
+```
+
+- Vite puts `hls.js` in a chunk of its own, about 180 kB gzipped, and the page only requests it when a source needs it.
+- The build warns that this chunk is over 500 kB. To quiet that, raise `build.chunkSizeWarningLimit`.
+- Forget to install `hls.js` and the build still passes, because it's an optional peer dependency. Vite swaps in a stub, and the player shows its error overlay when an HLS source loads.
+
+## Use it with Tailwind 4
+
+Add the Vite plugin:
+
+```bash
+npm install tailwindcss @tailwindcss/vite
+```
+
+```ts title="vite.config.ts"
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});
+```
+
+Then put the skin in your stylesheet, after a line that declares the layer order. The skin lives in the `rv` layer, so placing `rv` before `utilities` lets a class like `rounded-none` override it. Without that line, the skin wins.
+
+```css title="src/index.css"
+@layer theme, base, rv, components, utilities;
+
+@import "tailwindcss";
+@import "react-video-kit/styles.css";
+```
+
+Remove the skin's import from `src/Player.tsx`. [Theming](/docs/v4/theming) has the details.
+
+Last built against Vite 8.3.5, `@vitejs/plugin-react` 6.2.1, React 19.3.1, Tailwind CSS 4.3.4, and hls.js 1.7.4.

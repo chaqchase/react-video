@@ -1,0 +1,155 @@
+/*
+ * After HBO Max: the title and the time left sit above a thin white timeline, with a
+ * small transport centred under it and the other buttons in the far corner.
+ */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-max {
+    --rv-accent: #fff;
+    --rv-focus: #fff;
+    --rv-font: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-muted: rgb(255 255 255 / 0.8);
+    --rv-glass-strong: rgb(16 19 30 / 0.97);
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.35);
+    --rv-buffered: rgb(255 255 255 / 0.5);
+    --rv-radius: 0;
+    --rv-menu-radius: 6px;
+    --rv-control-size: 34px;
+    --rv-icon-size: 20px;
+    --rv-inset: 22px;
+    --rv-bar-track: 2px;
+    --rv-bar-track-active: 4px;
+    --rv-bar-play-order: 0;
+  }
+
+  .rv-root.rv-theme-max [data-part="controls"]::before,
+  .rv-root.rv-theme-max [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.1) 22%, rgb(0 0 0 / 0.1) 54%, rgb(0 0 0 / 0.86));
+  }
+
+  /* First line: the title, then the time left at the far end. */
+  .rv-root.rv-theme-max [data-part="title"] {
+    position: static;
+    flex: 1 1 0;
+    order: -3;
+    gap: 3px;
+    min-width: 0;
+    text-shadow: none;
+  }
+
+  .rv-root.rv-theme-max [data-part="title-text"] {
+    order: 0;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .rv-root.rv-theme-max [data-part="title-eyebrow"] {
+    order: 1;
+    color: var(--rv-foreground);
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-max [data-part="title-description"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-max [data-part="remaining-time"] {
+    display: block;
+    order: -2;
+    align-self: flex-end;
+    margin-block: 0 2px;
+    margin-inline: auto 0;
+    color: var(--rv-foreground);
+  }
+
+  .rv-root.rv-theme-max [data-part="current-time"] {
+    display: none;
+  }
+
+  /* Second line: the timeline, with its thumb up all the time. */
+  .rv-root.rv-theme-max [data-part="timeline"] {
+    order: -1;
+  }
+
+  .rv-root.rv-theme-max [data-part="timeline-thumb"] {
+    opacity: var(--rv-shown, 1);
+    transform: scale(0.8);
+  }
+
+  /* Third line: the transport in a box of its own, since it never mirrors, and the buttons. */
+  .rv-root.rv-theme-max [data-part="transport"] {
+    position: static;
+    display: flex;
+    flex: none;
+    gap: 14px;
+    translate: none;
+  }
+
+  /* With room to spare it centres on the whole player, whatever sits beside it. */
+  @container rv (min-width: 720px) {
+    .rv-root.rv-theme-max [data-part="transport"] {
+      position: absolute;
+      inset-inline: 0;
+      inset-block: auto calc(var(--rv-inset-scaled) / 2);
+      pointer-events: none;
+    }
+  }
+
+  /* More buttons take more room to centre without running into each other. */
+  @container rv (max-width: 1099px) {
+    .rv-root.rv-theme-max:has([data-position="details"] > [data-part="control-group"]:last-child > :nth-child(3), [data-part="transport"] > :nth-child(4)) [data-part="transport"] {
+      position: static;
+    }
+  }
+
+  .rv-root.rv-theme-max [data-part="transport"] > [data-part="seek-button"] {
+    display: inline-grid;
+  }
+
+  .rv-root.rv-theme-max [data-part="volume"] {
+    order: 10;
+  }
+
+  /* This player has no large button, so the bar is up before playback and its play button does the job. */
+  .rv-root.rv-theme-max [data-part="play-overlay"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-max:not([data-started]) [data-part="controls"] {
+    --rv-shown: 1;
+  }
+
+  .rv-root.rv-theme-max [data-part="captions-toggle"][aria-pressed="true"] {
+    background: transparent;
+    color: var(--rv-foreground);
+  }
+
+  @container rv (max-width: 479px) {
+    /* The controls sit higher at this size, so the shade has to start higher too. */
+    .rv-root.rv-theme-max [data-part="controls"]::before,
+    .rv-root.rv-theme-max [data-part="controls"]:has([data-part="title"])::before {
+      background: linear-gradient(rgb(0 0 0 / 0.55), transparent 24%, transparent 38%, rgb(0 0 0 / 0.86));
+    }
+
+    .rv-root.rv-theme-max [data-part="transport"] > [data-part="seek-button"] {
+      display: none;
+    }
+
+    .rv-root.rv-theme-max [data-part="remaining-time"] {
+      display: block;
+      flex: 1;
+      text-align: end;
+    }
+
+  }
+
+  /* Lifted clear of the title and the time above the timeline. */
+  @container rv (min-width: 480px) {
+    .rv-root.rv-theme-max [data-part="control-group"] [data-part="menu-content"] {
+      bottom: calc(var(--rv-bar) + 58px);
+    }
+  }
+}

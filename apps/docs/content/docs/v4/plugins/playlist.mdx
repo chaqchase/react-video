@@ -1,0 +1,115 @@
+---
+title: Playlist
+description: A queue of videos, with previous and next buttons and an up-next card.
+---
+
+<PluginSummary id="playlist" />
+
+Adds previous and next buttons to the controls, and a card offering the next video when one ends. Press **Next** below, or seek close to the end and wait for the card. It counts down from 3 here, then plays the next item.
+
+<Demo slug="playlist" />
+
+## Usage
+
+Give the plugin `items`, and leave `src` off the player:
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { playlist } from "react-video-kit/playlist";
+
+const plugins = [
+  playlist({
+    items: [
+      { src: "/first.mp4", title: "First light", poster: "/first.jpg" },
+      { src: "/second.mp4", title: "The long ridge" },
+    ],
+  }),
+];
+
+<VideoPlayer plugins={plugins} />;
+```
+
+An item's `src` takes anything the player's [`src`](/docs/v4/concepts/sources) does, such as a list of fallbacks.
+
+An item's `title`, `eyebrow`, and `description` show above the timeline while it plays, as they would [on the player](/docs/v4/composition/player#give-it-a-title). To browse the queue by season, with thumbnails and running times, add the [episodes](/docs/v4/plugins/episodes) plugin.
+
+Use `start` to begin on another item, and `loop` to wrap around at the ends:
+
+```tsx
+playlist({ items, start: 2, loop: true });
+```
+
+`countdown` sets how many seconds the up-next card counts down, and defaults to 5. `0` skips the card and moves on at once. `null` shows the card and waits for the viewer.
+
+```tsx
+playlist({ items, countdown: null });
+```
+
+## Show the queue
+
+Read the queue with `useVideoState` and move through it with `useCommands`, from anywhere inside the player.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { playlist } from "react-video-kit/playlist";
+
+function Queue() {
+  const items = useVideoState(playlist, (state) => state.items);
+  const index = useVideoState(playlist, (state) => state.index);
+  const { select } = useCommands(playlist);
+  return (
+    <ol>
+      {items.map((item, position) => (
+        <li key={position}>
+          <button aria-current={position === index} onClick={() => select(position)}>
+            {item.title}
+          </button>
+        </li>
+      ))}
+    </ol>
+  );
+}
+```
+
+`select` plays straight away. `select(position, false)` loads the item without playing. `setItems` replaces the queue and loads the item at the index you give it, also without playing.
+
+## Place the parts yourself
+
+`VideoPlayer` places the buttons and the card through [slots](/docs/v4/composition/slots). When you compose your own layout, put them wherever you like:
+
+```tsx
+import * as Video from "react-video-kit";
+import { PlaylistNext, PlaylistPrevious, PlaylistTitle, UpNext } from "react-video-kit/playlist";
+
+<Video.Root plugins={plugins}>
+  <Video.Media />
+  <UpNext />
+  <Video.Controls>
+    <PlaylistTitle />
+    <PlaylistPrevious />
+    <Video.PlayPause />
+    <PlaylistNext />
+  </Video.Controls>
+</Video.Root>;
+```
+
+## Behaviour
+
+- The queue decides what plays. The current item replaces any `src` on the player when it mounts.
+- Every item plays in the same `<video>` element, and `next`, `previous`, and `select` ask it to play in the same tick. A new element wouldn't have permission to autoplay on mobile.
+- Without `loop`, `next` does nothing on the last item and `previous` does nothing on the first. The matching button gets `aria-disabled`, and no card appears when the last item ends.
+- With `loop`, both buttons stay enabled. `next` on the last item goes to the first, `previous` on the first goes to the last, and the last item's card offers the first.
+- With a single item, the buttons don't render.
+- **Play now** moves on straight away, and **Cancel** stays on the finished video. Seeking back or replaying clears the card too, because the video is no longer ended.
+- An item with no `poster` removes the poster, including one set on the player.
+- An item's `title` appears on the up-next card. With no title, the card leaves that line out.
+- A `title`, `eyebrow`, or `description` on `VideoPlayer` replaces the current item's, so nothing changes as the queue moves.
+- The root has `data-up-next` while the card is showing.
+- The [persistence](/docs/v4/plugins/persistence) plugin saves a position for each item, so going back to an item resumes it.
+- The [media session](/docs/v4/plugins/media-session) plugin doesn't register previous or next track actions, so the system's track buttons don't move through the queue.
+
+## API
+
+<PluginApi id="playlist" />

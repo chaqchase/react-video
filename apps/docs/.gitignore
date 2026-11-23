@@ -1,0 +1,10 @@
+/.next/
+/out/
+/public/media/
+/test-results/
+/playwright-report/
+next-env.d.ts
+*.tsbuildinfo
+/.open-next/
+/.wrangler/
+/cloudflare/.cloudflare/

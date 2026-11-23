@@ -1,0 +1,84 @@
+/* After YouTube's web player: a thin red timeline over a flat row, with the time as "0:41 / 16:53". */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-youtube {
+    --rv-accent: #f03;
+    --rv-focus: #fff;
+    --rv-font: Roboto, Arial, ui-sans-serif, sans-serif;
+    --rv-muted: rgb(255 255 255 / 0.9);
+    --rv-glass-strong: rgb(28 28 28 / 0.9);
+    --rv-glass-hover: transparent;
+    --rv-track: rgb(255 255 255 / 0.2);
+    --rv-buffered: rgb(255 255 255 / 0.4);
+    --rv-radius: 12px;
+    --rv-menu-radius: 12px;
+    --rv-control-size: 40px;
+    --rv-icon-size: 22px;
+    --rv-bar-track: 3px;
+    --rv-bar-track-active: 5px;
+  }
+
+  .rv-root.rv-theme-youtube [data-part="controls"]::before {
+    background: linear-gradient(transparent calc(100% - 96px), rgb(0 0 0 / 0.72));
+  }
+
+  .rv-root.rv-theme-youtube [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.8), transparent 92px, transparent calc(100% - 96px), rgb(0 0 0 / 0.72));
+  }
+
+  .rv-root.rv-theme-youtube [data-part="timeline-track"] {
+    border-radius: 0;
+  }
+
+  .rv-root.rv-theme-youtube [data-part="timeline-thumb"] {
+    opacity: var(--rv-shown, 1);
+    transform: scale(0.8);
+  }
+
+  .rv-root.rv-theme-youtube [data-part="current-time"] {
+    margin-inline-start: 8px;
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-youtube [data-part="remaining-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-youtube [data-position="scrubber"] > [data-part="duration"] {
+    display: inline;
+    margin-inline-start: 4px;
+    color: var(--rv-foreground);
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-youtube [data-position="scrubber"] > [data-part="duration"]::before {
+    content: "/ ";
+  }
+
+  /* The two times swap sides when the row mirrors, so the slash has to change ends to stay between them. */
+  .rv-root.rv-theme-youtube[dir="rtl"] [data-position="scrubber"] > [data-part="duration"]::before {
+    content: none;
+  }
+
+  .rv-root.rv-theme-youtube[dir="rtl"] [data-position="scrubber"] > [data-part="duration"]::after {
+    content: " /";
+  }
+
+  .rv-root.rv-theme-youtube [data-part="captions-toggle"][aria-pressed="true"] {
+    background: transparent;
+    color: var(--rv-foreground);
+    box-shadow: inset 0 -3px 0 -1px var(--rv-accent);
+  }
+
+  @container rv (max-width: 479px) {
+    .rv-root.rv-theme-youtube [data-position="scrubber"] > [data-part="duration"] {
+      display: inline;
+      font-size: 12px;
+    }
+
+    .rv-root.rv-theme-youtube [data-part="current-time"] {
+      font-size: 12px;
+    }
+  }
+}

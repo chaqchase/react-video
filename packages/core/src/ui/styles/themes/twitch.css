@@ -1,0 +1,166 @@
+/* After Twitch's player: a purple timeline between its two times, over 32px round buttons. */
+@import "./_bar.css";
+
+@layer rv {
+  .rv-root.rv-theme-twitch {
+    --rv-accent: #9147ff;
+    --rv-focus: #bf94ff;
+    --rv-font: Inter, Roobert, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --rv-muted: #efeff1;
+    --rv-foreground: #efeff1;
+    --rv-glass-strong: #18181b;
+    --rv-glass-hover: rgb(255 255 255 / 0.2);
+    --rv-track: rgb(255 255 255 / 0.3);
+    --rv-buffered: rgb(255 255 255 / 0.5);
+    --rv-radius: 0;
+    --rv-menu-radius: 6px;
+    --rv-control-size: 32px;
+    --rv-icon-size: 20px;
+    --rv-inset: 10px;
+    --rv-bar-track: 4px;
+    --rv-bar-track-active: 6px;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="controls"]::before {
+    background: linear-gradient(transparent calc(100% - 140px), rgb(0 0 0 / 0.8));
+  }
+
+  .rv-root.rv-theme-twitch [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.8), transparent 104px, transparent calc(100% - 140px), rgb(0 0 0 / 0.8));
+  }
+
+  /* The times bracket the timeline, and together they fill the line exactly. */
+  .rv-root.rv-theme-twitch [data-part="timeline"] {
+    flex: 0 0 calc(100% - 104px);
+    order: -2;
+  }
+
+  .rv-root.rv-theme-twitch[data-live] [data-part="timeline"] {
+    flex-basis: 100%;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="current-time"] {
+    flex: 0 0 52px;
+    order: -3;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="remaining-time"] {
+    display: none;
+  }
+
+  .rv-root.rv-theme-twitch [data-position="scrubber"] > [data-part="duration"] {
+    display: inline;
+    flex: 0 0 52px;
+    order: -1;
+    color: var(--rv-foreground);
+    font-weight: 600;
+    text-align: end;
+  }
+
+  /* The timeline never mirrors, so each time stays at its own end of it. */
+  .rv-root.rv-theme-twitch[dir="rtl"] [data-part="current-time"] {
+    order: -1;
+  }
+
+  .rv-root.rv-theme-twitch[dir="rtl"] [data-position="scrubber"] > [data-part="duration"] {
+    order: -3;
+  }
+
+  /* The slider is always out here, with a round white thumb. */
+  .rv-root.rv-theme-twitch [data-part="volume"],
+  .rv-root.rv-theme-twitch [data-part="volume"]:hover,
+  .rv-root.rv-theme-twitch [data-part="volume"]:focus-within {
+    padding-inline-end: 10px;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="volume-slider"] {
+    overflow: visible;
+    width: 72px;
+    opacity: 1;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="volume-thumb"] {
+    width: 12px;
+    height: 12px;
+    left: -6px;
+    margin-top: -6px;
+    opacity: 1;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="title-text"] {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="title-eyebrow"] {
+    order: 1;
+    font-size: 13px;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="title-description"] {
+    order: 2;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="live"] {
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: #eb0400;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="live"]::before {
+    display: none;
+  }
+
+  .rv-root.rv-theme-twitch [data-part="menu-content"] {
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.6), inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+
+  .rv-root.rv-theme-twitch [data-part="captions-toggle"][aria-pressed="true"] {
+    background: var(--rv-glass-hover);
+    color: var(--rv-foreground);
+  }
+
+  @container rv (max-width: 479px) {
+    .rv-root.rv-theme-twitch [data-part="timeline"] {
+      flex-basis: 100%;
+    }
+
+    .rv-root.rv-theme-twitch [data-part="current-time"],
+    .rv-root.rv-theme-twitch[dir="rtl"] [data-part="current-time"] {
+      flex: none;
+      order: 6;
+      margin-inline-start: 6px;
+    }
+
+    .rv-root.rv-theme-twitch [data-position="scrubber"] > [data-part="duration"] {
+      display: none;
+    }
+
+    .rv-root.rv-theme-twitch [data-part="volume"],
+    .rv-root.rv-theme-twitch [data-part="volume"]:hover,
+    .rv-root.rv-theme-twitch [data-part="volume"]:focus-within {
+      padding-inline-end: 0;
+    }
+
+    /* Folded away, but still there for the keyboard, which opens it. */
+    .rv-root.rv-theme-twitch [data-part="volume-slider"] {
+      overflow: hidden;
+      width: 0;
+      opacity: 0;
+    }
+
+    /* This close to the edge, a wider ring would be cut off. */
+    .rv-root.rv-theme-twitch [data-part="controls"] [data-control]:focus-visible {
+      outline-offset: 1px;
+      box-shadow: 0 0 0 1px rgb(0 0 0 / 0.85) !important;
+    }
+  }
+}

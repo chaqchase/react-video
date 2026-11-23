@@ -1,0 +1,90 @@
+---
+title: Audio tracks
+description: A menu to switch between a source's audio languages and descriptions.
+---
+
+<PluginSummary id="audio-tracks" />
+
+Adds an **Audio** row to the settings menu when a source has more than one audio track. The demo plays an HLS stream with English and Spanish audio. Press play, open the settings menu, and switch. The Spanish track is the same music at a higher pitch, so you'll hear the change.
+
+<Demo slug="hls-tracks" />
+
+## Usage
+
+`audioTracks()` takes no options, and it isn't in `defaultPlugins()`, so add it yourself:
+
+```tsx
+import { audioTracks } from "react-video-kit/audio-tracks";
+import { hls } from "react-video-kit/hls";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [hls(), audioTracks(), ...defaultPlugins()];
+
+<VideoPlayer src="/video.m3u8" plugins={plugins} />;
+```
+
+## What provides tracks
+
+The plugin doesn't add tracks. It lists what the playing source reports, and the row needs at least two.
+
+- **HLS through [hls.js](/docs/v4/plugins/hls):** each `TYPE=AUDIO` entry in the master playlist is a track. `NAME` is its label and `LANGUAGE` its language.
+- **[DASH](/docs/v4/plugins/dash) through dash.js:** each audio track in the manifest. Its first label is the name, or else its language.
+- **The browser:** with no engine playing, the plugin reads the video element's `audioTracks` list, which is how Safari's native tracks reach the menu. Where the element has no such list, there's nothing to show.
+
+The demo's playlist has these two lines:
+
+```text
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="English",LANGUAGE="en",DEFAULT=YES,AUTOSELECT=YES,URI="audio-en.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Español",LANGUAGE="es",DEFAULT=NO,AUTOSELECT=YES,URI="audio-es.m3u8"
+```
+
+## Build your own control
+
+Tracks are part of the player's media state, so read them with `useVideoState`, and change them with the plugin's `select`.
+
+```tsx
+"use client";
+
+import { useCommands, useVideoState } from "react-video-kit";
+import { audioTracks } from "react-video-kit/audio-tracks";
+
+function AudioButtons() {
+  const tracks = useVideoState((media) => media.audioTracks);
+  const active = useVideoState((media) => media.audioTrack);
+  const { select } = useCommands(audioTracks);
+  return tracks.map((track) => (
+    <button key={track.id} aria-pressed={track.id === active} onClick={() => select(track.id)}>
+      {track.label || track.language || track.id}
+    </button>
+  ));
+}
+```
+
+## Place the menu yourself
+
+`AudioMenu` is the row that appears in the settings menu. When you compose your own layout, put it in any [menu](/docs/v4/composition/parts#menus):
+
+```tsx
+import * as Video from "react-video-kit";
+import { AudioMenu } from "react-video-kit/audio-tracks";
+
+<Video.Menu>
+  <Video.MenuTrigger aria-label="Audio">Audio</Video.MenuTrigger>
+  <Video.MenuContent>
+    <AudioMenu />
+  </Video.MenuContent>
+</Video.Menu>;
+```
+
+## Behaviour
+
+- `AudioMenu` renders nothing with fewer than two tracks.
+- The menu names each track by its label, then its language, then its ID.
+- With an engine, `media.audioTrack` changes when the engine reports the switch, not when the viewer picks. With the browser's own tracks, it changes straight away.
+- Switching through hls.js keeps playing.
+- The list resets with each new source. The [persistence](/docs/v4/plugins/persistence) plugin doesn't remember the choice.
+- Subtitles in the same manifest go to the [captions](/docs/v4/plugins/captions) menu.
+
+## API
+
+<PluginApi id="audio-tracks" />

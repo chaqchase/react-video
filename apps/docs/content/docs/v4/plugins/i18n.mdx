@@ -1,0 +1,133 @@
+---
+title: Languages
+description: Translates the controls and sets their text direction.
+---
+
+<PluginSummary id="i18n" />
+
+Translates every label in the controls, and sets the player's language and text direction. Switch the demo to Arabic, then hover a control to read its label, or open the settings menu.
+
+<Demo slug="i18n" />
+
+## Usage
+
+```tsx
+import { i18n } from "react-video-kit/i18n";
+import { ar } from "react-video-kit/i18n/ar";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [i18n({ locale: "ar", strings: ar })];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+`locale` is a BCP 47 tag, such as `ar` or `pt-BR`. Text direction comes from it, and `dir` overrides that:
+
+```tsx
+i18n({ locale: "ar", strings: ar, dir: "ltr" });
+```
+
+## Locales that ship
+
+| Language | Import |
+| --- | --- |
+| Arabic | `import { ar } from "react-video-kit/i18n/ar"` |
+| Spanish | `import { es } from "react-video-kit/i18n/es"` |
+| French | `import { fr } from "react-video-kit/i18n/fr"` |
+
+Each is its own entry, so the ones you don't import stay out of your bundle. English is built into the parts, and needs no import. None of the three translates `airplay`, so that label stays "AirPlay".
+
+## Supply your own strings
+
+Pass any of the strings below. Anything you leave out falls back to English.
+
+```tsx
+import { i18n, type Strings } from "react-video-kit/i18n";
+
+const de: Strings = {
+  play: "Abspielen",
+  pause: "Pause",
+  mute: "Stumm",
+  unmute: "Ton an",
+};
+
+i18n({ locale: "de", strings: de });
+```
+
+To change a few strings in a shipped locale, spread it:
+
+```tsx
+import { i18n } from "react-video-kit/i18n";
+import { fr } from "react-video-kit/i18n/fr";
+
+i18n({ locale: "fr", strings: { ...fr, cancel: "Non merci" } });
+```
+
+These are all the strings the built-in parts and plugins read:
+
+<Api entry="react-video-kit/i18n" name="Strings" />
+
+A few aren't button labels. `of` joins the times a screen reader hears on the timeline, as in "0:05 of 0:30". `muted` and `unmuted` confirm the `m` key in the [hotkeys](/docs/v4/plugins/hotkeys) plugin. `skipAdIn` and `castingTo` come before a number and a device name. `seekBack` and `seekForward` name the buttons on either side of play, and `{seconds}` in them becomes the distance. `back` names the row that leaves a settings submenu, for screen readers.
+
+## Switch language while playing
+
+The demo gives the player a `key`, which makes a new player and restarts the video. `setLocale` changes language without interrupting playback:
+
+```tsx
+"use client";
+
+import { useCommands } from "react-video-kit";
+import { i18n } from "react-video-kit/i18n";
+import { fr } from "react-video-kit/i18n/fr";
+
+function SwitchToFrench() {
+  const { setLocale } = useCommands(i18n);
+  return <button onClick={() => setLocale("fr", fr)}>Français</button>;
+}
+```
+
+It replaces the current strings rather than merging into them, and works out the direction again unless you pass one as the third argument.
+
+## Translate your own parts
+
+`useLabel` returns the current translation, or your fallback when there's none or the plugin isn't installed:
+
+```tsx
+"use client";
+
+import { useLabel } from "react-video-kit";
+
+function PlayLabel() {
+  const label = useLabel("play", "Play");
+  return <span>{label}</span>;
+}
+```
+
+## What mirrors
+
+`dir` and `lang` go on the player's root element, so they're already right in the server's HTML. The default skin follows `dir` for layout, but some things stay fixed.
+
+These mirror in a right-to-left language:
+
+- The control row and everything in it. Play sits on the right and settings on the left.
+- The time readout, with the current time on the right of the duration.
+- The left and right arrow keys in menus, which swap between opening a submenu and going back.
+- The settings menu, which opens from the left, above its button.
+
+These don't:
+
+- The timeline and the volume slider, which set `dir="ltr"`. They fill from left to right, and the right arrow key still moves forward.
+- The left and right arrow keys in the [hotkeys](/docs/v4/plugins/hotkeys) plugin. Left always seeks back.
+- Double-tap in the [gestures](/docs/v4/plugins/gestures) plugin. The left half always seeks back.
+- Icons, which aren't flipped.
+- The up-next card, which stays on the right, and the unmute chip, which stays at the top left.
+- Times, which stay in Western digits.
+
+## Behaviour
+
+- These languages get `rtl` automatically: `ar`, `dv`, `fa`, `he`, `ks`, `ps`, `sd`, `ug`, `ur`, and `yi`. Only the language part of the tag counts, so `ar-EG` is `rtl` and `pt-BR` is `ltr`.
+- Some text sits outside `Strings`: the detail line on the error overlay, which comes from the browser or the provider, and short readouts such as `+10s`.
+
+## API
+
+<PluginApi id="i18n" />

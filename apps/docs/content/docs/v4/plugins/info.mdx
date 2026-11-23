@@ -1,0 +1,85 @@
+---
+title: Info panel
+description: A panel about the video, with its artwork, details, description, and credits.
+---
+
+<PluginSummary id="info" />
+
+Adds an **i** button beside the settings menu, which opens a panel about the video.
+
+<Demo slug="info" />
+
+## Usage
+
+```tsx
+import { info } from "react-video-kit/info";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [
+  info({
+    eyebrow: "Nature",
+    title: "The Long Coast",
+    artwork: "/artwork.jpg",
+    facts: ["2024", "TV-PG", "1h 20m"],
+    description: "A year along one of the most remote coastlines on Earth.",
+    credits: [
+      { role: "Directed by", names: "A. Rivera" },
+      { role: "Written by", names: ["A. Rivera", "J. Okafor"] },
+    ],
+  }),
+];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Every option is optional, and whatever you leave out doesn't render. `facts` is joined into one line. The description can be as long as it needs to be, because the panel scrolls.
+
+To name the video on the player itself, use [`title`, `eyebrow`, and `description`](/docs/v4/composition/player#give-it-a-title) too. They're separate because this plugin is only loaded by players that want a panel.
+
+## With a playlist
+
+Whatever isn't given here comes from the current [playlist](/docs/v4/plugins/playlist) item: its `title`, `eyebrow`, `description`, and its `thumbnail` or `poster` as the artwork. So details that belong to the whole series can go here, and the rest stays on each item:
+
+```tsx
+const plugins = [playlist({ items }), info({ facts: ["2024", "TV-PG", "6 episodes"] })];
+```
+
+## Change what it shows
+
+`setInfo` replaces everything on the panel, for details that load later:
+
+```tsx
+player.plugin(info).commands.setInfo({ title: "The Long Coast", facts: ["2024"] });
+```
+
+## Place the parts yourself
+
+`VideoPlayer` places the button and the panel through [slots](/docs/v4/composition/slots). When you compose your own layout, put them wherever you like:
+
+```tsx
+import * as Video from "react-video-kit";
+import { InfoButton, InfoPanel } from "react-video-kit/info";
+
+<Video.Root src="/video.mp4" plugins={plugins}>
+  <Video.Media />
+  <InfoPanel />
+  <Video.Controls>
+    <Video.PlayPause />
+    <InfoButton />
+  </Video.Controls>
+</Video.Root>;
+```
+
+## Behaviour
+
+- Playback carries on behind the panel, and the other controls step aside until it closes.
+- Focus moves to the text, so the arrow keys scroll it. The [hotkeys](/docs/v4/plugins/hotkeys) plugin ignores keys pressed inside, and the [idle](/docs/v4/plugins/idle) plugin doesn't hide anything while it's open.
+- **Esc** and the close button close it, and focus goes back to the button that opened it.
+- It closes when the source changes, since what's on it was about the last video.
+- The artwork doesn't show on small players, where it would crowd the text.
+- Nothing renders until it first opens.
+- The root has `data-info-open` while it's open.
+
+## API
+
+<PluginApi id="info" />

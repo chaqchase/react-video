@@ -1,0 +1,13 @@
+{
+  "title": "Recipes",
+  "pages": [
+    "index",
+    "next-app-router",
+    "next-pages-router",
+    "vite",
+    "react-router",
+    "tanstack-start",
+    "astro",
+    "writing-a-plugin"
+  ]
+}

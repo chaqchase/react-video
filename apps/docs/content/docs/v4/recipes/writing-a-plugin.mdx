@@ -1,0 +1,279 @@
+---
+title: Writing a plugin
+description: Build a skip intro button, and meet each part of a plugin on the way.
+---
+
+Your plugins use the same API as the ones the package ships. This page builds a small one from scratch: a skip intro button that shows while the current time is inside the intro, and seeks to the end of the intro when pressed. For a real player, the [skip](/docs/v4/plugins/skip) plugin is the complete version.
+
+Press play below. The button appears at 2 seconds, and pressing it jumps to 12.
+
+<Demo slug="custom-plugin" />
+
+The rest of this page goes through that file one piece at a time.
+
+## Define the plugin and its options
+
+`definePlugin` takes a name and a function that returns the plugin's spec. That function's parameters become the plugin's options. The spec is empty for now.
+
+```tsx
+import { definePlugin } from "react-video-kit/core";
+
+interface SkipIntroOptions {
+  start: number;
+  end: number;
+}
+
+export const skipIntro = definePlugin("skip-intro", ({ start, end }: SkipIntroOptions) => ({}));
+```
+
+Calling the result creates an instance for the `plugins` prop:
+
+```tsx
+const plugins = [skipIntro({ start: 2, end: 12 })];
+```
+
+- The function runs once for each player, so anything it declares stays private to that player, and one instance can be shared between players.
+- A player can only install a name once, and `media` is reserved.
+
+## Add state and commands
+
+`state` returns the plugin's initial state. `commands` receives the plugin's context and returns what the plugin can do. TypeScript infers both.
+
+```tsx
+export const skipIntro = definePlugin("skip-intro", ({ end }: SkipIntroOptions) => ({
+  state: () => ({ inIntro: false }),
+  commands: (context) => ({
+    skip: () => context.commands.seek(end),
+  }),
+}));
+```
+
+`context.commands` holds the player's own commands, like `seek` and `play`. `context.state()` reads this plugin's state, `context.set()` merges into it, and `context.media()` reads the player's media state.
+
+State holds `inIntro`, not the time. Time changes many times a second and [stays out of the store](/docs/v4/concepts/state-and-time), while this boolean only changes on the way in and on the way out.
+
+## Read it from a component
+
+`useVideoState` and `useCommands` take the plugin's factory, and get their types from it:
+
+```tsx
+import { useCommands, useVideoState } from "react-video-kit";
+
+function SkipIntroButton() {
+  const visible = useVideoState(skipIntro, (state, media) => state.inIntro && media.started);
+  const { skip } = useCommands(skipIntro);
+  if (!visible) return null;
+  return (
+    <button type="button" onClick={() => skip()}>
+      Skip intro
+    </button>
+  );
+}
+```
+
+- The selector gets the plugin's state and the media state, and the component renders again only when the result changes.
+- `media.started` keeps the button off the poster. Before the source loads, the timeline is empty, and `seek` has nowhere to go.
+- Both hooks throw an error naming the plugin if it isn't installed.
+
+Outside the player, `player.plugin(skipIntro)` gives the same typed access from a [`ref`](/docs/v4/concepts/plugins).
+
+## Put it in a slot
+
+`slots` gives the component a place in the layout:
+
+```tsx
+export const skipIntro = definePlugin("skip-intro", ({ end }: SkipIntroOptions) => ({
+  state: () => ({ inIntro: false }),
+  commands: (context) => ({
+    skip: () => context.commands.seek(end),
+  }),
+  slots: { overlay: SkipIntroButton },
+}));
+```
+
+A plugin gives each slot one component, which takes no props and reads what it needs through hooks. [Slots](/docs/v4/composition/slots) lists them all. In your own layout, a slot only appears where you render `<Video.Slot name="overlay" />`, and you can make up new names.
+
+`overlay` parts render directly inside the player's root, so they position themselves. The demo's button uses `absolute`, and a `z-index` above the controls, which sit at 2.
+
+## Run code at the right time
+
+Three hooks run only in the browser, and each one receives a `scope` that ends with it:
+
+- `setup(context, scope)` runs from mount to unmount.
+- `attach(context, element, scope)` runs while the media element is connected.
+- `source(context, source, scope)` runs for each source until the next one.
+
+The clock lasts as long as the player, so the code that sets `inIntro` goes in `setup`:
+
+```tsx
+export const skipIntro = definePlugin("skip-intro", ({ start, end }: SkipIntroOptions) => ({
+  state: () => ({ inIntro: false }),
+  commands: (context) => ({
+    skip: () => context.commands.seek(end),
+  }),
+  setup(context, scope) {
+    const check = (time: number) => context.set({ inIntro: time >= start && time < end });
+    scope.add(context.clock.bind(check, () => 0.25));
+  },
+  slots: { overlay: SkipIntroButton },
+}));
+```
+
+`clock.bind(write, resolution)` calls `write` right away, then whenever time has moved by `resolution` seconds, and after every seek or source change. Its second argument, `jumped`, is `true` for the calls that aren't steady playback, so a plugin that counts time watched can leave those out. Nothing runs while the video is paused. `set` ignores values that haven't changed, so the button renders when it appears and when it goes, and not in between.
+
+In a component, `useClock(write, resolution)` does the same without rendering, and `useCurrentTime(1)` gives you the time as state, rendering once a second. The [hooks](/docs/v4/hooks) page covers both.
+
+### Clean up with the scope
+
+Whatever a hook starts has to end with it. React's Strict Mode mounts twice in development, so anything left behind runs twice.
+
+- `scope.on(target, type, listener)` adds an event listener.
+- `scope.add(cleanup)` runs a function at the end. `clock.bind` and `context.lock` both return one.
+- `scope.signal` is an `AbortSignal` to pass to `fetch`.
+- `context.watch(scope, select, listener)` calls `listener` when part of the media state changes.
+
+### Read the element in `attach`
+
+Use `attach` for what the player doesn't report. This plugin reads the video's shape, and `attrs` writes it to the player's root as a data attribute, with no React render, so CSS can use it:
+
+```tsx
+export const orientation = definePlugin("orientation", () => ({
+  state: () => ({ portrait: false }),
+  attrs: { "data-portrait": (state) => state.portrait },
+  attach(context, element, scope) {
+    scope.on(element, "loadedmetadata", () => {
+      context.set({ portrait: element.videoHeight > element.videoWidth });
+    });
+  },
+}));
+```
+
+### Change per video in `source`
+
+With a [playlist](/docs/v4/plugins/playlist), each video has its own intro. The `source` hook picks it up, and its scope unbinds the clock when the next source starts:
+
+```tsx
+interface Intro {
+  start: number;
+  end: number;
+}
+
+export const skipIntros = definePlugin("skip-intros", (intros: Record<string, Intro>) => {
+  let intro: Intro | undefined;
+  return {
+    state: () => ({ inIntro: false }),
+    commands: (context) => ({
+      skip() {
+        if (intro) context.commands.seek(intro.end);
+      },
+    }),
+    source(context, source, scope) {
+      const current = intros[source.src];
+      intro = current;
+      const check = (time: number) =>
+        context.set({ inIntro: current !== undefined && time >= current.start && time < current.end });
+      scope.add(context.clock.bind(check, () => 0.25));
+    },
+  };
+});
+```
+
+## Intercept commands with gates and locks
+
+A gate sits in front of `load`, `play`, or `seek`. It gets the request, can change it, and passes it on by calling `next`. Not calling `next` cancels the command.
+
+This one stops the viewer seeking past what they've already watched, as a training video might:
+
+```tsx
+export const noSkipAhead = definePlugin("no-skip-ahead", () => {
+  let furthest = 0;
+  return {
+    source(context, _source, scope) {
+      furthest = 0;
+      const track = (time: number) => {
+        furthest = Math.max(furthest, time);
+      };
+      scope.add(context.clock.bind(track, () => 1));
+    },
+    gates: {
+      seek: (time, next) => next(Math.min(time, furthest)),
+    },
+  };
+});
+```
+
+- Gates run in plugin order, and can be `async`.
+- A `load` gate can rewrite the request. The [persistence](/docs/v4/plugins/persistence) plugin adds a `startTime` this way.
+- A `play` gate that doesn't call `next` makes `commands.play()` resolve to `false`.
+- A play that starts the load runs the `source` hooks first, so a `play` gate can use what they set up.
+- Browsers only let playback start soon after a gesture. A `play` gate runs inside that gesture up to its first `await`, and after that the browser can refuse to play.
+
+A lock blocks commands outright until it's released. This one keeps the viewer from seeking or changing speed for the first few seconds of each video:
+
+```tsx
+export const mustWatch = definePlugin("must-watch", ({ seconds }: { seconds: number }) => ({
+  source(context, _source, scope) {
+    const unlock = context.lock("must-watch", ["seek", "rate"]);
+    scope.add(unlock);
+    const check = (time: number) => {
+      if (time >= seconds && context.isLocked("seek")) unlock();
+    };
+    scope.add(context.clock.bind(check, () => 0.5));
+  },
+}));
+```
+
+- `context.lock(id, commands)` returns the function that releases it. Locks outlive a source, so add it to the scope.
+- A locked command does nothing. The controls react too: a `seek` lock disables the timeline, a `rate` lock hides the speed menu, and a `volume` lock hides the volume slider.
+- The player checks `play`, `pause`, `seek`, `rate`, and `volume`. Any other name is yours to check with `context.isLocked()`.
+
+## Depend on other plugins
+
+`requires` names plugins that must be installed, and creating the player throws an error if one is missing. `after` only sets the order, and does nothing when the other plugin is absent. That order applies to lifecycle hooks, gates, and slots.
+
+```tsx
+import type { speed } from "react-video-kit/speed";
+
+export const startFast = definePlugin("start-fast", ({ rate }: { rate: number }) => ({
+  requires: ["speed"],
+  setup(context) {
+    context.find<typeof speed>("speed")?.commands.set(rate);
+  },
+}));
+```
+
+`context.find` reads another plugin by name. With `import type`, it adds none of that plugin's code to your bundle, which suits an optional dependency: drop `requires`, and `find` returns `undefined` when the plugin isn't there.
+
+## Report failures
+
+`context.error` reports a failure the same way the library's own plugins do. Give it a code of your own with your plugin's prefix, and say whether it stops playback:
+
+```tsx
+context.error({
+  code: "skip-intro-load",
+  message: "The intro markers didn't load.",
+  fatal: false,
+});
+```
+
+A non-fatal error reaches `onError` and `player.onError` while the video keeps playing. A fatal one also shows the error overlay. Set `retryable: true` on a failure that can pass, so that [`recovery()`](/docs/v4/plugins/recovery) retries it. To choose the code from a load gate or a provider, throw a `VideoKitError`. [Errors](/docs/v4/concepts/errors) lists every code the library uses.
+
+## Keep it light and safe on the server
+
+- **Mark the file `"use client"`** when it has parts or hooks. `definePlugin` itself has no directive, so it works anywhere, but instances still have to be [created in a client file](/docs/v4/recipes/next-app-router).
+- **Keep the factory, `state`, and `commands` pure.** All three run on the server when the player is created. Touch the DOM, `window`, or storage only inside a lifecycle hook, or inside a command when it's called.
+- **Match the server's first render.** `state` is what the server renders and what the browser hydrates with, so to restore something from `localStorage`, read it in `setup` and call `context.set`.
+- **Give each plugin its own file.** A bundler keeps a file's top-level `definePlugin` calls unless the whole file is unused, so a second plugin in the same file stays in the bundle for everyone who imports the first. A plugin's own parts can share its file, since `slots` keeps them anyway. When you publish plugins, also set `"sideEffects"` in `package.json`, listing only your CSS.
+- **Import heavy dependencies with `import()`**, inside a hook or a command, so viewers only download them when they're used.
+
+## Types
+
+<Api entry="react-video-kit/core" name="PluginSpec" />
+
+The context passed to commands, hooks, and gates:
+
+<Api entry="react-video-kit/core" name="PluginContext" />
+
+The scope passed to lifecycle hooks:
+
+<Api entry="react-video-kit/core" name="Scope" />

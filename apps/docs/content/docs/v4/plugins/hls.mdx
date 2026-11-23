@@ -1,0 +1,101 @@
+---
+title: HLS
+description: Plays HLS streams through hls.js, or through the browser itself on Apple devices.
+---
+
+<PluginSummary id="hls" />
+
+Plays `.m3u8` streams. Apple's browsers play them natively, and everywhere else hls.js does, downloaded only when an HLS source loads. Press play below. Where hls.js is playing, the settings menu lists each quality.
+
+<Demo slug="hls" />
+
+## Usage
+
+hls.js is an optional peer dependency, so add it yourself. The package asks for `^1.7.0`.
+
+```bash
+npm install hls.js
+```
+
+```tsx
+import { hls } from "react-video-kit/hls";
+import { defaultPlugins, VideoPlayer } from "react-video-kit/player";
+
+const plugins = [hls(), ...defaultPlugins()];
+
+<VideoPlayer src="/stream.m3u8" plugins={plugins} />;
+```
+
+`hls()` isn't part of `defaultPlugins()`, so list it alongside them.
+
+To change how hls.js behaves, pass its settings as `config`:
+
+```tsx
+hls({ config: { maxBufferLength: 30 } });
+```
+
+`config` goes to the `Hls` constructor as it is, with two exceptions. The player sets `startPosition` when it resumes from a position, and the [DRM](/docs/v4/plugins/drm) plugin replaces `emeEnabled`, `drmSystems`, and `licenseXhrSetup`.
+
+## How the provider gets chosen
+
+`hls()` claims a source whose `type` is `application/vnd.apple.mpegurl` or `application/x-mpegurl`. With no `type`, it claims a path ending in `.m3u8`, ignoring any query string or hash. A URL with no extension needs a type:
+
+```tsx
+<VideoPlayer src={{ src: "/streams/42", type: "application/x-mpegurl" }} plugins={plugins} />;
+```
+
+It then decides what plays the stream:
+
+| Browser | `hls()` | `hls({ preferEngine: true })` |
+| --- | --- | --- |
+| Apple's, with native HLS | The browser | hls.js |
+| Any other | hls.js | hls.js |
+
+hls.js also needs Media Source or Managed Media Source. Without either, the plugin steps aside and the browser gets the source if `canPlayType` says it can play it. If it can't, the player tries the next [fallback source](/docs/v4/concepts/sources), and after the last one reports a fatal `source-no-provider` error.
+
+Chrome reports native HLS too, but the plugin only trusts it on Apple's browsers, which it recognises by `navigator.vendor`.
+
+## Native HLS versus hls.js
+
+The demo at the top follows the table. This one sets `preferEngine`, so it uses hls.js everywhere. In Safari, the two demos show the difference.
+
+<Demo slug="hls-engine" />
+
+With native HLS, `media.provider` is `"native"`:
+
+- hls.js is never downloaded.
+- The browser chooses the quality, so no levels are reported and the [quality](/docs/v4/plugins/quality) menu doesn't appear.
+- The [live](/docs/v4/plugins/live) plugin reads the live window from the element.
+- The [DRM](/docs/v4/plugins/drm) plugin runs the key exchange itself.
+
+With hls.js, `media.provider` is `"hls"`:
+
+- Quality levels and audio tracks are read from the playlist, for the [quality](/docs/v4/plugins/quality) and [audio tracks](/docs/v4/plugins/audio-tracks) menus.
+- hls.js reports the live window and runs the key exchange.
+
+## When hls.js loads
+
+hls.js downloads when a source the plugin claims starts loading, so `hls()` adds little to a page of MP4s. The `load` prop decides when that is:
+
+| `load` | The source starts loading |
+| --- | --- |
+| `"eager"` | As soon as the player mounts. This is the default. |
+| `"visible"` | When the player scrolls into view, or straight away if the browser has no `IntersectionObserver`. |
+| `"play"` | On the first play. |
+
+```tsx
+<VideoPlayer src="/stream.m3u8" plugins={plugins} load="visible" />;
+```
+
+`load` is read once, when the player is created. If hls.js fails to download, the player reports a fatal `hls-engine-load` error instead of hanging.
+
+## Behaviour
+
+- Choosing a quality sets hls.js's `nextLevel`, which keeps what's buffered. Playback doesn't stall, and the new quality shows once the buffer runs out.
+- A fatal media error gets up to two recovery attempts in any 30 seconds, the second also swapping the audio codec for streams that declared it wrongly. After that the player reports a fatal error with code `3`.
+- A fatal error is reported with one of the [`hls-` codes](/docs/v4/concepts/errors#hls), with hls.js's `details` string as `nativeCode`. Failed downloads are ones the [recovery](/docs/v4/plugins/recovery) plugin retries, and non-fatal errors are left to hls.js.
+- hls.js doesn't draw subtitles. The [captions](/docs/v4/plugins/captions) plugin does.
+
+## API
+
+<PluginApi id="hls" />

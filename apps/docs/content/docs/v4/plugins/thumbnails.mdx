@@ -1,0 +1,103 @@
+---
+title: Thumbnails
+description: Shows a frame above the timeline as the pointer moves along it.
+---
+
+<PluginSummary id="thumbnails" />
+
+Shows a frame from the video above the timeline, along with the time. Hover the timeline in the demo. The line under the player changes when the thumbnail file is fetched, which doesn't happen until that first hover.
+
+<Demo slug="thumbnails" />
+
+## Usage
+
+```tsx
+import { VideoPlayer } from "react-video-kit/player";
+import { thumbnails } from "react-video-kit/thumbnails";
+
+const plugins = [thumbnails({ src: "/thumbnails.vtt" })];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+Thumbnails isn't in `defaultPlugins()`, so add it to the list if you use those.
+
+To pick a file for each source, pass a function. Return `null` for a source with no thumbnails:
+
+```tsx
+import { thumbnails } from "react-video-kit/thumbnails";
+
+const files: Record<string, string> = { "/film.mp4": "/film.thumbnails.vtt" };
+
+thumbnails({ src: ({ src }) => files[src] ?? null });
+```
+
+## The WebVTT file
+
+Each cue covers a stretch of the video, and its text points at a rectangle in an image, called a sprite:
+
+```text
+WEBVTT
+
+00:00.000 --> 00:05.000
+thumbnails.jpg#xywh=0,0,160,90
+
+00:05.000 --> 00:10.000
+thumbnails.jpg#xywh=160,0,160,90
+
+00:10.000 --> 00:15.000
+thumbnails.jpg#xywh=320,0,160,90
+```
+
+- `#xywh=` takes the left edge, the top edge, the width, and the height, in whole pixels. `#xywh=pixel:0,0,160,90` means the same.
+- The image path is relative to the WebVTT file. A full URL works too.
+- Cues can point at different images, so a long video can use several sprites.
+- A cue with no `#xywh=` shows its whole image at 160×90, cropped to fit, so one image per cue works too. The `#xywh=percent:` form isn't read, and shows the whole image the same way.
+
+## Make a sprite with ffmpeg
+
+This takes a frame every 5 seconds, scales each to 160×90, and tiles them into one image. For a 30-second video, that's 6 tiles in a row:
+
+```bash
+ffmpeg -i video.mp4 -vf "fps=1/5,scale=160:90,tile=6x1" -frames:v 1 -q:v 5 thumbnails.jpg
+```
+
+Then write one cue for each tile, with the left edge at its index times the width, as in the file above.
+
+## When the file loads
+
+The player fetches the WebVTT file the first time the preview needs it: when the pointer first hovers the timeline, or when a finger first taps or drags on it. A viewer who never touches the timeline never downloads it. The sprite loads next, and the frame appears once the image is decoded, with no further pointer movement.
+
+The file loads with `fetch`, so a file on another origin needs CORS headers. Each new source starts over, fetching its own file on its first hover.
+
+## Place the part yourself
+
+`<Video.Timeline />` with no children includes `ThumbnailPreview` through its slots. If you give it children, put it in the preview yourself:
+
+```tsx
+import * as Video from "react-video-kit";
+import { ThumbnailPreview } from "react-video-kit/thumbnails";
+
+<Video.Timeline>
+  <Video.TimelineTrack>
+    <Video.TimelineBuffered />
+    <Video.TimelineFill />
+  </Video.TimelineTrack>
+  <Video.TimelineThumb />
+  <Video.TimelinePreview>
+    <ThumbnailPreview />
+  </Video.TimelinePreview>
+</Video.Timeline>;
+```
+
+## Behaviour
+
+- Sprite frames are drawn at the size in the cue, one sprite pixel to one CSS pixel.
+- Touch has no hover, so on touch the preview shows only during a drag. Seeking with the keyboard doesn't show it.
+- A missing file means no thumbnails and no error. The preview still shows the time.
+- A time with no cue shows the time alone.
+- With the [chapters](/docs/v4/plugins/chapters) plugin, the frame and the title stack in plugin order.
+
+## API
+
+<PluginApi id="thumbnails" />

@@ -1,0 +1,102 @@
+---
+title: Sources
+description: What you can pass to src, and when anything loads.
+---
+
+The `src` prop accepts four shapes. A plugin can add support for more formats, but the shapes stay the same.
+
+## One file
+
+```tsx
+<VideoPlayer src="/video.mp4" />
+```
+
+Add a `type` when the URL doesn't reveal the format, such as a signed URL with no file extension. It's how the player picks the right engine.
+
+```tsx
+<VideoPlayer src={{ src: "/api/video/42", type: "application/vnd.apple.mpegurl" }} plugins={[hls()]} />
+```
+
+## A list of fallbacks
+
+An array means "try these in order, and use the first that works". If one fails to load, the player moves on to the next. They aren't quality levels.
+
+<Demo slug="fallback" />
+
+```tsx
+<VideoPlayer
+  src={[
+    { src: "/video.webm", type: "video/webm" },
+    { src: "/video.mp4", type: "video/mp4" },
+  ]}
+/>
+```
+
+If none of them work, the player shows an error rather than spinning forever, with a retry button if trying again could help. [Errors](/docs/v4/concepts/errors) has every code, and how to handle them.
+
+<Demo slug="failed-player" />
+
+## Renditions of one video
+
+To offer quality levels for progressive files, list them as `renditions`. Add the [quality](/docs/v4/plugins/quality) plugin to give viewers the menu. Switching keeps their position.
+
+```tsx
+<VideoPlayer
+  plugins={[quality()]}
+  src={{
+    initial: 1,
+    renditions: [
+      { src: "/video-1080.mp4", label: "1080p", height: 1080 },
+      { src: "/video-720.mp4", label: "720p", height: 720 },
+      { src: "/video-360.mp4", label: "360p", height: 360 },
+    ],
+  }}
+/>
+```
+
+Adaptive streams have their own levels, so with [HLS](/docs/v4/plugins/hls) and [DASH](/docs/v4/plugins/dash) you pass one URL.
+
+## No source yet
+
+`null` or an empty string renders an idle player. Set `src` later, and it loads then.
+
+## Changing the source
+
+Change the prop and the new source loads. The player compares sources by value, so re-rendering with an equal array or object doesn't reload.
+
+<Demo slug="source-change" />
+
+From code, use the `setSource` command. `reload` loads the current source again, and can resume from a position:
+
+```tsx
+const { setSource, reload } = useCommands();
+
+setSource("/next-video.mp4");
+reload(120);
+```
+
+Calling `reload` is also how you retry after an error. A failed source stays failed until the next load. With no position, `reload` picks up where the failure happened, and plays again if the viewer was watching.
+
+## When it loads
+
+`load` controls when the player resolves a source and imports any engine. It's read once, when the player is created.
+
+| Value | When it loads | Good for |
+|---|---|---|
+| `eager` | As soon as the player mounts. This is the default. | The main video on a page |
+| `visible` | When the player enters the viewport | Players further down a page |
+| `play` | When the viewer presses Play | Many players on a page, or saving bandwidth |
+
+Each of these only changes when loading starts. A play starts it in any of them, if it hasn't already. The player renders the same in all three, and the poster shows until the video has a frame.
+
+```tsx
+<VideoPlayer src="/stream.m3u8" plugins={[hls()]} load="visible" />
+```
+
+## Choosing an engine
+
+Each provider says whether it can play a source, based only on its `type` or URL. The first that can wins, and the browser's own playback is the fallback. That check imports no code, so an engine you installed but don't need never downloads. This player has both the HLS and DASH plugins, and it downloads neither engine:
+
+<Demo slug="engine-unused" />
+
+Read more in [Providers](/docs/v4/concepts/providers).

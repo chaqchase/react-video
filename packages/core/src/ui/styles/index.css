@@ -1,0 +1,3035 @@
+@layer rv {
+  .rv-root {
+    --rv-accent: #fff;
+    --rv-foreground: #fff;
+    --rv-muted: rgb(255 255 255 / 0.8);
+    --rv-glass: rgb(18 18 20 / 0.2);
+    --rv-glass-strong: rgb(16 16 18 / 0.62);
+    --rv-glass-filter: blur(var(--rv-blur)) saturate(1.8) brightness(0.62);
+    --rv-glass-hover: rgb(255 255 255 / 0.12);
+    --rv-track: rgb(255 255 255 / 0.23);
+    --rv-buffered: rgb(255 255 255 / 0.3);
+    --rv-focus: #5eb1ff;
+    --rv-blur: 30px;
+    --rv-radius: 20px;
+    --rv-pill-radius: 999px;
+    --rv-menu-radius: 20px;
+    --rv-control-size: 38px;
+    --rv-icon-size: 20px;
+    --rv-gap: 8px;
+    --rv-inset: 16px;
+    --rv-max-height: 85svh;
+    --rv-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif, "Segoe UI", Roboto, sans-serif;
+    --rv-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --rv-duration-in: 160ms;
+    --rv-duration-out: 280ms;
+    --rv-duration-press: 110ms;
+    --rv-duration-fade: 360ms;
+    /* Light catches the top left and bottom right of the edge, and it glows a little inside. */
+    --rv-rim:
+      inset 0 0 0 0.5px rgb(255 255 255 / 0.1),
+      inset 0.5px 1px 0.5px -0.5px rgb(255 255 255 / 0.5),
+      inset -0.5px -1px 0.5px -0.5px rgb(255 255 255 / 0.22),
+      inset 0 14px 18px -14px rgb(255 255 255 / 0.16),
+      inset 0 -12px 16px -14px rgb(255 255 255 / 0.1),
+      0 8px 28px rgb(0 0 0 / 0.22);
+
+    position: relative;
+    display: block;
+    container: rv / inline-size;
+    /* Containment removes intrinsic width, which would collapse a shrink-wrapped player. */
+    contain-intrinsic-inline-size: 640px;
+    isolation: isolate;
+    overflow: hidden;
+    /* Unlike `hidden`, this can't scroll, so focusing a control can't push the picture aside. */
+    overflow: clip;
+    aspect-ratio: var(--rv-aspect, 16 / 9);
+    /* A box that can't scroll would otherwise grow to fit what's in it, in some browsers only. */
+    min-height: 0;
+    width: 100%;
+    border-radius: var(--rv-radius);
+    background: #000;
+    color: var(--rv-foreground);
+    font: 500 13px/1 var(--rv-font);
+    letter-spacing: -0.006em;
+    /* A centred page shouldn't centre the player's own text. */
+    text-align: start;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  /* Tracking pulls connected letters apart in Arabic and Hebrew alike. */
+  .rv-root[dir="rtl"],
+  .rv-root[dir="rtl"] * {
+    letter-spacing: 0;
+  }
+
+  /* What's reserved until the video's own shape arrives, which replaces it exactly. */
+  .rv-root[data-orientation="portrait"] {
+    --rv-aspect: 9 / 16;
+  }
+
+  .rv-root[data-orientation="square"] {
+    --rv-aspect: 1;
+  }
+
+  /* At full width a tall video would run off the screen, so its height sets its width instead. */
+  .rv-root:is([data-orientation="portrait"], [data-orientation="square"]) {
+    max-width: calc(var(--rv-max-height) * (var(--rv-aspect)));
+    margin-inline: auto;
+  }
+
+  .rv-root:fullscreen,
+  .rv-root:-webkit-full-screen {
+    border-radius: 0;
+    aspect-ratio: auto;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+
+  .rv-root[data-controls="hidden"] {
+    cursor: none;
+  }
+
+  .rv-root [data-part="media"] {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+  }
+
+  /* A click can focus the picture, and a key pressed after it would ring the whole frame. */
+  .rv-root [data-part="media"][tabindex="-1"]:focus {
+    outline: none;
+  }
+
+  /* The controls cover the picture. Clicks pass through to the video except on a control. */
+  .rv-root [data-part="controls"] {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 10px;
+    --rv-inset-scaled: calc(var(--rv-inset) * var(--rv-inset-scale, 1));
+    padding: max(var(--rv-inset-scaled), env(safe-area-inset-top)) max(var(--rv-inset-scaled), env(safe-area-inset-right)) max(var(--rv-inset-scaled), env(safe-area-inset-bottom)) max(var(--rv-inset-scaled), env(safe-area-inset-left));
+    pointer-events: none;
+  }
+
+  /* The picture dims while the controls show, so white glyphs read on any frame. */
+  .rv-root [data-part="controls"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(rgb(0 0 0 / 0.42), rgb(0 0 0 / 0.16) 30%, rgb(0 0 0 / 0.16) 52%, rgb(0 0 0 / 0.66));
+    pointer-events: none;
+  }
+
+  /* A title and its description need more than the glyphs do. */
+  .rv-root [data-part="controls"]:has([data-part="title"])::before {
+    background: linear-gradient(rgb(0 0 0 / 0.42), rgb(0 0 0 / 0.16) 30%, rgb(0 0 0 / 0.16) 46%, rgb(0 0 0 / 0.72) 80%, rgb(0 0 0 / 0.8));
+  }
+
+  /* An open menu has to clear the large button, or a bottom sheet would sit behind it. */
+  .rv-root [data-part="controls"]:has([data-part="menu-content"][data-state="open"]) {
+    z-index: 4;
+  }
+
+  .rv-root:not([data-controls="hidden"]) :is([data-part="control-group"], [data-part="control-row"] > [data-part="timeline"], [data-part="transport"] > *, [data-part="controls"] > :not([data-part="control-row"], [data-part="transport"], [data-part="title"])) {
+    pointer-events: auto;
+  }
+
+  /*
+   * Everything fades one piece at a time, never as a whole. Opacity on a shared parent
+   * would cut the glass off from the picture behind it, and its blur would pop in at the end.
+   */
+  :where(.rv-root [data-part="controls"])::before,
+  :where(.rv-root [data-part="controls"]) > :where(:not([data-part="control-row"], [data-part="transport"])),
+  :where(.rv-root [data-part="transport"]) > *,
+  :where(.rv-root [data-part="control-row"]) > :where(:not([data-part="control-group"])),
+  :where(.rv-root [data-part="control-group"])::before,
+  :where(.rv-root [data-part="control-group"]) > :where(:not([data-part="menu-content"])) {
+    opacity: var(--rv-shown, 1);
+    transition: opacity var(--rv-duration-fade) ease-in-out;
+  }
+
+  .rv-root[data-controls="hidden"] [data-part="controls"] {
+    --rv-shown: 0;
+  }
+
+  /* Keyboard users can still reach hidden controls, which then reveal themselves. Not for the
+     play button, which is where focus is left after pressing play: any key brings them back. */
+  .rv-root[data-controls="hidden"] [data-part="controls"]:has(:focus-visible:not([data-part="play-pause"])) {
+    --rv-shown: 1;
+  }
+
+  /* Before playback a poster and one button are all there is, until the pointer arrives. */
+  @media (hover: hover) {
+    .rv-root:not([data-started], :hover, :focus-within) [data-part="controls"] {
+      --rv-shown: 0;
+    }
+  }
+
+  /* The large button takes this one's place before playback and at the end. */
+  .rv-root:not([data-started]) [data-part="transport"] [data-part="play-pause"],
+  .rv-root[data-ended] [data-part="transport"] [data-part="play-pause"] {
+    visibility: hidden;
+  }
+
+  .rv-root [data-part="control-row"] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rv-gap);
+  }
+
+  .rv-root [data-part="control-row"][data-position="top"] {
+    margin-block-end: auto;
+    align-items: flex-start;
+  }
+
+  /* With nothing on the left, what's on the right stays on the right. */
+  .rv-root [data-position="top"] > [data-part="control-group"]:last-child {
+    margin-inline-start: auto;
+  }
+
+  /* The title on one side and the buttons on the other. Either can be missing. */
+  .rv-root [data-part="control-row"][data-position="details"] {
+    align-items: flex-end;
+    min-width: 0;
+  }
+
+  .rv-root [data-position="details"] > [data-part="control-group"]:last-child {
+    flex: none;
+    margin-inline-start: auto;
+  }
+
+  .rv-root [data-position="details"]:not(:has(> [data-part="title"], > [data-part="control-group"]:not(:empty))) {
+    display: none;
+  }
+
+  /* The scrubber: a bare track across the picture, with the times below it. It never mirrors. */
+  .rv-root [data-part="control-row"][data-position="scrubber"] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    direction: ltr;
+    margin-block-start: -4px;
+  }
+
+  .rv-root [data-position="scrubber"] > [data-part="timeline"] {
+    grid-column: 1 / -1;
+  }
+
+  .rv-root [data-position="scrubber"] > [data-part="remaining-time"] {
+    justify-self: end;
+  }
+
+  /* Off in this layout, for themes that show the total rather than what's left. */
+  .rv-root [data-position="scrubber"] > [data-part="duration"] {
+    display: none;
+  }
+
+  .rv-root [data-part="control-group"] {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1) + 4px);
+    padding: 2px;
+    border-radius: var(--rv-pill-radius);
+  }
+
+  /* On a layer of its own, because blur on the group would stop a menu inside it blurring the video. */
+  .rv-root [data-part="control-group"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--rv-glass);
+    box-shadow: var(--rv-rim);
+    -webkit-backdrop-filter: var(--rv-glass-filter);
+    backdrop-filter: var(--rv-glass-filter);
+  }
+
+  .rv-root [data-part="control-group"]:empty {
+    display: none;
+  }
+
+  /* A timeline inside a group becomes a pill, with its times beside it. */
+  .rv-root [data-part="control-group"]:has(> [data-part="timeline"]) {
+    flex: 1;
+    gap: 10px;
+    padding-inline: 14px;
+    direction: ltr;
+  }
+
+  .rv-root [data-part="current-time"],
+  .rv-root [data-part="remaining-time"] {
+    flex: none;
+    color: var(--rv-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    text-shadow: 0 1px 8px rgb(0 0 0 / 0.3);
+  }
+
+  .rv-root :is([data-part="control-group"], [data-part="control-row"]) > [data-part="timeline"] {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+
+  /* The name of the video, above the scrubber. */
+  .rv-root [data-part="title"] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    margin-inline-start: 2px;
+    text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
+  }
+
+  .rv-root [data-part="title-eyebrow"] {
+    color: var(--rv-muted);
+    font-size: 12px;
+  }
+
+  .rv-root [data-part="title-text"] {
+    overflow: hidden;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Everything that floats on the picture is the same stronger glass. */
+  .rv-root :is(
+    [data-part="menu-content"],
+    [data-part="timeline-preview"],
+    [data-part="hotkeys-feedback"],
+    [data-part="toast"],
+    [data-part="stats"],
+    [data-part="unmute-chip"],
+    [data-part="up-next"],
+    [data-part="skip"],
+    [data-part="ad-label"],
+    [data-part="ad-link"],
+    [data-part="ad-skip"]:disabled
+  ) {
+    background: var(--rv-glass-strong);
+    box-shadow: var(--rv-rim);
+    -webkit-backdrop-filter: var(--rv-glass-filter);
+    backdrop-filter: var(--rv-glass-filter);
+  }
+
+  /* Buttons */
+  .rv-root [data-control] {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: calc(var(--rv-control-size) * var(--rv-scale, 1));
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1));
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--rv-pill-radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1));
+    cursor: pointer;
+    transition:
+      opacity var(--rv-duration-fade) var(--rv-ease),
+      background-color var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  /* A comfortable touch target around a compact visual. */
+  .rv-root [data-control]::before {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  .rv-root [data-control]:active {
+    transform: scale(0.92);
+    transition-duration: var(--rv-duration-fade), var(--rv-duration-in), var(--rv-duration-press);
+  }
+
+  /* The transport: separate glass buttons in the centre of the picture. */
+  .rv-root [data-part="transport"] {
+    position: absolute;
+    inset: 50% 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--rv-control-size) * var(--rv-scale, 1) * 0.5);
+    direction: ltr;
+    translate: 0 -50%;
+  }
+
+  .rv-root [data-part="transport"] > [data-control],
+  .rv-root [data-part="play-overlay"] {
+    background: var(--rv-glass);
+    box-shadow: var(--rv-rim);
+    -webkit-backdrop-filter: var(--rv-glass-filter);
+    backdrop-filter: var(--rv-glass-filter);
+  }
+
+  .rv-root [data-part="transport"] > [data-control] {
+    width: calc(var(--rv-control-size) * var(--rv-scale, 1) * 1.42);
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1) * 1.42);
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1) * 1.75);
+  }
+
+  .rv-root [data-part="transport"] > [data-part="play-pause"],
+  .rv-root [data-part="play-overlay"] {
+    width: calc(var(--rv-control-size) * var(--rv-scale, 1) * 2);
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1) * 2);
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1) * 1.7);
+  }
+
+  /* A triangle's weight sits towards its base, so centring its box looks off to the left.
+     It points right in every language, so the nudge can't be a logical property. */
+  .rv-root :is([data-part="play-pause"], [data-part="play-overlay"]) > :is([data-show="paused"], [data-show="ready"]) {
+    margin-left: 0.14em;
+  }
+
+  .rv-root [data-part="transport"] > [data-part="seek-button"] > svg text {
+    font-family: var(--rv-font);
+  }
+
+  .rv-root [data-control]:focus-visible,
+  .rv-root [data-part="timeline"]:has(input:focus-visible) [data-part="timeline-track"],
+  .rv-root [data-part="volume-slider"]:has(input:focus-visible) [data-part="volume-track"] {
+    outline: 2px solid var(--rv-focus);
+    outline-offset: 2px;
+    /* A dark band inside the ring, so one of the two shows on any picture, in any theme. */
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 0.85) !important;
+  }
+
+  /* Rows sit in a dark sheet that clips, so their ring goes inside and needs no band. */
+  .rv-root [data-part="menu-content"] [role^="menuitem"]:focus-visible {
+    outline: 2px solid var(--rv-focus);
+    outline-offset: -2px;
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-control]:hover {
+      background: var(--rv-glass-hover);
+    }
+
+    /* The large buttons stay dark glass, only a little lifted, so their white glyphs still read. */
+    .rv-root [data-part="transport"] > [data-control]:hover,
+    .rv-root [data-part="play-overlay"]:hover {
+      background: rgb(255 255 255 / 0.1);
+      transform: scale(1.06);
+    }
+
+    .rv-root [data-part="transport"] > [data-control]:hover:active,
+    .rv-root [data-part="play-overlay"]:hover:active {
+      transform: scale(0.92);
+    }
+
+    /* Tooltips only appear where hover exists, after a beat. */
+    .rv-root [data-part="control-group"] [data-control][aria-label]::after {
+      content: attr(aria-label);
+      position: absolute;
+      inset: auto auto calc(100% + 10px) 50%;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: var(--rv-glass-strong);
+      box-shadow: var(--rv-rim);
+      -webkit-backdrop-filter: var(--rv-glass-filter);
+      backdrop-filter: var(--rv-glass-filter);
+      color: var(--rv-foreground);
+      font: 500 12px/1 var(--rv-font);
+      white-space: nowrap;
+      opacity: 0;
+      transform: translate(-50%, 4px);
+      pointer-events: none;
+      transition:
+        opacity var(--rv-duration-in) var(--rv-ease),
+        transform var(--rv-duration-in) var(--rv-ease);
+    }
+
+    .rv-root [data-part="control-group"] [data-control][aria-label]:hover::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      transition-delay: 450ms;
+    }
+
+    /* There's no room above the top row, so its tooltips hang below it. */
+    .rv-root [data-position="top"] [data-control][aria-label]::after {
+      inset-block: calc(100% + 10px) auto;
+    }
+
+    .rv-root [data-part="control-group"]:first-child > [data-control]:first-child::after {
+      inset-inline: 0 auto;
+      transform: translate(0, 4px);
+    }
+
+    .rv-root [data-part="control-group"]:first-child > [data-control]:first-child:hover::after {
+      transform: translate(0, 0);
+    }
+
+    .rv-root [data-part="control-group"]:last-child > [data-control]:last-child::after {
+      inset-inline: auto 0;
+      transform: translate(0, 4px);
+    }
+
+    .rv-root [data-part="control-group"]:last-child > [data-control]:last-child:hover::after {
+      transform: translate(0, 0);
+    }
+
+    .rv-root [data-state="open"]::after {
+      display: none;
+    }
+  }
+
+  /* Icons that swap by state stack in one grid cell, then cross-fade and scale. */
+  .rv-root [data-control] > svg {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-control] > svg[data-show] {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  .rv-root [data-control][data-state="paused"] > [data-show="paused"],
+  .rv-root [data-control][data-state="playing"] > [data-show="playing"],
+  .rv-root [data-control][data-state="ended"] > [data-show="ended"],
+  .rv-root [data-control][data-state="ready"] > [data-show="ready"],
+  .rv-root [data-control][data-state="started"] > [data-show="ready"],
+  .rv-root [data-control][data-state="active"] > [data-show="active"],
+  .rv-root [data-control][data-state="inactive"] > [data-show="inactive"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .rv-root [data-part="pip"][data-state="active"],
+  .rv-root [data-part="menu-trigger"][data-state="open"] {
+    background: var(--rv-glass-hover);
+  }
+
+  /* Each wave follows its own stretch of the level, from dim to full, in step with the slider. */
+  .rv-root [data-part="mute"] {
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1) * 1.1);
+  }
+
+  .rv-root [data-part="mute"] > svg {
+    transition:
+      opacity 300ms ease-in-out,
+      transform 300ms ease-in-out;
+  }
+
+  .rv-root [data-part="mute"] [data-wave] {
+    transition:
+      opacity 300ms ease-in-out,
+      transform 300ms ease-in-out;
+  }
+
+  .rv-root [data-part="mute"] [data-wave="low"] {
+    opacity: clamp(0.4, 0.4 + var(--rv-volume, 1) * 2, 1);
+  }
+
+  .rv-root [data-part="mute"] [data-wave="mid"] {
+    opacity: clamp(0.4, 0.4 + (var(--rv-volume, 1) - 0.3) * 2, 1);
+  }
+
+  .rv-root [data-part="mute"] [data-wave="high"] {
+    opacity: clamp(0.4, 0.4 + (var(--rv-volume, 1) - 0.6) * 1.5, 1);
+  }
+
+  /* Muted, the speaker dims and shifts over, the waves go, and the slash falls across it. */
+  .rv-root [data-part="mute"] [data-wave="slash"] {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  .rv-root [data-part="mute"][data-level="muted"] > svg {
+    opacity: 0.72;
+    transform: translateX(0.2em);
+  }
+
+  .rv-root [data-part="mute"][data-level="muted"] [data-wave="all"] {
+    opacity: 0;
+  }
+
+  .rv-root [data-part="mute"][data-level="muted"] [data-wave="slash"] {
+    opacity: 1;
+    transform: translate(-48px, 48px);
+  }
+
+  /* Sliders share a real input for focus and assistive tech. */
+  /* Timeline */
+  .rv-root [data-part="timeline"] {
+    position: relative;
+    height: 20px;
+    margin: 0 4px;
+    touch-action: pan-y;
+    cursor: pointer;
+  }
+
+  /* 44px of hit area around a slim track. */
+  .rv-root [data-part="timeline"]::before {
+    content: "";
+    position: absolute;
+    inset: -12px 0;
+  }
+
+  .rv-root [data-part="timeline"][data-disabled] {
+    cursor: default;
+    opacity: calc(var(--rv-shown, 1) * 0.6);
+  }
+
+  .rv-root [data-part="timeline-track"] {
+    position: absolute;
+    inset: 50% 0 auto;
+    overflow: hidden;
+    height: 6px;
+    translate: 0 -50%;
+    border-radius: var(--rv-pill-radius);
+    background: var(--rv-track);
+    transition: height var(--rv-duration-out) var(--rv-ease);
+  }
+
+  /* On its own the track is thick, and frosted, since it has no pill behind it. */
+  .rv-root [data-part="control-row"] > [data-part="timeline"] [data-part="timeline-track"] {
+    height: 8px;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .rv-root [data-part="timeline-buffered"],
+  .rv-root [data-part="timeline-fill"] {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
+  }
+
+  .rv-root [data-part="timeline-buffered"] {
+    background: var(--rv-buffered);
+    transition: transform 400ms linear;
+  }
+
+  .rv-root [data-part="timeline-fill"] {
+    background: var(--rv-accent);
+  }
+
+  .rv-root [data-part="timeline-rail"] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .rv-root [data-part="timeline-thumb"] {
+    position: absolute;
+    top: 50%;
+    left: -7px;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: var(--rv-accent);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="timeline"][data-dragging] [data-part="timeline-track"] {
+    height: 10px;
+  }
+
+  .rv-root [data-part="control-row"] > [data-part="timeline"][data-dragging] [data-part="timeline-track"] {
+    height: 12px;
+  }
+
+  .rv-root [data-part="timeline"]:has(input:focus-visible) [data-part="timeline-thumb"] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-track"] {
+      height: 10px;
+    }
+
+    .rv-root [data-part="control-row"] > [data-part="timeline"]:not([data-disabled]):hover [data-part="timeline-track"] {
+      height: 12px;
+    }
+  }
+
+  .rv-root [data-part="timeline-preview"] {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="timeline-preview"][data-visible] {
+    opacity: 1;
+  }
+
+  /* With a picture there's no frame to speak of: the words sit on it, over a soft shade. */
+  .rv-root [data-part="timeline-preview"]:has([data-part="thumbnail"][data-visible]) {
+    padding: 0;
+    border-radius: 12px;
+    background: #000;
+  }
+
+  .rv-root [data-part="timeline-preview"]:has([data-part="thumbnail"][data-visible])::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(transparent 45%, rgb(0 0 0 / 0.7));
+    box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.16);
+  }
+
+  .rv-root [data-part="timeline-preview"]:has([data-part="thumbnail"][data-visible]) :is([data-part="timeline-preview-time"], [data-part="chapter-title"]) {
+    position: absolute;
+    z-index: 1;
+    bottom: 6px;
+    max-width: calc(100% - 16px);
+    font-size: 11px;
+  }
+
+  .rv-root [data-part="timeline-preview"]:has([data-part="thumbnail"][data-visible]) [data-part="chapter-title"] {
+    bottom: 21px;
+    color: var(--rv-muted);
+  }
+
+  /* Time */
+  .rv-root [data-part="time"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding-inline: 8px 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .rv-root [data-part="time-separator"],
+  .rv-root [data-part="duration"] {
+    color: var(--rv-muted);
+  }
+
+  /* Volume */
+  .rv-root [data-part="volume"] {
+    display: inline-flex;
+    align-items: center;
+    transition: padding var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="volume-slider"] {
+    position: relative;
+    flex: none;
+    overflow: hidden;
+    width: 0;
+    height: calc(var(--rv-control-size) * var(--rv-scale, 1));
+    touch-action: none;
+    cursor: pointer;
+    opacity: 0;
+    transition:
+      width var(--rv-duration-out) var(--rv-ease),
+      opacity var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="volume"]:hover [data-part="volume-slider"],
+  .rv-root [data-part="volume"]:focus-within [data-part="volume-slider"] {
+    overflow: visible;
+    width: 84px;
+    opacity: 1;
+  }
+
+  /* Set on the pill's side of it, since the slider itself always runs left to right. */
+  .rv-root [data-part="volume"]:hover,
+  .rv-root [data-part="volume"]:focus-within {
+    padding-inline-end: 14px;
+  }
+
+  .rv-root [data-part="volume-track"] {
+    position: absolute;
+    inset: 50% 0 auto;
+    overflow: hidden;
+    height: 8px;
+    margin-top: -4px;
+    border-radius: var(--rv-pill-radius);
+    background: var(--rv-track);
+  }
+
+  .rv-root [data-part="volume-fill"] {
+    position: absolute;
+    inset: 0;
+    background: var(--rv-accent);
+    transform-origin: left;
+  }
+
+  .rv-root [data-part="volume-rail"] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .rv-root [data-part="volume-thumb"] {
+    position: absolute;
+    top: 50%;
+    left: -7px;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: var(--rv-accent);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+    opacity: 0;
+    transition: opacity var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="volume-slider"]:has(input:focus-visible) [data-part="volume-thumb"] {
+    opacity: 1;
+  }
+
+  /* Overlays */
+  /* Above the controls, or the layer that dims the picture would grey its glyph. */
+  .rv-root [data-part="play-overlay"] {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    z-index: 3;
+    translate: -50% -50%;
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      background-color var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease),
+      visibility 0s;
+  }
+
+  .rv-root [data-part="play-overlay"][data-state="started"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.82);
+    pointer-events: none;
+    transition-delay: 0s, 0s, 0s, var(--rv-duration-out);
+  }
+
+  /* Nothing here can play, so the only controls left are the way out of fullscreen. */
+  .rv-root[data-status="error"]
+    :is(
+      [data-part="play-overlay"],
+      [data-part="transport"],
+      [data-position="details"],
+      [data-position="scrubber"]
+    ) {
+    display: none;
+  }
+
+  .rv-root[data-status="error"] [data-part="controls"] {
+    z-index: 4;
+  }
+
+  .rv-root[data-status="error"] [data-part="controls"]::before {
+    opacity: 0;
+  }
+
+  /* Bare ticks, in the place of the play icon rather than over a button of their own. */
+  .rv-root [data-part="buffering"] {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    font-size: calc(var(--rv-icon-size) * var(--rv-scale, 1) * 1.9);
+    filter: drop-shadow(0 1px 6px rgb(0 0 0 / 0.4));
+    translate: -50% -50%;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--rv-duration-out) var(--rv-ease),
+      visibility 0s var(--rv-duration-out);
+  }
+
+  .rv-root [data-part="buffering"][data-visible] {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+  }
+
+  .rv-root [data-part="buffering"] > svg {
+    animation: rv-spin 800ms steps(8) infinite;
+  }
+
+  .rv-root:has([data-part="buffering"][data-visible]) :is([data-part="play-pause"], [data-part="play-overlay"]) > svg {
+    opacity: 0;
+  }
+
+  @keyframes rv-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  .rv-root [data-part="error-overlay"] {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 16px;
+    background: rgb(0 0 0 / 0.62);
+    -webkit-backdrop-filter: blur(var(--rv-blur));
+    backdrop-filter: blur(var(--rv-blur));
+    text-align: center;
+    text-wrap: balance;
+    animation: rv-fade var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="error-title"] {
+    margin: 0;
+    font-size: calc(17px * var(--rv-scale));
+    font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+
+  .rv-root [data-part="error-message"] {
+    max-width: 44ch;
+    margin: 0;
+    color: rgb(255 255 255 / 0.85);
+    font-size: calc(14px * var(--rv-scale));
+    line-height: 1.35;
+  }
+
+  /* Selectable, so that viewers can copy it into a message to support. */
+  .rv-root [data-part="error-code"] {
+    margin: 2px 0 0;
+    color: rgb(255 255 255 / 0.78);
+    font-size: calc(12px * var(--rv-scale));
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .rv-root [data-part="error-retry"] {
+    width: auto;
+    height: 34px;
+    margin-top: 10px;
+    padding-inline: 16px;
+    background: #fff;
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .rv-root [data-part="error-retry"]::before {
+    content: none;
+  }
+
+  /* Only the essentials fit in a player this small. */
+  @container rv (max-width: 300px) {
+    .rv-root [data-part="error-message"] {
+      display: none;
+    }
+  }
+
+  @keyframes rv-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Double-tap seek ripple */
+  .rv-root [data-part="seek-feedback"] {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .rv-root [data-part="seek-feedback"] > span {
+    position: absolute;
+    top: 50%;
+    left: 22%;
+    display: grid;
+    place-items: center;
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    color: #fff;
+    font: 600 15px/1 var(--rv-font);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 10px rgb(0 0 0 / 0.5);
+    opacity: 0;
+  }
+
+  .rv-root [data-part="seek-feedback"] > span::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+  }
+
+  .rv-root [data-part="seek-feedback"][data-direction="forward"] > span {
+    left: 78%;
+  }
+
+  .rv-root [data-part="seek-feedback"][data-active] > span {
+    animation: rv-seek-label 560ms var(--rv-ease);
+  }
+
+  .rv-root [data-part="seek-feedback"][data-active] > span::before {
+    animation: rv-ripple 560ms var(--rv-ease);
+  }
+
+  @keyframes rv-seek-label {
+    from,
+    60% {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes rv-ripple {
+    from {
+      opacity: 1;
+      transform: scale(0.5);
+    }
+
+    to {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+
+  /* Menu */
+  .rv-root [data-part="menu-content"] {
+    position: absolute;
+    inset-inline-end: max(var(--rv-inset), env(safe-area-inset-right));
+    bottom: calc(100% + 8px);
+    z-index: 4;
+    overflow: hidden;
+    width: 240px;
+    border-radius: var(--rv-menu-radius);
+    font-size: 13px;
+    font-weight: 400;
+    transform-origin: bottom right;
+    transition:
+      opacity 220ms var(--rv-ease),
+      transform 220ms var(--rv-ease),
+      height 220ms var(--rv-ease);
+  }
+
+  .rv-root[dir="rtl"] [data-part="menu-content"] {
+    transform-origin: bottom left;
+  }
+
+  .rv-root [data-part="control-group"] [data-part="menu-content"] {
+    inset-inline-end: 0;
+  }
+
+  @starting-style {
+    .rv-root [data-part="menu-content"][data-state="open"] {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+  }
+
+  .rv-root [data-part="menu-content"][data-state="closed"] {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+    pointer-events: none;
+    transition-duration: 140ms;
+  }
+
+  .rv-root [data-part="menu-panels"] {
+    position: relative;
+  }
+
+  .rv-root [data-part="menu-panel"] {
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    /* The menu measures the room it has, since the player clips whatever passes its edge. */
+    max-height: min(320px, var(--rv-menu-room, 320px));
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(16px);
+    transition:
+      opacity 180ms var(--rv-ease),
+      transform 220ms var(--rv-ease),
+      visibility 0s 220ms;
+  }
+
+  .rv-root [data-part="menu-panel"][data-root] {
+    transform: translateX(-16px);
+  }
+
+  .rv-root [data-part="menu-panel"][data-active] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  /* Scrolls apart from the back row, which stays in reach above it. */
+  .rv-root [data-part="menu-list"] {
+    min-height: 0;
+    padding: 4px;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .rv-root [data-part="menu-item"],
+  .rv-root [data-part="menu-radio-item"],
+  .rv-root [data-part="menu-back"] {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    padding: 0 10px;
+    border-radius: 12px;
+    color: rgb(255 255 255 / 0.84);
+    cursor: pointer;
+    transition: background-color var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="menu-item-label"] {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rv-root [data-part="menu-item-value"] {
+    color: var(--rv-muted);
+    white-space: nowrap;
+  }
+
+  .rv-root [data-part="menu-item"][data-sub]::after,
+  .rv-root [data-part="menu-back"]::before {
+    content: "";
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border: solid var(--rv-muted);
+    border-width: 1.5px 1.5px 0 0;
+    transform: rotate(45deg);
+  }
+
+  .rv-root[dir="rtl"] [data-part="menu-item"][data-sub]::after {
+    transform: rotate(-135deg);
+  }
+
+  .rv-root [data-part="menu-back"]::before {
+    transform: rotate(-135deg);
+  }
+
+  .rv-root[dir="rtl"] [data-part="menu-back"]::before {
+    transform: rotate(45deg);
+  }
+
+  .rv-root [data-part="menu-back"] {
+    flex: none;
+    margin: 4px 4px 0;
+    color: var(--rv-foreground);
+    font-weight: 600;
+  }
+
+  /* The check leads the row, and every label lines up after it, checked or not. */
+  .rv-root [data-part="menu-radio-item"] {
+    padding-inline-start: 34px;
+  }
+
+  .rv-root [data-part="menu-radio-item"][data-checked] {
+    color: var(--rv-foreground);
+    font-weight: 500;
+  }
+
+  .rv-root [data-part="menu-radio-item"]::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: 15px;
+    top: 50%;
+    width: 5px;
+    height: 10px;
+    margin-top: -7px;
+    border: solid var(--rv-accent);
+    border-width: 0 1.75px 1.75px 0;
+    opacity: 0;
+    transform: rotate(45deg) scale(0.5);
+    transition:
+      opacity var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="menu-radio-item"][data-checked]::after {
+    opacity: 1;
+    transform: rotate(45deg);
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-part="menu-item"]:hover,
+    .rv-root [data-part="menu-radio-item"]:hover,
+    .rv-root [data-part="menu-back"]:hover {
+      background: var(--rv-glass-hover);
+    }
+  }
+
+  .rv-root [role^="menuitem"][aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  /* Captions lift clear of the controls while they're showing. */
+  .rv-root [data-part="captions"] {
+    position: absolute;
+    inset: auto 5% 5%;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    pointer-events: none;
+    transition: transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root:not([data-controls="hidden"]) [data-part="captions"] {
+    transform: translateY(calc(-1 * var(--rv-control-size) * var(--rv-scale, 1) - 64px));
+  }
+
+  /* In a short player that would land on the centre buttons, so they rise to the gap below. */
+  @container rv (max-width: 719px) {
+    .rv-root:not([data-controls="hidden"], [data-orientation="portrait"], [class*="rv-theme-"]) [data-part="captions"] {
+      transform: translateY(calc(27px - 18cqw));
+    }
+  }
+
+  @container rv (max-width: 479px) {
+    .rv-root:not([data-controls="hidden"], [data-orientation="portrait"], [class*="rv-theme-"]) [data-part="captions"] {
+      transform: translateY(calc(60px - 25cqw));
+    }
+  }
+
+  .rv-root [data-part="caption-line"] {
+    padding: 0.2em 0.5em;
+    border-radius: 6px;
+    background: var(--rv-caption-background, rgb(0 0 0 / 0.72));
+    color: var(--rv-caption-color, #fff);
+    font: 500 var(--rv-caption-size, clamp(13px, 2.6cqw, 28px)) / 1.3 var(--rv-font);
+    /* Each line sets its own direction, so RTL punctuation lands on the correct side. */
+    unicode-bidi: plaintext;
+    white-space: pre-line;
+  }
+
+  /* Shows native captions in iOS fullscreen, where the player can't draw its own. */
+  .rv-root [data-part="media"]::cue {
+    background: rgb(0 0 0 / 0.72);
+    color: #fff;
+  }
+
+  .rv-root [data-part="captions-toggle"]::before {
+    border-radius: inherit;
+  }
+
+  .rv-root [data-part="captions-toggle"][aria-pressed="true"] {
+    background: var(--rv-glass-hover);
+    color: var(--rv-accent);
+  }
+
+  /* Hotkey confirmation */
+  .rv-root :is([data-part="hotkeys-feedback"], [data-part="toast"]) {
+    position: absolute;
+    inset: 12% auto auto 50%;
+    z-index: 3;
+    padding: 9px 14px;
+    border-radius: var(--rv-pill-radius);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    transform: translate(-50%, -4px);
+    pointer-events: none;
+    transition:
+      opacity var(--rv-duration-out) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root :is([data-part="hotkeys-feedback"], [data-part="toast"])[data-visible] {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    transition-duration: var(--rv-duration-in);
+  }
+
+  /* Left in the page while empty, or a screen reader wouldn't announce what appears in it. */
+  .rv-root :is([data-part="hotkeys-feedback"], [data-part="toast"]):empty {
+    padding: 0;
+  }
+
+  /* Timeline preview extras */
+  .rv-root [data-part="thumbnail"] {
+    display: none;
+    background-repeat: no-repeat;
+  }
+
+  .rv-root [data-part="thumbnail"][data-visible] {
+    display: block;
+  }
+
+  .rv-root [data-part="chapter-title"]:empty {
+    display: none;
+  }
+
+  .rv-root [data-part="chapter-title"] {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Muted autoplay */
+  .rv-root [data-part="unmute-chip"] {
+    position: absolute;
+    inset-block-start: calc(var(--rv-control-size) + 26px);
+    inset-inline-start: var(--rv-inset);
+    z-index: 3;
+    width: auto;
+    height: auto;
+    padding: 9px 14px;
+    font-size: 13px;
+    animation: rv-fade var(--rv-duration-out) var(--rv-ease);
+  }
+
+  /* While retrying, a failure is an implementation detail, so show a stall instead. */
+  .rv-root[data-retrying] [data-part="error-overlay"] {
+    display: none;
+  }
+
+  .rv-root[data-retrying] [data-part="buffering"] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Live */
+  .rv-root[data-live] :is([data-part="time"], [data-part="current-time"], [data-part="remaining-time"]) {
+    display: none;
+  }
+
+  .rv-root[data-live]:not([data-dvr]) :is([data-part="timeline"], [data-part="seek-button"]) {
+    display: none;
+  }
+
+  .rv-root[data-live]:not([data-dvr]) [data-position="scrubber"] {
+    display: none;
+  }
+
+  .rv-root[data-live]:not([data-dvr]) [data-part="control-group"]:has(> [data-part="timeline"]) {
+    flex: none;
+    padding-inline: 2px;
+  }
+
+  .rv-root [data-part="live"] {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    width: auto;
+    padding-inline: 10px;
+    color: var(--rv-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: color var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="live"]::before {
+    content: "";
+    position: static;
+    width: 7px;
+    height: 7px;
+    transform: none;
+    border-radius: 50%;
+    background: currentcolor;
+    transition: background var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="live"][data-edge] {
+    color: var(--rv-foreground);
+  }
+
+  .rv-root [data-part="live"][data-edge]::before {
+    background: var(--rv-live, #ff453a);
+  }
+
+  /* Every stream runs a few seconds behind its edge. That isn't worth showing as a gap in the bar. */
+  .rv-root[data-live-edge] [data-part="timeline"]:not([data-dragging]) [data-part="timeline-fill"] {
+    transform: none !important;
+  }
+
+  /* Up next */
+  .rv-root [data-part="up-next"] {
+    position: absolute;
+    inset-block-end: calc(var(--rv-control-size) * var(--rv-scale, 1) + 72px);
+    inset-inline-end: var(--rv-inset);
+    z-index: 3;
+    max-width: min(320px, 80%);
+    padding: 14px 16px;
+    border-radius: var(--rv-menu-radius);
+    animation: rv-fade var(--rv-duration-out) var(--rv-ease);
+  }
+
+  /* The card can't clear what's centred on most players, so it takes the centre, and Cancel gives it back. */
+  @container rv (max-width: 1080px) {
+    .rv-root:not([class*="rv-theme-"]) [data-part="up-next"] {
+      inset: 50% auto auto 50%;
+      width: max-content;
+      translate: -50% -50%;
+    }
+
+    .rv-root:not([class*="rv-theme-"]):has([data-part="up-next"]) :is([data-part="transport"], [data-part="play-overlay"]) {
+      visibility: hidden;
+    }
+  }
+
+  /* No theme has room beside it on a small player. */
+  @container rv (max-width: 560px) {
+    .rv-root [data-part="up-next"] {
+      inset: 50% auto auto 50%;
+      width: max-content;
+      translate: -50% -50%;
+    }
+
+    .rv-root:has([data-part="up-next"]) :is([data-part="play-overlay"], [data-part="title"]) {
+      visibility: hidden;
+    }
+  }
+
+  /* A theme's bar takes the lower half of a phone-sized player. */
+  @container rv (max-width: 400px) {
+    .rv-root[class*="rv-theme-"] [data-part="up-next"] {
+      inset-block-start: 8px;
+      translate: -50% 0;
+    }
+  }
+
+  .rv-root [data-part="up-next-label"] {
+    margin: 0;
+    color: var(--rv-muted);
+    font-size: 12px;
+  }
+
+  .rv-root [data-part="up-next-title"] {
+    margin: 2px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .rv-root [data-part="up-next-actions"] {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .rv-root [data-part="up-next-play"],
+  .rv-root [data-part="up-next-cancel"] {
+    width: auto;
+    height: 32px;
+    padding-inline: 12px;
+    font-size: 13px;
+  }
+
+  .rv-root [data-part="up-next-play"] {
+    background: var(--rv-accent);
+    color: #000;
+  }
+
+  /* Disabled transport buttons */
+  /* The glass stays whole, and only what's on it fades. */
+  .rv-root [data-control][aria-disabled="true"] {
+    cursor: default;
+  }
+
+  .rv-root [data-control][aria-disabled="true"] > svg {
+    opacity: 0.35;
+  }
+
+  /* Casting */
+  .rv-root [data-part="casting"] {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 0.72);
+    font-size: 15px;
+  }
+
+  .rv-root [data-part="casting"] p {
+    margin: 0;
+  }
+
+  .rv-root[data-casting] [data-part="play-overlay"],
+  .rv-root[data-casting] [data-part="buffering"] {
+    display: none;
+  }
+
+  /* Ads */
+  .rv-root [data-part="ad-container"] {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .rv-root[data-ad] [data-part="ad-container"] {
+    pointer-events: auto;
+  }
+
+  .rv-root [data-part="ad-media"] {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+  }
+
+  .rv-root [data-part="ad-overlay"] {
+    position: absolute;
+    --rv-inset-scaled: calc(var(--rv-inset) * var(--rv-inset-scale, 1));
+    inset: auto var(--rv-inset-scaled) calc(var(--rv-inset-scaled) + 48px);
+    z-index: 3;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  /* Nothing but play and the volume applies during an ad, so nothing else shows. */
+  .rv-root[data-ad] [data-part="transport"] > :not([data-part="play-pause"]),
+  .rv-root[data-ad] [data-position="details"],
+  .rv-root[data-ad] [data-position="top"] > [data-part="control-group"]:first-child {
+    visibility: hidden;
+  }
+
+  .rv-root [data-part="ad-label"],
+  .rv-root [data-part="ad-link"] {
+    padding: 8px 12px;
+    border-radius: var(--rv-pill-radius);
+    color: var(--rv-foreground);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    pointer-events: auto;
+  }
+
+  .rv-root [data-part="ad-skip"] {
+    width: auto;
+    height: 34px;
+    margin-inline-start: auto;
+    padding-inline: 16px;
+    background: #fff;
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: auto;
+  }
+
+  .rv-root [data-part="ad-skip"]:disabled {
+    color: var(--rv-muted);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    cursor: default;
+  }
+
+  @media (hover: hover) {
+    .rv-root :is([data-part="ad-skip"]:not(:disabled), [data-part="error-retry"]):hover {
+      background: rgb(255 255 255 / 0.84);
+    }
+  }
+
+  /* The description is there while paused, and folds away once the video plays. */
+  .rv-root [data-part="title-description"] {
+    display: -webkit-box;
+    overflow: hidden;
+    max-width: 62ch;
+    max-height: 2.9em;
+    color: var(--rv-muted);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.42;
+    letter-spacing: -0.003em;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    transition:
+      max-height var(--rv-duration-fade) var(--rv-ease),
+      margin var(--rv-duration-fade) var(--rv-ease),
+      opacity var(--rv-duration-fade) var(--rv-ease);
+  }
+
+  .rv-root[data-playing] [data-part="title-description"] {
+    max-height: 0;
+    margin-block-start: -4px;
+    opacity: 0;
+  }
+
+  /* Skip intro: stays while the controls are hidden, sliding down into the room they leave. */
+  .rv-root [data-part="skip"] {
+    --rv-skip-end: calc(var(--rv-inset) * var(--rv-inset-scale, 1));
+    --rv-skip-above: 106px;
+    position: absolute;
+    inset-block-end: var(--rv-skip-above);
+    inset-inline-end: var(--rv-skip-end);
+    z-index: 3;
+    width: auto;
+    padding-inline: 18px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--rv-duration-out) var(--rv-ease),
+      visibility 0s linear var(--rv-duration-out),
+      translate var(--rv-duration-fade) var(--rv-ease),
+      background-color var(--rv-duration-in) var(--rv-ease),
+      transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="skip"][data-state="visible"] {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .rv-root[data-controls="hidden"] [data-part="skip"] {
+    translate: 0 calc(var(--rv-skip-above) - var(--rv-skip-end));
+  }
+
+  /* Before the first play there's a poster and nothing to skip yet. */
+  .rv-root:not([data-started]) [data-part="skip"][data-state="visible"] {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Panels: sheets over the picture, which carries on playing behind them. */
+  .rv-root [data-part="panel"] {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    outline: 0;
+    cursor: default;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: auto;
+    transition:
+      opacity var(--rv-duration-out) var(--rv-ease),
+      visibility 0s linear var(--rv-duration-out);
+  }
+
+  .rv-root [data-part="panel"][data-state="open"] {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .rv-root [data-part="panel-sheet"] {
+    position: relative;
+    translate: 0 12px;
+    transition: translate var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="panel"][data-state="open"] [data-part="panel-sheet"] {
+    translate: 0 0;
+  }
+
+  @starting-style {
+    .rv-root [data-part="panel"][data-state="open"] {
+      opacity: 0;
+    }
+
+    .rv-root [data-part="panel"][data-state="open"] [data-part="panel-sheet"] {
+      translate: 0 12px;
+    }
+  }
+
+  /* The sheet takes over from the controls, and they're out of the tab order meanwhile. */
+  .rv-root:has([data-part="panel"][data-state="open"]) :is(
+    [data-part="controls"],
+    [data-part="play-overlay"],
+    [data-part="skip"],
+    [data-part="up-next"],
+    [data-part="captions"]
+  ) {
+    --rv-shown: 0;
+    visibility: hidden;
+  }
+
+  .rv-root [data-part="panel-close"] {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: var(--rv-inset);
+    width: 30px;
+    height: 30px;
+    background: rgb(255 255 255 / 0.14);
+    font-size: 14px;
+  }
+
+  .rv-root [data-part="panel-header"] {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 30px;
+    margin-block-end: 8px;
+    padding-inline: var(--rv-inset) calc(var(--rv-inset) + 40px);
+  }
+
+  .rv-root [data-part="panel-title"] {
+    flex: none;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* Episodes */
+  /* Sits at the bottom, but can scroll to its top where text is spaced out in a short player. */
+  .rv-root [data-panel="episodes"] {
+    justify-content: flex-start;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.84), rgb(0 0 0 / 0.68) 55%, rgb(0 0 0 / 0.22));
+  }
+
+  .rv-root [data-panel="episodes"] [data-part="panel-sheet"] {
+    --rv-tile: 180px;
+    margin-block-start: auto;
+    padding-block-end: 12px;
+  }
+
+  .rv-root [data-part="episodes-seasons"] {
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .rv-root [data-part="episodes-season"] {
+    flex: none;
+    height: 28px;
+    padding-inline: 12px;
+    border: 0;
+    border-radius: var(--rv-pill-radius);
+    background: transparent;
+    color: var(--rv-muted);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition:
+      background-color var(--rv-duration-in) var(--rv-ease),
+      color var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="episodes-season"][aria-pressed="true"] {
+    background: var(--rv-foreground);
+    color: #000;
+  }
+
+  .rv-root [data-part="episodes-pager"] {
+    position: relative;
+  }
+
+  .rv-root [data-part="episodes-list"] {
+    --rv-before: 0px;
+    --rv-after: 0px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 4px var(--rv-inset);
+    scroll-padding-inline: var(--rv-inset);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(var(--rv-across, to right), transparent, #000 var(--rv-before), #000 calc(100% - var(--rv-after)), transparent);
+    mask-image: linear-gradient(var(--rv-across, to right), transparent, #000 var(--rv-before), #000 calc(100% - var(--rv-after)), transparent);
+  }
+
+  .rv-root[dir="rtl"] [data-part="episodes-list"] {
+    --rv-across: to left;
+  }
+
+  .rv-root [data-part="episodes-list"][data-more-before] {
+    --rv-before: 40px;
+  }
+
+  .rv-root [data-part="episodes-list"][data-more-after] {
+    --rv-after: 40px;
+  }
+
+  .rv-root [data-part="episodes-list"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rv-root [data-part="episode"] {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    width: var(--rv-tile);
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    scroll-snap-align: start;
+  }
+
+  .rv-root [data-part="episode-thumbnail"] {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    margin-block-end: 7px;
+    border-radius: 10px;
+    outline: 0.5px solid rgb(255 255 255 / 0.16);
+    outline-offset: -0.5px;
+    background: rgb(255 255 255 / 0.08);
+    transition: transform var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="episode-thumbnail"] > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .rv-root [data-part="episode"]:active [data-part="episode-thumbnail"] {
+    transform: scale(0.97);
+  }
+
+  .rv-root [data-part="episode"]:focus-visible [data-part="episode-thumbnail"] {
+    outline: 2px solid var(--rv-focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 0.85);
+  }
+
+  .rv-root [data-part="episode-playing"] {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: rgb(0 0 0 / 0.42);
+  }
+
+  .rv-root [data-part="episode-playing"] > i {
+    width: 3px;
+    height: 16px;
+    border-radius: 2px;
+    background: #fff;
+    transform: scaleY(0.4);
+    animation: rv-playing 760ms ease-in-out infinite alternate;
+  }
+
+  .rv-root [data-part="episode-playing"] > i:nth-child(2) {
+    animation-delay: -420ms;
+  }
+
+  .rv-root [data-part="episode-playing"] > i:nth-child(3) {
+    animation-delay: -180ms;
+  }
+
+  .rv-root[data-paused] [data-part="episode-playing"] > i {
+    animation-play-state: paused;
+  }
+
+  @keyframes rv-playing {
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  /* Runs the same way as the timeline, which doesn't mirror either. */
+  .rv-root [data-part="episode-progress"] {
+    position: absolute;
+    inset: auto 8px 7px;
+    overflow: hidden;
+    height: 3px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.34);
+  }
+
+  .rv-root [data-part="episode-progress"] > span {
+    display: block;
+    height: 100%;
+    background: #fff;
+    transform-origin: left;
+  }
+
+  .rv-root [data-part="episode-title"] {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rv-root [data-part="episode-meta"] {
+    min-height: 1.3em;
+    margin-block-start: 2px;
+    color: var(--rv-muted);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .rv-root [data-part="episode-description"] {
+    display: none;
+  }
+
+  /* Paging is for a mouse. Touch and trackpads scroll, and the keyboard has its arrows. */
+  .rv-root [data-part="episodes-page"] {
+    position: absolute;
+    inset-block-start: calc(var(--rv-tile) * 9 / 32 + 4px);
+    z-index: 1;
+    display: none;
+    width: 34px;
+    height: 34px;
+    background: rgb(40 40 44 / 0.92);
+    box-shadow: var(--rv-rim);
+    font-size: 15px;
+    translate: 0 -50%;
+  }
+
+  .rv-root [data-part="episodes-page"][data-direction="back"] {
+    inset-inline-start: 8px;
+  }
+
+  .rv-root [data-part="episodes-page"][data-direction="forward"] {
+    inset-inline-end: 8px;
+  }
+
+  .rv-root[dir="rtl"] [data-part="episodes-page"] > svg {
+    scale: -1 1;
+  }
+
+  @media (hover: hover) {
+    .rv-root [data-part="skip"]:hover {
+      background: rgb(70 70 74 / 0.72);
+    }
+
+    .rv-root [data-part="panel-close"]:hover,
+    .rv-root [data-part="episodes-page"]:hover {
+      background: rgb(90 90 94 / 0.92);
+    }
+
+    .rv-root [data-part="episodes-season"]:not([aria-pressed="true"]):hover {
+      background: rgb(255 255 255 / 0.12);
+      color: var(--rv-foreground);
+    }
+
+    .rv-root [data-part="episode"]:hover [data-part="episode-thumbnail"] {
+      transform: scale(1.025);
+    }
+
+    .rv-root [data-part="episodes-pager"][data-overflow]:hover > [data-part="episodes-page"],
+    .rv-root [data-part="episodes-pager"][data-overflow] > [data-part="episodes-page"]:focus-visible {
+      display: inline-grid;
+    }
+
+    .rv-root [data-part="episodes-pager"]:has(> [data-part="episodes-list"]:not([data-more-before])) > [data-direction="back"],
+    .rv-root [data-part="episodes-pager"]:has(> [data-part="episodes-list"]:not([data-more-after])) > [data-direction="forward"] {
+      display: none;
+    }
+  }
+
+  /* Info */
+  .rv-root [data-panel="info"] {
+    background: rgb(10 10 12 / 0.62);
+    -webkit-backdrop-filter: blur(28px) saturate(1.5) brightness(0.72);
+    backdrop-filter: blur(28px) saturate(1.5) brightness(0.72);
+  }
+
+  .rv-root [data-panel="info"] [data-part="panel-sheet"] {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .rv-root [data-panel="info"] [data-part="panel-close"] {
+    inset-block-start: 14px;
+    inset-inline-end: 14px;
+  }
+
+  .rv-root [data-part="info-artwork"] {
+    flex: none;
+    width: 30%;
+    max-height: 100%;
+    border-radius: 12px;
+    outline: 0.5px solid rgb(255 255 255 / 0.16);
+    outline-offset: -0.5px;
+    object-fit: cover;
+  }
+
+  /* The fade says there's more to scroll to, and the padding clears it at the very end. */
+  .rv-root [data-part="info-body"] {
+    flex: 1;
+    min-width: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-block-end: 16px;
+    padding-inline-end: 32px;
+    -webkit-mask-image: linear-gradient(to top, transparent, #000 16px);
+    mask-image: linear-gradient(to top, transparent, #000 16px);
+    border-radius: 6px;
+    outline-offset: 2px;
+    scrollbar-color: rgb(255 255 255 / 0.3) transparent;
+    scrollbar-width: thin;
+  }
+
+  .rv-root [data-part="info-body"]:not(:focus-visible) {
+    outline: 0;
+  }
+
+  .rv-root [data-part="info-body"] > p {
+    margin: 0;
+  }
+
+  .rv-root [data-part="info-eyebrow"] {
+    margin-block-end: 5px;
+    color: var(--rv-muted);
+    font-size: 13px;
+  }
+
+  .rv-root [data-part="info-title"] {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.024em;
+    line-height: 1.15;
+  }
+
+  .rv-root [data-part="info-body"] > [data-part="info-facts"] {
+    margin-block-start: 7px;
+    color: var(--rv-muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rv-root [data-part="info-body"] > [data-part="info-description"] {
+    max-width: 62ch;
+    margin-block-start: 12px;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: -0.006em;
+    line-height: 1.5;
+  }
+
+  .rv-root [data-part="info-credits"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px 20px;
+    margin: 16px 0 0;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .rv-root [data-part="info-credits"] dt {
+    margin-block-end: 2px;
+    color: var(--rv-muted);
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .rv-root [data-part="info-credits"] dd {
+    margin: 0;
+  }
+
+  /* Small players drop the slider and shrink. */
+  /* These scale the tokens rather than redeclare them, which would beat a consumer's value. */
+  @container rv (max-width: 479px) {
+    .rv-root > * {
+      --rv-scale: 0.8;
+      --rv-inset-scale: 0.625;
+    }
+
+    .rv-root [data-part="controls"] {
+      gap: 6px;
+    }
+
+    .rv-root [data-part="ad-overlay"] {
+      bottom: calc(var(--rv-inset-scaled) + 28px);
+    }
+
+    /* The times move beside the track, so it all fits on one line. */
+    .rv-root [data-part="control-row"][data-position="scrubber"] {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      margin-block-start: 0;
+    }
+
+    .rv-root [data-position="scrubber"] > [data-part="timeline"] {
+      grid-area: 1 / 2;
+    }
+
+    .rv-root [data-position="scrubber"] > [data-part="current-time"] {
+      grid-area: 1 / 1;
+    }
+
+    .rv-root [data-position="scrubber"] > [data-part="remaining-time"] {
+      grid-area: 1 / 3;
+    }
+
+    .rv-root [data-part="control-row"] > [data-part="timeline"] [data-part="timeline-track"] {
+      height: 6px;
+    }
+
+    .rv-root [data-part="time-separator"],
+    .rv-root [data-part="duration"],
+    .rv-root [data-part="title"] {
+      display: none;
+    }
+
+    /* With no room for a slider, the pill has no reason to grow. */
+    .rv-root [data-part="volume"]:hover [data-part="volume-slider"],
+    .rv-root [data-part="volume"]:focus-within [data-part="volume-slider"] {
+      overflow: hidden;
+      width: 0;
+      opacity: 0;
+    }
+
+    .rv-root [data-part="volume"]:hover,
+    .rv-root [data-part="volume"]:focus-within {
+      padding-inline-end: 0;
+    }
+
+    /* Except for the keyboard, which has no other way to set the volume here. */
+    .rv-root [data-part="volume"]:has(input:focus-visible) [data-part="volume-slider"] {
+      overflow: visible;
+      width: 64px;
+      opacity: 1;
+    }
+
+    .rv-root [data-part="volume"]:has(input:focus-visible) {
+      padding-inline-end: 12px;
+    }
+
+    .rv-root [data-part="control-group"]:has(> [data-part="timeline"]) {
+      gap: 8px;
+      padding-inline: 11px;
+    }
+
+    .rv-root [data-panel="episodes"] [data-part="panel-sheet"] {
+      --rv-tile: 124px;
+      padding-block-end: 8px;
+    }
+
+    .rv-root [data-part="panel-header"] {
+      gap: 8px;
+      margin-block-end: 4px;
+    }
+
+    .rv-root [data-part="panel-title"] {
+      font-size: 14px;
+    }
+
+    .rv-root [data-part="episodes-season"] {
+      height: 26px;
+      padding-inline: 10px;
+      font-size: 12px;
+    }
+
+    .rv-root [data-part="episodes-list"] {
+      gap: 8px;
+    }
+
+    .rv-root [data-part="episode-thumbnail"] {
+      margin-block-end: 4px;
+      border-radius: 8px;
+    }
+
+    .rv-root [data-part="episode-title"] {
+      font-size: 12px;
+    }
+
+    .rv-root [data-part="episode-meta"] {
+      font-size: 11px;
+    }
+
+    /* The centre buttons fill the middle here, and the title's place in the row is free. */
+    .rv-root [data-part="skip"] {
+      --rv-skip-above: 36px;
+      inset-inline: var(--rv-skip-end) auto;
+      height: 34px;
+      padding-inline: 14px;
+      font-size: 13px;
+    }
+
+    .rv-root [data-part="info-artwork"] {
+      display: none;
+    }
+
+    .rv-root [data-panel="info"] [data-part="panel-sheet"] {
+      padding: 14px;
+    }
+
+    .rv-root [data-part="info-title"] {
+      font-size: 18px;
+    }
+
+    /* At this size it needs the full white to read over a bright picture. */
+    .rv-root [data-part="current-time"],
+    .rv-root [data-part="remaining-time"] {
+      color: var(--rv-foreground);
+      font-size: 11px;
+    }
+
+    /* The menu becomes a bottom sheet, placed against the controls instead of its group. */
+    .rv-root [data-part="control-group"]:has([data-part="menu-content"]) {
+      position: static;
+      background: var(--rv-glass-strong);
+      box-shadow: var(--rv-rim);
+      opacity: var(--rv-shown, 1);
+      transition: opacity var(--rv-duration-fade) var(--rv-ease);
+    }
+
+    .rv-root [data-part="control-group"]:has([data-part="menu-content"])::before {
+      display: none;
+    }
+
+    .rv-root [data-part="menu-content"],
+    .rv-root[dir="rtl"] [data-part="menu-content"],
+    .rv-root [data-part="control-group"] [data-part="menu-content"] {
+      inset-inline: 8px;
+      bottom: max(8px, env(safe-area-inset-bottom));
+      width: auto;
+      transform-origin: bottom center;
+    }
+
+    /* The slider that gives this button room is gone, so its tooltip lines up with the edge. */
+    @media (hover: hover) {
+      .rv-root [data-part="control-group"]:last-child > [data-part="volume"] [data-part="mute"][aria-label]::after {
+        inset-inline: auto 0;
+        transform: translate(0, 4px);
+      }
+
+      .rv-root [data-part="control-group"]:last-child > [data-part="volume"] [data-part="mute"][aria-label]:hover::after {
+        transform: translate(0, 0);
+      }
+    }
+
+    /* A sheet covers the bottom of the picture, so what's under it steps aside rather than peek out. */
+    .rv-root:not([data-orientation="portrait"]) [data-part="controls"]:has([data-part="menu-content"][data-state="open"]) [data-position="scrubber"] {
+      --rv-shown: 0;
+    }
+
+    .rv-root:not([data-orientation="portrait"]) [data-part="control-group"]:has(> [data-part="menu-content"][data-state="open"]) {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .rv-root:not([data-orientation="portrait"]) [data-part="control-group"]:has(> [data-part="menu-content"][data-state="open"]) > :not([data-part="menu-content"]) {
+      opacity: 0;
+    }
+  }
+
+  @container rv (min-width: 840px) {
+    .rv-root > * {
+      --rv-scale: 1.158;
+      --rv-inset-scale: 1.375;
+    }
+
+    .rv-root [data-part="control-row"][data-position="scrubber"] {
+      margin-block-start: -2px;
+    }
+
+    .rv-root [data-part="current-time"],
+    .rv-root [data-part="remaining-time"] {
+      font-size: 13px;
+    }
+
+    .rv-root [data-part="title-text"] {
+      font-size: 24px;
+    }
+
+    .rv-root [data-part="title-eyebrow"] {
+      font-size: 14px;
+    }
+
+    .rv-root [data-part="title-description"] {
+      font-size: 15px;
+    }
+
+    .rv-root [data-panel="episodes"] [data-part="panel-sheet"] {
+      --rv-tile: 248px;
+      padding-block-end: 22px;
+    }
+
+    .rv-root [data-part="panel-header"] {
+      min-height: 34px;
+      margin-block-end: 12px;
+    }
+
+    .rv-root [data-part="panel-title"] {
+      font-size: 20px;
+    }
+
+    .rv-root [data-part="panel-close"] {
+      width: 34px;
+      height: 34px;
+    }
+
+    .rv-root [data-part="episode-title"] {
+      font-size: 15px;
+    }
+
+    .rv-root [data-part="episode-meta"] {
+      font-size: 13px;
+    }
+
+    .rv-root [data-part="episode-description"] {
+      display: -webkit-box;
+      overflow: hidden;
+      margin-block-start: 5px;
+      color: var(--rv-muted);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.38;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .rv-root [data-part="skip"] {
+      --rv-skip-above: 122px;
+      padding-inline: 22px;
+      font-size: 15px;
+    }
+
+    .rv-root [data-panel="info"] [data-part="panel-sheet"] {
+      gap: 36px;
+      padding: 44px;
+    }
+
+    .rv-root [data-part="info-title"] {
+      font-size: 34px;
+    }
+
+    .rv-root [data-part="info-body"] > [data-part="info-description"] {
+      font-size: 16px;
+    }
+
+    .rv-root [data-part="info-credits"] {
+      font-size: 14px;
+    }
+
+    /* There's room to leave the volume open, so it never has to be hunted for. */
+    .rv-root [data-part="volume-slider"] {
+      overflow: visible;
+      width: 84px;
+      opacity: 1;
+    }
+
+    .rv-root [data-part="volume"] {
+      gap: 2px;
+      padding-inline-end: 14px;
+    }
+  }
+
+  /* A setting that's on or off ends in a switch. */
+  .rv-root [data-part="menu-item"][role="menuitemcheckbox"]::after {
+    content: "";
+    flex: none;
+    width: 30px;
+    height: 18px;
+    border-radius: var(--rv-pill-radius);
+    background-color: rgb(255 255 255 / 0.2);
+    background-image: radial-gradient(circle closest-side, #fff 94%, transparent);
+    background-position: 2px center;
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    transition:
+      background-color var(--rv-duration-in) var(--rv-ease),
+      background-position var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root [data-part="menu-item"][role="menuitemcheckbox"][aria-checked="true"]::after {
+    background-color: var(--rv-switch-on, #34c759);
+    background-position: calc(100% - 2px) center;
+  }
+
+  .rv-root[dir="rtl"] [data-part="menu-item"][role="menuitemcheckbox"]::after {
+    background-position: calc(100% - 2px) center;
+  }
+
+  .rv-root[dir="rtl"] [data-part="menu-item"][role="menuitemcheckbox"][aria-checked="true"]::after {
+    background-position: 2px center;
+  }
+
+  .rv-root kbd[data-part="menu-item-value"] {
+    font: inherit;
+  }
+
+  /* Ambient light. A shadow is the one thing the root's clipping leaves alone. */
+  .rv-root[data-ambient] {
+    box-shadow:
+      -26px 0 96px -6px color-mix(in srgb, var(--rv-ambient-left, transparent) 78%, transparent),
+      26px 0 96px -6px color-mix(in srgb, var(--rv-ambient-right, transparent) 78%, transparent);
+    transition: box-shadow 900ms linear;
+  }
+
+  /* Mini player */
+  .rv-root[data-mini] {
+    position: fixed;
+    z-index: var(--rv-mini-layer, 50);
+    inset-block: auto max(16px, env(safe-area-inset-bottom));
+    inset-inline: auto max(16px, env(safe-area-inset-right));
+    width: var(--rv-mini-width, min(360px, 62vw));
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 0.5px rgb(255 255 255 / 0.14),
+      0 18px 48px rgb(0 0 0 / 0.42);
+    animation: rv-mini-in var(--rv-duration-out) var(--rv-ease);
+  }
+
+  .rv-root[data-mini^="top"] {
+    inset-block: max(16px, env(safe-area-inset-top)) auto;
+  }
+
+  .rv-root[data-mini$="start"] {
+    inset-inline: max(16px, env(safe-area-inset-left)) auto;
+  }
+
+  @keyframes rv-mini-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+    }
+  }
+
+  /* Floating, the corners only offer the way back and the way out. */
+  .rv-root[data-mini] [data-position="top"] [data-control]:not([data-part^="mini-"]),
+  .rv-root[data-mini] [data-position="top"] [data-part="volume"],
+  .rv-root[data-mini] [data-position="details"] {
+    display: none;
+  }
+
+  /* On a phone the corner is too small for three round buttons. */
+  @container rv (max-width: 300px) {
+    .rv-root[data-mini] [data-part="seek-button"] {
+      display: none;
+    }
+  }
+
+  [data-part="mini-slot"] {
+    border-radius: var(--rv-radius, 20px);
+    background: rgb(128 128 128 / 0.1);
+  }
+
+  /* Fit */
+  .rv-root[data-fit="cover"] [data-part="media"] {
+    object-fit: cover;
+  }
+
+  /* Loop */
+  .rv-root [data-part="loop-range"] {
+    position: absolute;
+    inset-block: 0;
+    background: var(--rv-loop-range, rgb(255 214 10 / 0.86));
+    pointer-events: none;
+  }
+
+  /* Actions under a radio group line up with its labels. */
+  .rv-root [data-part="menu-item"][data-inset] {
+    padding-inline-start: 34px;
+  }
+
+  .rv-root [data-part="menu-divider"] {
+    flex: none;
+    height: 0.5px;
+    margin-block: 5px;
+    margin-inline: 34px 10px;
+    background: rgb(255 255 255 / 0.16);
+  }
+
+  /* Keyboard shortcuts */
+  .rv-root [data-panel="shortcuts"] {
+    background: rgb(10 10 12 / 0.62);
+    -webkit-backdrop-filter: blur(28px) saturate(1.5) brightness(0.72);
+    backdrop-filter: blur(28px) saturate(1.5) brightness(0.72);
+  }
+
+  .rv-root [data-panel="shortcuts"] [data-part="panel-sheet"] {
+    position: absolute;
+    inset: 0;
+  }
+
+  .rv-root [data-panel="shortcuts"] [data-part="panel-close"] {
+    inset-block-start: 14px;
+    inset-inline-end: 14px;
+  }
+
+  .rv-root [data-part="shortcuts-body"] {
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 24px;
+    scrollbar-color: rgb(255 255 255 / 0.3) transparent;
+    scrollbar-width: thin;
+  }
+
+  .rv-root [data-part="shortcuts-body"]:not(:focus-visible) {
+    outline: 0;
+  }
+
+  .rv-root [data-part="shortcuts-title"] {
+    margin: 0;
+    margin-block-end: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 30px;
+  }
+
+  .rv-root [data-part="shortcuts-list"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+    gap: 2px 28px;
+    margin: 0;
+  }
+
+  .rv-root [data-part="shortcut"] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 32px;
+  }
+
+  .rv-root [data-part="shortcut-name"] {
+    color: var(--rv-muted);
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .rv-root [data-part="shortcut-keys"] {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    color: var(--rv-muted);
+    direction: ltr;
+  }
+
+  .rv-root [data-part="shortcut-key"] {
+    display: inline-grid;
+    place-items: center;
+    min-width: 24px;
+    height: 24px;
+    padding-inline: 6px;
+    border-radius: 7px;
+    background: rgb(255 255 255 / 0.13);
+    box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.14);
+    color: var(--rv-foreground);
+    font: 500 12px/1 var(--rv-font);
+  }
+
+  /* Stats */
+  .rv-root [data-part="stats"] {
+    position: absolute;
+    inset-block-start: var(--rv-inset);
+    inset-inline-start: var(--rv-inset);
+    z-index: 5;
+    overflow-y: auto;
+    width: min(290px, calc(100% - var(--rv-inset) * 2));
+    max-height: calc(100% - var(--rv-inset) * 2);
+    padding: 14px 16px 12px;
+    border-radius: var(--rv-menu-radius);
+    font-size: 12px;
+    line-height: 1.35;
+    scrollbar-width: none;
+    animation: rv-fade var(--rv-duration-in) var(--rv-ease);
+    transition: opacity var(--rv-duration-in) var(--rv-ease);
+  }
+
+  .rv-root [data-part="stats"][data-state="closed"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .rv-root [data-part="stats-title"] {
+    margin: 0 0 9px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .rv-root [data-part="stats-list"] {
+    display: grid;
+    gap: 5px;
+    margin: 0;
+  }
+
+  .rv-root [data-part="stats-row"] {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .rv-root [data-part="stats-row"][hidden] {
+    display: none;
+  }
+
+  .rv-root [data-part="stats-row"] > dt {
+    color: var(--rv-muted);
+  }
+
+  .rv-root [data-part="stats-row"] > dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  .rv-root [data-part="stats-actions"] {
+    display: flex;
+    gap: 6px;
+    margin-top: 11px;
+  }
+
+  .rv-root [data-part="stats-action"] {
+    flex: 1;
+    width: auto;
+    height: 28px;
+    background: rgb(255 255 255 / 0.13);
+    font-size: 12px;
+  }
+
+  /* A small player has no height for a column, so the rows share the width. */
+  @container rv (max-width: 479px) {
+    .rv-root [data-part="stats"] {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 7px 10px;
+      inset-block-start: 6px;
+      inset-inline-start: 6px;
+      width: calc(100% - 12px);
+      max-height: calc(100% - 12px);
+      padding-block: 8px 11px;
+      padding-inline: 13px 8px;
+      font-size: 11px;
+    }
+
+    .rv-root [data-part="stats-title"] {
+      margin: 0;
+      font-size: 12px;
+    }
+
+    .rv-root [data-part="stats-list"] {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(2, auto);
+      gap: 4px 14px;
+      padding-inline-end: 5px;
+    }
+
+    .rv-root [data-part="stats-row"] {
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .rv-root [data-part="stats-row"] > dd {
+      flex: none;
+    }
+
+    .rv-root [data-part="stats-actions"] {
+      margin: 0;
+    }
+
+    .rv-root [data-part="stats-action"] {
+      flex: none;
+      height: 26px;
+      padding-inline: 11px;
+      font-size: 11px;
+    }
+
+    /* The panel reaches these rows, and they'd only show as slivers under its edge. */
+    .rv-root[data-stats] :is([data-position="top"], [data-position="details"]) {
+      visibility: hidden;
+    }
+  }
+
+  /* Transcript. It usually lives outside the player, so it takes its colours from the page. */
+  [data-part="transcript"] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: var(--rv-transcript-height, 320px);
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+
+  [data-part="transcript-list"] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 0;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  /* Lines stay quiet with no fill of their own, so only the current one stands out. */
+  [data-part="transcript-cue"] {
+    display: grid;
+    grid-template-columns: 2.6em minmax(0, 1fr);
+    align-items: baseline;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: color-mix(in srgb, currentColor 76%, transparent);
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition:
+      background-color 160ms cubic-bezier(0.32, 0.72, 0, 1),
+      color 160ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  [data-part="transcript-cue"]:focus-visible {
+    /* Off the player it sits on the page's own colours, so it takes the text's. */
+    outline: 2px solid var(--rv-focus, currentColor);
+    outline-offset: -2px;
+  }
+
+  [data-part="transcript-cue"][aria-current="true"] {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    color: inherit;
+  }
+
+  @media (hover: hover) {
+    [data-part="transcript-cue"]:hover {
+      background: color-mix(in srgb, currentColor 5%, transparent);
+      color: inherit;
+    }
+
+    [data-part="transcript-cue"][aria-current="true"]:hover {
+      background: color-mix(in srgb, currentColor 10%, transparent);
+    }
+  }
+
+  [data-part="transcript-time"] {
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  [data-part="transcript-resume"] {
+    position: absolute;
+    inset-block-end: 10px;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, CanvasText 88%, transparent);
+    color: Canvas;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* A narrow player usually has no room for a title, but a tall one has plenty. */
+  .rv-root[data-orientation="portrait"] [data-part="title"] {
+    display: flex;
+  }
+
+  /* A tall player has room above its button too, so its menu stays a popover and not a sheet. */
+  @container rv (max-width: 479px) {
+    .rv-root[data-orientation="portrait"] [data-part="control-group"]:has([data-part="menu-content"]) {
+      position: relative;
+      background: none;
+      box-shadow: none;
+      opacity: 1;
+    }
+
+    .rv-root[data-orientation="portrait"] [data-part="control-group"]:has([data-part="menu-content"])::before {
+      display: block;
+    }
+
+    .rv-root[data-orientation="portrait"] [data-part="control-group"] [data-part="menu-content"] {
+      inset-inline: auto 0;
+      bottom: calc(100% + 8px);
+      width: min(240px, 100cqw - var(--rv-inset-scaled) * 2);
+      transform-origin: bottom right;
+    }
+
+    .rv-root[data-orientation="portrait"][dir="rtl"] [data-part="control-group"] [data-part="menu-content"] {
+      transform-origin: bottom left;
+    }
+  }
+
+  /* A tall player is narrow because of its shape, so a mouse still gets a volume slider. */
+  @media (hover: hover) {
+    .rv-root[data-orientation="portrait"] [data-part="volume-slider"] {
+      display: block;
+    }
+
+    .rv-root[data-orientation="portrait"] [data-part="volume"]:hover [data-part="volume-slider"],
+    .rv-root[data-orientation="portrait"] [data-part="volume"]:focus-within [data-part="volume-slider"] {
+      width: 64px;
+    }
+
+    .rv-root[data-orientation="portrait"] [data-part="volume"]:hover,
+    .rv-root[data-orientation="portrait"] [data-part="volume"]:focus-within {
+      padding-inline-end: 12px;
+    }
+  }
+
+  /* Reduced transparency: solid surfaces, with nothing moving behind the text. */
+  @media (prefers-reduced-transparency: reduce) {
+    /* Repeated to outrank a theme's own tokens, since the viewer's preference comes first. */
+    .rv-root.rv-root.rv-root {
+      --rv-glass: rgb(38 38 40);
+      --rv-glass-strong: rgb(28 28 30);
+      --rv-glass-hover: rgb(62 62 64);
+      --rv-glass-filter: none;
+      --rv-caption-background: #000;
+    }
+
+    .rv-root * {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+
+    .rv-root :is([data-part="panel"], [data-part="error-overlay"], [data-part="stats"]) {
+      background: var(--rv-glass-strong);
+    }
+  }
+
+  /* More contrast: darker behind everything, and nothing dimmed. */
+  @media (prefers-contrast: more) {
+    .rv-root.rv-root.rv-root {
+      --rv-muted: #fff;
+      --rv-glass: rgb(0 0 0 / 0.72);
+      --rv-glass-strong: rgb(0 0 0 / 0.9);
+      --rv-glass-hover: rgb(70 70 74 / 0.92);
+      --rv-track: rgb(255 255 255 / 0.5);
+      --rv-buffered: rgb(255 255 255 / 0.68);
+      --rv-caption-background: #000;
+    }
+
+    .rv-root [data-part="controls"]::before,
+    .rv-root [data-part="controls"]:has([data-part="title"])::before {
+      background: linear-gradient(rgb(0 0 0 / 0.66), rgb(0 0 0 / 0.36) 30%, rgb(0 0 0 / 0.36) 52%, rgb(0 0 0 / 0.86)) !important;
+    }
+
+    .rv-root [data-control]:focus-visible,
+    .rv-root [data-part="timeline"]:has(input:focus-visible) [data-part="timeline-track"],
+    .rv-root [data-part="volume-slider"]:has(input:focus-visible) [data-part="volume-track"] {
+      outline-width: 3px;
+    }
+
+    .rv-root [data-part="mute"][data-level="muted"] > svg {
+      opacity: 1;
+    }
+  }
+
+  /* Forced colours: the browser removes every background, which is all a slider's fill is,
+     so those use system colours. Anything else with no outline of its own gets a border. */
+  @media (forced-colors: active) {
+    .rv-root :is([data-part="timeline-track"], [data-part="volume-track"]) {
+      forced-color-adjust: none;
+      background: Canvas !important;
+      box-shadow: 0 0 0 1px CanvasText;
+    }
+
+    .rv-root :is([data-part="timeline-fill"], [data-part="volume-fill"]) {
+      forced-color-adjust: none;
+      background: Highlight !important;
+    }
+
+    .rv-root [data-part="timeline-buffered"] {
+      forced-color-adjust: none;
+      background: GrayText !important;
+    }
+
+    .rv-root :is([data-part="timeline-thumb"], [data-part="volume-thumb"]) {
+      forced-color-adjust: none;
+      background: CanvasText !important;
+    }
+
+    /* A dark glyph with nothing behind it would disappear into a dark picture. */
+    .rv-root [data-control] {
+      border: 1px solid ButtonText;
+      background: ButtonFace !important;
+      color: ButtonText !important;
+    }
+
+    .rv-root [data-control] > svg {
+      filter: none !important;
+    }
+
+    .rv-root :is([aria-pressed="true"], [aria-current="true"]),
+    [data-part="transcript-cue"][aria-current="true"] {
+      forced-color-adjust: none;
+      background: Highlight !important;
+      color: HighlightText !important;
+    }
+
+    .rv-root :is([data-part="menu-content"], [data-part="panel-sheet"], [data-part="stats"], [data-part="up-next"], [data-part="caption-line"]) {
+      border: 1px solid CanvasText;
+    }
+
+    .rv-root [data-control]:focus-visible,
+    .rv-root [data-part="timeline"]:has(input:focus-visible) [data-part="timeline-track"],
+    .rv-root [data-part="volume-slider"]:has(input:focus-visible) [data-part="volume-track"],
+    .rv-root [data-part="menu-content"] [role^="menuitem"]:focus-visible,
+    .rv-root [data-part="episode"]:focus-visible [data-part="episode-thumbnail"],
+    [data-part="transcript-cue"]:focus-visible {
+      outline: 3px solid Highlight !important;
+      box-shadow: none !important;
+    }
+  }
+
+  /* Reduced motion: no movement, just quick fades. */
+  @media (prefers-reduced-motion: reduce) {
+    .rv-root,
+    .rv-root * {
+      --rv-duration-in: 120ms;
+      --rv-duration-out: 120ms;
+      --rv-duration-press: 0ms;
+      --rv-duration-fade: 120ms;
+    }
+
+    .rv-root [data-part="controls"],
+    .rv-root [data-control],
+    .rv-root [data-control] > svg,
+    .rv-root [data-part="menu-content"],
+    .rv-root [data-part="menu-panel"],
+    .rv-root [data-part="play-overlay"],
+    .rv-root [data-part="timeline-thumb"] {
+      transform: none !important;
+      transition-property: opacity, background-color, visibility;
+    }
+
+    .rv-root :is([data-part="panel-sheet"], [data-part="skip"]) {
+      translate: none !important;
+    }
+
+    .rv-root [data-part="episode-thumbnail"] {
+      transform: none !important;
+    }
+
+    .rv-root [data-part="timeline-buffered"] {
+      transition: none;
+    }
+
+    .rv-root [data-control]::after,
+    .rv-root :is([data-part="hotkeys-feedback"], [data-part="toast"]) {
+      transition-property: opacity !important;
+    }
+
+    .rv-root [data-part="captions"] {
+      transition: none;
+    }
+
+    .rv-root [data-part="episode-playing"] > i {
+      animation: none;
+    }
+
+    .rv-root [data-part="mute"] [data-wave] {
+      transition-property: opacity;
+    }
+
+    .rv-root [data-part="timeline-track"] {
+      transition: none;
+    }
+
+    .rv-root [data-part="buffering"] > svg {
+      animation-duration: 2400ms;
+    }
+
+    .rv-root [data-part="seek-feedback"][data-active] > span::before {
+      animation-name: rv-fade;
+    }
+
+    .rv-root[data-mini] {
+      animation-name: rv-fade;
+    }
+
+    [data-part="transcript-cue"] {
+      transition: none;
+    }
+  }
+}

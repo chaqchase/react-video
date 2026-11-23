@@ -1,0 +1,69 @@
+---
+title: Media Session
+description: Connects the lock screen, notification, and hardware media keys to the player.
+---
+
+<PluginSummary id="media-session" />
+
+Tells the browser what's playing through the [Media Session API](https://developer.mozilla.org/docs/Web/API/Media_Session_API), and lets the system's media controls drive the player. Press Play in the demo, then try your system's media controls. The line under the player shows what the browser has been told.
+
+<Demo slug="media-session" />
+
+## Usage
+
+```tsx
+import { mediaSession } from "react-video-kit/media-session";
+import { VideoPlayer } from "react-video-kit/player";
+
+const plugins = [
+  mediaSession({
+    metadata: {
+      title: "First light",
+      artist: "Ridge Films",
+      album: "The long ridge",
+      artwork: [{ src: "/art.jpg", sizes: "512x512", type: "image/jpeg" }],
+    },
+  }),
+];
+
+<VideoPlayer src="/video.mp4" plugins={plugins} />;
+```
+
+`seekStep` sets how many seconds the system's skip buttons move, and defaults to 10:
+
+```tsx
+mediaSession({ seekStep: 30 });
+```
+
+`metadata` can also be a function of the source. It runs when the player claims the session, and again each time the source changes while the player owns it:
+
+```tsx
+mediaSession({
+  metadata: (source) => ({ title: source.src }),
+});
+```
+
+## What the system gets
+
+The browser decides how much of this to show.
+
+- **What's playing:** the `title`, `artist`, `album`, and `artwork` you give it.
+- **Whether it's playing:** `playbackState`, as `playing` or `paused`.
+- **Where it is:** duration, rate, and position, updated when the duration, rate, or seeking state changes. Streams with no finite duration, such as live ones, don't send this.
+- **What it can do:** handlers for `play`, `pause`, `seekbackward`, `seekforward`, and `seekto`. The skip buttons use the offset the system sends, or `seekStep` if it sends none. The seek handlers do nothing when the player can't seek, as on plain live or during an ad, though the system may still show the buttons.
+
+There are no handlers for `previoustrack` or `nexttrack`, so these buttons don't move through a [playlist](/docs/v4/plugins/playlist).
+
+## Behaviour
+
+- Nothing changes in the browser until a player first plays. Then that player claims the session.
+- A page has one media session, so the player that most recently played owns it. The other players stay as they are.
+- A player with no `metadata` clears what the previous owner set.
+- When the owning player unmounts, it clears its handlers and metadata and sets the state to `none`.
+- Actions a browser doesn't know are skipped, and so are positions it rejects.
+- Where the API doesn't exist, the plugin does nothing and the player works as usual.
+- Actions go through the player's commands, so they respect anything locking them, such as an [ad](/docs/v4/plugins/ads).
+
+## API
+
+<PluginApi id="media-session" />
