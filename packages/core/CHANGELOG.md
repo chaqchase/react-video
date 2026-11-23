@@ -4,7 +4,16 @@
 
 ### Major Changes
 
-- b2a1ee3: Rebuild the player around a small kernel and opt-in plugins. See the [migration guide](https://react-video-kit.chaqchase.com/docs/v4/migration).
+- b2a1ee3: React Video Kit is rebuilt around a small kernel and opt-in plugins.
+
+  - **Compose at any level:** a ready-made player, styled parts, or headless primitives.
+  - **Pay for what you use:** HLS, DASH, live, captions, playlists, AirPlay, Chromecast, ads, DRM, and analytics are each their own import.
+  - **No re-renders during playback:** time never enters React state.
+  - **New look:** a default skin, themes, and vertical video.
+  - **Typed error codes** for every failure path.
+  - **ESM only.**
+
+  Upgrading from 3.x? Read the [migration guide](https://react-video-kit.chaqchase.com/docs/v4/migration).
 
 ## 3.0.1
 
