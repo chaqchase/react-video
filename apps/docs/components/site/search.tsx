@@ -2,11 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
-import type { SearchEntry } from "@/lib/docs/search";
+import { search, type SearchEntry } from "@/lib/docs/search";
 import { SearchIcon } from "./icons";
 
 const subscribe = () => () => {};
 const isApple = () => /Mac|iPhone|iPad/.test(navigator.platform);
+
+let index: Promise<SearchEntry[]> | undefined;
+/** Fetched on the first query and kept, so later ones rank without the network. A failed fetch tries again next time. */
+const loadIndex = () =>
+  (index ??= fetch("/search-index.json")
+    .then((response) => {
+      if (!response.ok) throw new Error(`Search index: ${response.status}`);
+      return response.json() as Promise<SearchEntry[]>;
+    })
+    .catch((error: unknown) => {
+      index = undefined;
+      throw error;
+    }));
 
 /** The docs in one box, on every page. It opens with the button, or with ⌘K from anywhere. */
 export function Search() {
@@ -35,21 +48,18 @@ export function Search() {
 
   useEffect(() => {
     if (!trimmed) return;
-    const controller = new AbortController();
-    const timer = setTimeout(() => {
-      fetch(`/api/search?query=${encodeURIComponent(trimmed)}`, { signal: controller.signal })
-        .then((response) => response.json() as Promise<SearchEntry[]>)
-        .then((next) => {
-          setFound({ query: trimmed, results: next });
-          setActive(0);
-        })
-        .catch(() => {
-          // A newer query took over, or the network dropped and the old results still stand.
-        });
-    }, 80);
+    let current = true;
+    loadIndex()
+      .then((entries) => {
+        if (!current) return;
+        setFound({ query: trimmed, results: search(entries, trimmed) });
+        setActive(0);
+      })
+      .catch(() => {
+        // The network dropped, and the old results still stand.
+      });
     return () => {
-      clearTimeout(timer);
-      controller.abort();
+      current = false;
     };
   }, [trimmed]);
 

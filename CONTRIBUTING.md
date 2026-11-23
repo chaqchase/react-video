@@ -56,3 +56,19 @@ Changesets drives releases, and `release.yml` publishes with npm trusted publish
 - `main` is v4, and publishes to `latest`. There's no pre-release mode.
 - `v3` maintains 3.x. Publish from it with `--tag v3`, so a patch never takes `latest` from v4.
 - Cherry-pick between branches; never merge them.
+
+## Deploying the docs
+
+The site is one Cloudflare Worker, `react-video-kit-docs`, served at `react-video-kit.chaqchase.com` and deployed with the `cf` CLI. OpenNext builds the Next.js app in `apps/docs`, and `apps/docs/cloudflare` deploys it. That folder is its own package so `cf` doesn't detect Next.js and run its own build. Its `worker.mjs` wraps OpenNext's handler to:
+
+- redirect the old `react-vide-kit.chaqchase.com` to the new domain
+- answer byte ranges for `/media/*`, which static assets don't, and which Safari needs to play video
+
+To deploy:
+
+- Run `pnpm media` first. `public/media` is gitignored, and the demos ship without it.
+- Log in once with `pnpm --filter docs-cloudflare exec cf auth login`.
+- From `apps/docs`, run `pnpm run deploy`. It builds for Cloudflare, then runs `cf deploy`. Use `pnpm run`, because `pnpm deploy` is a built-in pnpm command.
+- To check without uploading, run `pnpm build:cloudflare`, then `pnpm run deploy --dry-run` in `apps/docs/cloudflare`.
+
+Pages must stay prerendered. The Worker has no filesystem, so a route that reads `content/` or `examples/` at request time fails there, even though `next start` serves it.

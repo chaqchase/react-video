@@ -1,4 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
+import { search, type SearchEntry } from "../lib/docs/search";
 import { expect, test, type Page } from "./test";
 
 const noErrors = (page: Page) => {
@@ -217,8 +218,9 @@ test.describe("docs", () => {
       ["dash", "/docs/v4/plugins/dash"],
       ["theming", "/docs/v4/theming"],
     ];
+    const entries = (await (await request.get("/search-index.json")).json()) as SearchEntry[];
     for (const [query, url] of queries) {
-      const results = await (await request.get(`/api/search?query=${query}`)).json();
+      const results = search(entries, query);
       expect(results[0]?.url, query).toBe(url);
     }
     await page.goto("/docs/v4");

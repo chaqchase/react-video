@@ -26,5 +26,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "public"]
+  "exclude": ["node_modules", "public", ".open-next", "cloudflare"]
 }

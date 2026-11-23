@@ -1,9 +1,13 @@
 packages:
   - "apps/*"
   - "packages/*"
+  # The docs site's Worker, kept apart from `apps/docs` so `cf` doesn't detect Next.js and rebuild it.
+  - "apps/docs/cloudflare"
 
 allowBuilds:
   esbuild: true
+  # Wrangler runs the site locally on it, and its install script fetches the binary.
+  workerd: true
 
 minimumReleaseAgeExclude:
   - '@rollup/rollup-android-arm-eabi@4.67.5'

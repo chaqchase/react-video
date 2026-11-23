@@ -1,0 +1,12 @@
+{
+  "name": "docs-cloudflare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "cf deploy"
+  },
+  "devDependencies": {
+    "cf": "1.0.0-rc.2",
+    "wrangler": "4.166.0"
+  }
+}

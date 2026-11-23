@@ -1,5 +1,5 @@
-import { getPages, type DocPage } from "./content";
-import { createSlugger } from "./slug";
+// Ranking only, with no filesystem access, so the browser can run it on the index
+// that `search-index.ts` builds when the site does.
 
 export interface SearchEntry {
   url: string;
@@ -10,31 +10,6 @@ export interface SearchEntry {
 
 const PER_PAGE = 3;
 const LIMIT = 24;
-
-/** Prose only. Code, tags, and link targets would match words nobody is reading. */
-const plain = (source: string) =>
-  source
-    .replace(/<[^>]+>/g, " ")
-    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/[`*_|]/g, "")
-    .replace(/^[-:\s]+$/gm, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-function entriesFor(page: DocPage): SearchEntry[] {
-  const slug = createSlugger();
-  const prose = page.body.replace(/^ *```[\s\S]*?^ *```/gm, "");
-  const sections = prose.split(/^(?=#{2,3}\s)/m);
-  const lead = /^#{2,3}\s/.test(sections[0] ?? "") ? "" : (sections.shift() ?? "");
-  return [
-    { url: page.url, page: page.title, text: plain(`${page.description} ${lead}`).slice(0, 240) },
-    ...sections.map((section) => {
-      const [line = "", ...rest] = section.split("\n");
-      const heading = plain(line.replace(/^#+\s*/, ""));
-      return { url: `${page.url}#${slug(heading)}`, page: page.title, heading, text: plain(rest.join(" ")).slice(0, 240) };
-    }),
-  ];
-}
 
 /** Lower comes first. The slug counts too, because a page can be titled differently: Keyboard is `hotkeys`. */
 function rank({ page, heading, text, url }: SearchEntry, query: string, words: string[]) {
@@ -59,12 +34,11 @@ function rank({ page, heading, text, url }: SearchEntry, query: string, words: s
 }
 
 /** A plain scored filter, since the index is small. */
-export function search(input: string) {
+export function search(entries: SearchEntry[], input: string) {
   const query = input.trim().toLowerCase();
   if (!query) return [];
   const words = query.split(/\s+/);
-  const scored = getPages()
-    .flatMap(entriesFor)
+  const scored = entries
     .flatMap((entry) => {
       const score = rank(entry, query, words);
       return score === null ? [] : [{ entry, score }];

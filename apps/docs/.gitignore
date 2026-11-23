@@ -5,3 +5,6 @@
 /playwright-report/
 next-env.d.ts
 *.tsbuildinfo
+/.open-next/
+/.wrangler/
+/cloudflare/.cloudflare/
