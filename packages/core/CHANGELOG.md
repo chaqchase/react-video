@@ -1,5 +1,11 @@
 # react-video-kit
 
+## 3.0.1
+
+### Patch Changes
+
+- 94e111c: Fix package metadata: point `repository` and `bugs` at the correct GitHub repo, list the licence file correctly in `files`, resolve separate types for ESM and CJS, and raise the `motion` peer to `>=11.11.12`, the first version that exports `motion/react`, which this package imports.
+
 ## 3.0.0
 
 ### Major Changes
@@ -76,7 +82,6 @@ If your app compiled the library’s Tailwind directives at build time:
   This is a major release marking the rename of the package from `@triyanox/react-video` to `react-video-kit`.
 
   ## Breaking Changes
-
   - Package name changed from `@triyanox/react-video` to `react-video-kit`
   - Import statements must be updated:
     ```diff
@@ -90,13 +95,11 @@ If your app compiled the library’s Tailwind directives at build time:
     ```
 
   ## Migration Guide
-
   1. Uninstall the old package: `npm uninstall @triyanox/react-video`
   2. Install the new package: `npm install react-video-kit`
   3. Update all import statements in your code from `@triyanox/react-video` to `react-video-kit'
 
   ## Repository Updates
-
   - GitHub repository: `chaqchase/video-kit` (previously `triyanox/react-video`)
   - Homepage: `https://react-vide-kit.chaqchase.com`
 
@@ -107,7 +110,6 @@ If your app compiled the library’s Tailwind directives at build time:
   This is a major release marking the rename of the package from `@triyanox/react-video` to `video-kit`.
 
   ## Breaking Changes
-
   - Package name changed from `@triyanox/react-video` to `video-kit`
   - Import statements must be updated:
     ```diff
@@ -121,13 +123,11 @@ If your app compiled the library’s Tailwind directives at build time:
     ```
 
   ## Migration Guide
-
   1. Uninstall the old package: `npm uninstall @triyanox/react-video`
   2. Install the new package: `npm install video-kit`
   3. Update all import statements in your code from `@triyanox/react-video` to `video-kit`
 
   ## Repository Updates
-
   - GitHub repository: `chaqchase/video-kit` (previously `triyanox/react-video`)
   - Homepage: `https://react-vide-kit.chaqchase.com`
 
