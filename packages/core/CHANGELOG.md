@@ -1,5 +1,11 @@
 # react-video-kit
 
+## 4.0.0
+
+### Major Changes
+
+- b2a1ee3: Rebuild the player around a small kernel and opt-in plugins. See the [migration guide](https://react-video-kit.chaqchase.com/docs/v4/migration).
+
 ## 3.0.1
 
 ### Patch Changes
